@@ -13,7 +13,6 @@ import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
-import javax.validation.constraints.NotNull;
 
 @Entity
 public class Node implements Serializable {
@@ -39,7 +38,6 @@ public class Node implements Serializable {
 	}
 
 	/** the main IP of the node */
-	@NotNull
 	private InetAddress mainIp = null;
 
 	/**

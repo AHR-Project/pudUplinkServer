@@ -9,7 +9,6 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToOne;
-import javax.validation.constraints.NotNull;
 
 import org.olsr.plugin.pud.PositionUpdate;
 
@@ -37,7 +36,6 @@ public class NodePosition implements Serializable {
 	}
 
 	/** the main IP of the node */
-	@NotNull
 	private InetAddress mainIp = null;
 
 	/**
@@ -92,7 +90,6 @@ public class NodePosition implements Serializable {
 	}
 
 	/** the position update uplink message */
-	@NotNull
 	private PositionUpdate positionUpdate = null;
 
 	/**
