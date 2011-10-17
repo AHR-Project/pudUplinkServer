@@ -22,6 +22,7 @@
 		<config>src/main/resources/META-INF/spring/relayServers.xml</config>
 		<config>src/main/resources/META-INF/spring/stopHandler.xml</config>
 		<config>src/main/resources/META-INF/spring/relayServerConfiguration.xml</config>
+		<config>src/main/resources/META-INF/spring/faker.xml</config>
 	</configs>
 	<configSets>
 	</configSets>

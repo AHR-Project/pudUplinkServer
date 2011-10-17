@@ -22,6 +22,7 @@
 		<project.dist.directory>dist</project.dist.directory>
 		<project.libdir>libs</project.libdir>
 		<project.scripts.directory>scripts</project.scripts.directory>
+		<project.spring.directory>src/main/resources/META-INF/spring</project.spring.directory>
 
 		<project.wireformat.dir>../nbsolsrd/lib/pud/wireformat-java/lib</project.wireformat.dir>
 		<project.wireformat.so>libOlsrdPudWireFormatJava.so</project.wireformat.so>
@@ -195,6 +196,26 @@
 				<version>1.3.9</version>
 				<executions>
 					<execution>
+						<id>replace-faker-use</id>
+						<phase>validate</phase>
+						<goals>
+							<goal>replace</goal>
+						</goals>
+						<configuration>
+							<file>${project.spring.directory}/private.properties</file>
+							<regexFlags>
+								<regexFlag>MULTILINE</regexFlag>
+							</regexFlags>
+							<replacements>
+								<replacement>
+									<token>^\s*faker\.use\s*=.*</token>
+									<value>faker.use=false</value>
+								</replacement>
+							</replacements>
+						</configuration>
+					</execution>
+					<execution>
+						<id>replace-relayserver-script-vars</id>
 						<phase>package</phase>
 						<goals>
 							<goal>replace</goal>

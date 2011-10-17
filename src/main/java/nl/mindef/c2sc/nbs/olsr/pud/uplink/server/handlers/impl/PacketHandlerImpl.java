@@ -8,6 +8,7 @@ import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.domainmodel.RelayServer;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.handlers.ClusterLeaderHandler;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.handlers.PacketHandler;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.handlers.PositionUpdateHandler;
+import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.handlers.impl.debug.Faker;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.util.Util;
 
 import org.apache.log4j.Level;
@@ -62,123 +63,25 @@ public class PacketHandlerImpl implements PacketHandler {
 	 * Fake data
 	 */
 
-	private enum MSGTYPE {
-		PU, CL
-	};
+	private boolean useFaker = false;
 
-	static private boolean firstFake = true;
+	/**
+	 * @param useFaker
+	 *            the useFaker to set
+	 */
+	public final void setUseFaker(boolean useFaker) {
+		this.useFaker = useFaker;
+	}
 
-	private void fakeit(MSGTYPE type, long utcTimestamp, Object msg,
-			RelayServer relayServer) {
-		if (!firstFake) {
-			return;
-		}
+	private Faker faker = null;
 
-		byte[] clmsg = null;
-		byte[] pumsg = null;
-		int initialNetwork = 0;
-		byte initialNode = 1;
-		if (type == MSGTYPE.PU) {
-			pumsg = ((PositionUpdate) msg).getData();
-			initialNetwork = pumsg[10];
-			initialNode = pumsg[11];
-		} else if (type == MSGTYPE.CL) {
-			clmsg = ((ClusterLeader) msg).getData();
-			initialNetwork = clmsg[10];
-			initialNode = clmsg[11];
-		} else {
-			throw new IllegalArgumentException("Illegal msg type");
-		}
-
-		boolean firstNode = true;
-		int network = initialNetwork;
-		int networkMax = network + 2;
-		byte node = initialNode;
-		int nodeCount = 0;
-		int nodeCountMax = 6;
-		byte clusterLeaderNode = node;
-		while (network <= networkMax) {
-			node = initialNode;
-			clusterLeaderNode = node;
-			nodeCount = 0;
-			while ((node < 255) && (nodeCount < nodeCountMax)) {
-				if (!firstNode) {
-					/*
-					 * Position Update Message
-					 */
-					if (type == MSGTYPE.PU) {
-						byte[] pumsgClone = pumsg.clone();
-						// olsr originator
-						pumsgClone[10] = (byte) network;
-						pumsgClone[11] = (byte) node;
-
-						positionUpdateHandler.handlePositionMessage(
-								utcTimestamp, new PositionUpdate(pumsgClone,
-										pumsgClone.length), relayServer);
-					}
-
-					/*
-					 * Cluster Leader Message
-					 */
-					if (type == MSGTYPE.CL) {
-						byte[] clmsgClone = clmsg.clone();
-						// originator
-						clmsgClone[10] = (byte) network;
-						clmsgClone[11] = (byte) node;
-
-						// clusterLeader
-						clmsgClone[14] = (byte) network;
-						clmsgClone[15] = (byte) clusterLeaderNode;
-
-						clusterLeaderHandler.handleClusterLeaderMessage(
-								utcTimestamp, new ClusterLeader(clmsgClone,
-										clmsgClone.length), relayServer);
-					}
-				} else {
-					firstNode = false;
-				}
-
-				node++;
-				nodeCount++;
-			}
-			network++;
-		}
-
-		/* add an extra standalone node */
-
-		node = initialNode;
-
-		/*
-		 * Position Update Message
-		 */
-		if (type == MSGTYPE.PU) {
-			byte[] pumsgClone = pumsg.clone();
-			// olsr originator
-			pumsgClone[10] = (byte) network;
-			pumsgClone[11] = (byte) node;
-
-			positionUpdateHandler.handlePositionMessage(utcTimestamp,
-					new PositionUpdate(pumsgClone, pumsgClone.length),
-					relayServer);
-		}
-
-		/*
-		 * Cluster Leader Message
-		 */
-		if (type == MSGTYPE.CL) {
-			byte[] clmsgClone = clmsg.clone();
-			// originator
-			clmsgClone[10] = (byte) network;
-			clmsgClone[11] = (byte) node;
-
-			// clusterLeader
-			clmsgClone[14] = (byte) (network - 1);
-			clmsgClone[15] = (byte) (clusterLeaderNode + nodeCountMax - 1);
-
-			clusterLeaderHandler.handleClusterLeaderMessage(utcTimestamp,
-					new ClusterLeader(clmsgClone, clmsgClone.length),
-					relayServer);
-		}
+	/**
+	 * @param faker
+	 *            the faker to set
+	 */
+	@Required
+	public final void setFaker(Faker faker) {
+		this.faker = faker;
 	}
 
 	/*
@@ -217,13 +120,19 @@ public class PacketHandlerImpl implements PacketHandler {
 					PositionUpdate pu = new PositionUpdate(data1, length);
 					updated |= positionUpdateHandler.handlePositionMessage(
 							utcTimestamp, pu, relayServer);
-					fakeit(MSGTYPE.PU, utcTimestamp, pu, relayServer);
+					if (useFaker) {
+						faker.fakeit(Faker.MSGTYPE.PU, utcTimestamp, pu,
+								relayServer);
+					}
 				} else if (type == PositionUpdate
 						.getUplinkMessageTypeClusterLeader()) {
 					ClusterLeader cl = new ClusterLeader(data1, length);
 					updated |= clusterLeaderHandler.handleClusterLeaderMessage(
 							utcTimestamp, cl, relayServer);
-					fakeit(MSGTYPE.CL, utcTimestamp, cl, relayServer);
+					if (useFaker) {
+						faker.fakeit(Faker.MSGTYPE.CL, utcTimestamp, cl,
+								relayServer);
+					}
 				} else {
 					logger.warn("Uplink message type " + type
 							+ " not supported");
@@ -235,7 +144,9 @@ public class PacketHandlerImpl implements PacketHandler {
 			return updated;
 		} finally {
 			config.getDataLock().unlock();
-			firstFake = false;
+			if (useFaker) {
+				faker.setFirstFake(false);
+			}
 		}
 	}
 }
