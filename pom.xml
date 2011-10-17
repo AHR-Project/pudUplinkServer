@@ -201,6 +201,7 @@
 						</goals>
 						<configuration>
 							<file>${project.dist.directory}/relayserver</file>
+							<regex>false</regex>
 							<replacements>
 								<replacement>
 									<token>__project.build.finalName__</token>
