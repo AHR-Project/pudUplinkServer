@@ -28,6 +28,7 @@
 		<project.wireformat.jar>OlsrdPudWireFormatJava.jar</project.wireformat.jar>
 		<project.gitsha>${project.build.directory}/gitsha</project.gitsha>
 		<project.startscript>relayserver</project.startscript>
+		<project.sysvscript>ahrrs</project.sysvscript>
 	</properties>
 
 	<issueManagement>
@@ -166,6 +167,7 @@
 									<directory>${project.scripts.directory}/target</directory>
 									<includes>
 										<include>${project.startscript}</include>
+										<include>${project.sysvscript}</include>
 									</includes>
 								</resource>
 							</resources>
@@ -230,6 +232,7 @@
 							<arguments>
 								<argument>755</argument>
 								<argument>${project.dist.directory}/${project.startscript}</argument>
+								<argument>${project.dist.directory}/${project.sysvscript}</argument>
 								<argument>${project.dist.directory}/${project.libdir}/${project.wireformat.so}</argument>
 							</arguments>
 						</configuration>
