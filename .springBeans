@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beansProjectDescription>
+	<version>1</version>
+	<pluginVersion><![CDATA[2.7.2.201109122348-RELEASE]]></pluginVersion>
+	<configSuffixes>
+		<configSuffix><![CDATA[xml]]></configSuffix>
+	</configSuffixes>
+	<enableImports><![CDATA[true]]></enableImports>
+	<configs>
+		<config>src/main/resources/META-INF/spring/application.xml</config>
+		<config>src/main/resources/META-INF/spring/application-context.xml</config>
+		<config>src/main/resources/META-INF/spring/clusterLeaderHandler.xml</config>
+		<config>src/main/resources/META-INF/spring/expiry.xml</config>
+		<config>src/main/resources/META-INF/spring/hibernate.xml</config>
+		<config>src/main/resources/META-INF/spring/jmx.xml</config>
+		<config>src/main/resources/META-INF/spring/nodes.xml</config>
+		<config>src/main/resources/META-INF/spring/packetHandler.xml</config>
+		<config>src/main/resources/META-INF/spring/positions.xml</config>
+		<config>src/main/resources/META-INF/spring/positionUpdateHandler.xml</config>
+		<config>src/main/resources/META-INF/spring/relayCluster.xml</config>
+		<config>src/main/resources/META-INF/spring/relayServer.xml</config>
+		<config>src/main/resources/META-INF/spring/relayServers.xml</config>
+		<config>src/main/resources/META-INF/spring/stopHandler.xml</config>
+		<config>src/main/resources/META-INF/spring/relayServerConfiguration.xml</config>
+	</configs>
+	<configSets>
+	</configSets>
+</beansProjectDescription>

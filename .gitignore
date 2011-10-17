@@ -1,1 +1,4 @@
+/build.jni/
+/dist/
 /target/
+/relayserver.log

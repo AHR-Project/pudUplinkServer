@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+
+	<!-- Spring -->
+	<bean
+		class="org.springframework.beans.factory.annotation.RequiredAnnotationBeanPostProcessor" />
+
+	<!-- Beans -->
+	<import resource="classpath:META-INF/spring/clusterLeaderHandler.xml" />
+	<import resource="classpath:META-INF/spring/packetHandler.xml" />
+	<import resource="classpath:META-INF/spring/positionUpdateHandler.xml" />
+	
+	<import resource="classpath:META-INF/spring/expiry.xml" />
+	
+	<import resource="classpath:META-INF/spring/hibernate.xml" />
+	<import resource="classpath:META-INF/spring/jmx.xml" />
+	
+	<import resource="classpath:META-INF/spring/nodes.xml" />
+	<import resource="classpath:META-INF/spring/positions.xml" />
+	<import resource="classpath:META-INF/spring/relayCluster.xml" />
+	<import resource="classpath:META-INF/spring/relayServers.xml" />
+	
+	<import resource="classpath:META-INF/spring/relayServer.xml" />
+	<import resource="classpath:META-INF/spring/relayServerConfiguration.xml"/>
+	
+	<import resource="classpath:META-INF/spring/stopHandler.xml" />
+
+</beans>

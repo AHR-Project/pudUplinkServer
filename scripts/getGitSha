@@ -1,0 +1,7 @@
+#!/bin/bash
+
+echo "Getting Git SHA into ${1}"
+if [[ ! -d "$(dirname "${1}")" ]]; then
+  mkdir "$(dirname "${1}")"
+fi
+echo "git.sha = $(git describe --dirty --always)" > "${1}"
