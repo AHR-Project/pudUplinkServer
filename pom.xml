@@ -186,21 +186,21 @@
 						<goals>
 							<goal>replace</goal>
 						</goals>
+						<configuration>
+							<file>${project.dist.directory}/relayserver</file>
+							<replacements>
+								<replacement>
+									<token>__project.build.finalName__</token>
+									<value>${project.build.finalName}</value>
+								</replacement>
+								<replacement>
+									<token>__project.libdir__</token>
+									<value>${project.libdir}</value>
+								</replacement>
+							</replacements>
+						</configuration>
 					</execution>
 				</executions>
-				<configuration>
-					<file>${project.dist.directory}/relayserver</file>
-					<replacements>
-						<replacement>
-							<token>__project.build.finalName__</token>
-							<value>${project.build.finalName}</value>
-						</replacement>
-						<replacement>
-							<token>__project.libdir__</token>
-							<value>${project.libdir}</value>
-						</replacement>
-					</replacements>
-				</configuration>
 			</plugin>
 
 			<plugin>
