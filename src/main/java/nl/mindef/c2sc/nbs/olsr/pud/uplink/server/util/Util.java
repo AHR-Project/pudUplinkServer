@@ -82,6 +82,8 @@ public class Util {
 					pu.getPositionUpdateValidityTime()));
 			s.append(String.format("      smask        = 0x%02x\n",
 					pu.getPositionUpdateSMask()));
+			s.append(String.format("      flags        = 0x%02x\n",
+					pu.getPositionUpdateFlags()));
 
 			s.append("        *** GpsInfo ***\n");
 			s.append(String.format("        time       = %d\n",
