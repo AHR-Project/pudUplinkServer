@@ -124,6 +124,7 @@ public class RelayServer extends Thread implements SignalHandler {
 	 */
 	@Override
 	public void run() {
+		logger.info("RelayServer started");
 		try {
 			sock = new DatagramSocket(config.getUplinkUdpPort());
 		} catch (SocketException e1) {
@@ -156,6 +157,7 @@ public class RelayServer extends Thread implements SignalHandler {
 		}
 
 		sock.close();
+		logger.info("RelayServer stopped");
 	}
 
 	/*
