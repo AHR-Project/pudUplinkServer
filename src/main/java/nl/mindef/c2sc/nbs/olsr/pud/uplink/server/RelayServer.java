@@ -35,6 +35,32 @@ public class RelayServer extends Thread implements SignalHandler {
 		this.config = config;
 	}
 
+	private PacketHandler packetHandler;
+
+	/**
+	 * @param packetHandler
+	 *            the packetHandler to set
+	 */
+	@Required
+	public final void setPacketHandler(PacketHandler packetHandler) {
+		this.packetHandler = packetHandler;
+	}
+
+	private RelayCluster relayCluster;
+
+	/**
+	 * @param relayCluster
+	 *            the relayCluster to set
+	 */
+	@Required
+	public final void setRelayCluster(RelayCluster relayCluster) {
+		this.relayCluster = relayCluster;
+	}
+
+	/*
+	 * The following setter are only needed for debug purposes
+	 */
+
 	/** the Node handler */
 	private Nodes nodes;
 
@@ -68,28 +94,6 @@ public class RelayServer extends Thread implements SignalHandler {
 	@Required
 	public final void setRelayServers(RelayServers relayServers) {
 		this.relayServers = relayServers;
-	}
-
-	private PacketHandler packetHandler;
-
-	/**
-	 * @param packetHandler
-	 *            the packetHandler to set
-	 */
-	@Required
-	public final void setPacketHandler(PacketHandler packetHandler) {
-		this.packetHandler = packetHandler;
-	}
-
-	private RelayCluster relayCluster;
-
-	/**
-	 * @param relayCluster
-	 *            the relayCluster to set
-	 */
-	@Required
-	public final void setRelayCluster(RelayCluster relayCluster) {
-		this.relayCluster = relayCluster;
 	}
 
 	/*
@@ -137,9 +141,9 @@ public class RelayServer extends Thread implements SignalHandler {
 				sock.receive(packet);
 				if (packetHandler.processPacket(packet, relayCluster.getMe())) {
 					if (logger.isDebugEnabled()) {
-						nodes.log(logger,Level.DEBUG);
-						positions.log(logger,Level.DEBUG);
-						relayServers.log(logger,Level.DEBUG);
+						nodes.log(logger, Level.DEBUG);
+						positions.log(logger, Level.DEBUG);
+						relayServers.log(logger, Level.DEBUG);
 					}
 
 					relayCluster.signalUpdate();
