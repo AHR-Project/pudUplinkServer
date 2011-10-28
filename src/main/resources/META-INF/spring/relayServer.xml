@@ -5,7 +5,6 @@
 
 	<bean id="RelayServer" class="nl.mindef.c2sc.nbs.olsr.pud.uplink.server.RelayServer"
 		init-method="init" destroy-method="destroy">
-		<property name="config" ref="RelayServerConfiguration" />
 		<property name="nodes" ref="Nodes" />
 		<property name="packetHandler" ref="PacketHandler" />
 		<property name="positions" ref="Positions" />

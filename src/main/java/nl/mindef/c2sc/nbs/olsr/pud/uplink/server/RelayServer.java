@@ -24,17 +24,6 @@ public class RelayServer extends Thread implements SignalHandler {
 
 	static private int BUFFERSIZE = 4000;
 
-	private RelayServerConfiguration config;
-
-	/**
-	 * @param config
-	 *            the config to set
-	 */
-	@Required
-	public final void setConfig(RelayServerConfiguration config) {
-		this.config = config;
-	}
-
 	/** the UDP port to listen on for uplink messages */
 	private int uplinkUdpPort = nl.mindef.c2sc.nbs.olsr.pud.uplink.server.domainmodel.RelayServer.PORT_DEFAULT;
 
