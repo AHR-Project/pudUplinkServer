@@ -377,7 +377,7 @@ public class RelayClusterImpl extends Thread implements RelayCluster {
 								+ ":" + clusterLeader.getDownlinkPort());
 					}
 
-					if ((clusterLeader.getDownlinkPort() == config.getUdpPort())
+					if ((clusterLeader.getDownlinkPort() == config.getUplinkUdpPort())
 							&& config.isMe(clusterLeader.getMainIp())) {
 						/* do not relay to ourselves */
 						if (logger.isDebugEnabled()) {

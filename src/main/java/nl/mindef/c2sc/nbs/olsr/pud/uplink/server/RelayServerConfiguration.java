@@ -9,24 +9,24 @@ import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class RelayServerConfiguration {
-	static public final int UDP_PORT_DEFAULT = 2241;
+	static public final int UPLINK_UDP_PORT_DEFAULT = 2241;
 
-	/** the UDP port to listen on */
-	private int udpPort = UDP_PORT_DEFAULT;
+	/** the UDP port to listen on for uplink messages */
+	private int uplinkUdpPort = UPLINK_UDP_PORT_DEFAULT;
 
 	/**
-	 * @return the udpPort
+	 * @return the uplinkUdpPort
 	 */
-	public final int getUdpPort() {
-		return udpPort;
+	public final int getUplinkUdpPort() {
+		return uplinkUdpPort;
 	}
 
 	/**
-	 * @param udpPort
-	 *            the udpPort to set
+	 * @param uplinkUdpPort
+	 *            the uplinkUdpPort to set
 	 */
-	public final void setUdpPort(int udpPort) {
-		this.udpPort = udpPort;
+	public final void setUplinkUdpPort(int uplinkUdpPort) {
+		this.uplinkUdpPort = uplinkUdpPort;
 	}
 
 	private ReentrantLock dataLock = new ReentrantLock();

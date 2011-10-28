@@ -125,9 +125,9 @@ public class RelayServer extends Thread implements SignalHandler {
 	@Override
 	public void run() {
 		try {
-			sock = new DatagramSocket(config.getUdpPort());
+			sock = new DatagramSocket(config.getUplinkUdpPort());
 		} catch (SocketException e1) {
-			System.err.println("Can't bind to UDP port " + config.getUdpPort()
+			System.err.println("Can't bind to uplink UDP port " + config.getUplinkUdpPort()
 					+ ": " + e1.getMessage());
 			return;
 		}
