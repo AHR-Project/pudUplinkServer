@@ -52,6 +52,17 @@ public class RelayClusterImpl extends Thread implements RelayCluster {
 		this.config = config;
 	}
 
+	/** the UDP port to listen on for uplink messages */
+	private int uplinkUdpPort = RelayServer.PORT_DEFAULT;
+
+	/**
+	 * @param uplinkUdpPort
+	 *            the uplinkUdpPort to set
+	 */
+	public final void setUplinkUdpPort(int uplinkUdpPort) {
+		this.uplinkUdpPort = uplinkUdpPort;
+	}
+
 	/** the Node handler */
 	private Nodes nodes;
 
@@ -377,8 +388,8 @@ public class RelayClusterImpl extends Thread implements RelayCluster {
 								+ ":" + clusterLeader.getDownlinkPort());
 					}
 
-					if ((clusterLeader.getDownlinkPort() == config.getUplinkUdpPort())
-							&& config.isMe(clusterLeader.getMainIp())) {
+					if (config.isMe(clusterLeader.getMainIp())
+							&& (clusterLeader.getDownlinkPort() == uplinkUdpPort)) {
 						/* do not relay to ourselves */
 						if (logger.isDebugEnabled()) {
 							logger.debug("  this is me: skipping");

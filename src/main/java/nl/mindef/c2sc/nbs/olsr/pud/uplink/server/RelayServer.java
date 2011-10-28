@@ -35,6 +35,17 @@ public class RelayServer extends Thread implements SignalHandler {
 		this.config = config;
 	}
 
+	/** the UDP port to listen on for uplink messages */
+	private int uplinkUdpPort = nl.mindef.c2sc.nbs.olsr.pud.uplink.server.domainmodel.RelayServer.PORT_DEFAULT;
+
+	/**
+	 * @param uplinkUdpPort
+	 *            the uplinkUdpPort to set
+	 */
+	public final void setUplinkUdpPort(int uplinkUdpPort) {
+		this.uplinkUdpPort = uplinkUdpPort;
+	}
+
 	private PacketHandler packetHandler;
 
 	/**
@@ -126,9 +137,9 @@ public class RelayServer extends Thread implements SignalHandler {
 	public void run() {
 		logger.info("RelayServer started");
 		try {
-			sock = new DatagramSocket(config.getUplinkUdpPort());
+			sock = new DatagramSocket(uplinkUdpPort);
 		} catch (SocketException e1) {
-			System.err.println("Can't bind to uplink UDP port " + config.getUplinkUdpPort()
+			System.err.println("Can't bind to uplink UDP port " + uplinkUdpPort
 					+ ": " + e1.getMessage());
 			return;
 		}

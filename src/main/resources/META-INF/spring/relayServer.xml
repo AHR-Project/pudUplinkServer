@@ -11,6 +11,7 @@
 		<property name="positions" ref="Positions" />
 		<property name="relayCluster" ref="RelayCluster" />
 		<property name="relayServers" ref="RelayServers" />
+		<property name="uplinkUdpPort" value="${uplink.listener.udp.port}" />
 	</bean>
 
 </beans>
