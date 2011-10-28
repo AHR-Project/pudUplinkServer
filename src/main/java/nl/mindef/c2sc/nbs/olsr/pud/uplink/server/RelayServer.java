@@ -101,6 +101,7 @@ public class RelayServer extends Thread implements SignalHandler {
 	private AtomicBoolean run = new AtomicBoolean(true);
 
 	public void init() {
+		this.setName(this.getClass().getSimpleName());
 		this.start();
 	}
 
@@ -119,7 +120,6 @@ public class RelayServer extends Thread implements SignalHandler {
 	 */
 	@Override
 	public void run() {
-		this.setName(this.getClass().getSimpleName());
 		try {
 			sock = new DatagramSocket(config.getUdpPort());
 		} catch (SocketException e1) {

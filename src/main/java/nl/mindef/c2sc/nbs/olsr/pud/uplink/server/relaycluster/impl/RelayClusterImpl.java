@@ -164,6 +164,8 @@ public class RelayClusterImpl extends Thread implements RelayCluster {
 	}
 
 	public void init() throws SocketException {
+		this.setName(this.getClass().getSimpleName());
+
 		for (RelayServer relayServer : configuredRelayServers) {
 			relayServers.addRelayServer(relayServer);
 		}
@@ -191,7 +193,6 @@ public class RelayClusterImpl extends Thread implements RelayCluster {
 
 	@Override
 	public void run() {
-		this.setName(this.getClass().getSimpleName());
 		while (run.get()) {
 			synchronized (run) {
 				try {
