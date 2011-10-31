@@ -400,6 +400,19 @@ public class DistributorImpl extends Thread implements Distributor {
 			List<Node> clusterLeaders = nodes.getClusterLeaders();
 			if ((clusterLeaders != null) && (clusterLeaders.size() > 0)) {
 				for (Node clusterLeader : clusterLeaders) {
+					int clusterLeaderDownlinkPort = clusterLeader
+							.getDownlinkPort();
+					if (clusterLeaderDownlinkPort == Node.DOWNLINK_PORT_INVALID) {
+						if (logger.isDebugEnabled()) {
+							logger.debug("  *** cluster leader "
+									+ clusterLeader.getMainIp()
+											.getHostAddress()
+									+ " skipped because of"
+									+ " invalid downlink port");
+						}
+						continue;
+					}
+
 					if (logger.isDebugEnabled()) {
 						logger.debug("  *** cluster leader "
 								+ clusterLeader.getMainIp().getHostAddress()
@@ -452,7 +465,7 @@ public class DistributorImpl extends Thread implements Distributor {
 								s.append(" " + packet.getLength());
 							}
 							packet.setAddress(clusterLeader.getMainIp());
-							packet.setPort(clusterLeader.getDownlinkPort());
+							packet.setPort(clusterLeaderDownlinkPort);
 							try {
 								sock.send(packet);
 							} catch (IOException e) {
