@@ -1,4 +1,4 @@
-package nl.mindef.c2sc.nbs.olsr.pud.uplink.server.domainmodel;
+package nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.domainmodel;
 
 import java.io.Serializable;
 import java.net.InetAddress;

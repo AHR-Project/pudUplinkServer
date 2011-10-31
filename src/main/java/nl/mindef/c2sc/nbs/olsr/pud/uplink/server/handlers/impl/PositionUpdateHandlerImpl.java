@@ -4,9 +4,9 @@ import java.net.InetAddress;
 
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.Nodes;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.Positions;
-import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.domainmodel.Node;
-import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.domainmodel.NodePosition;
-import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.domainmodel.RelayServer;
+import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.domainmodel.Node;
+import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.domainmodel.NodePosition;
+import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.domainmodel.RelayServer;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.handlers.PositionUpdateHandler;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.util.Util;
 

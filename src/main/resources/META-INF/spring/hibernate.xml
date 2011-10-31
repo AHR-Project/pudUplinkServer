@@ -33,7 +33,7 @@
 		<property name="dataSource" ref="dataSource" />
 		<property name="packagesToScan">
 			<list>
-				<value>nl.mindef.c2sc.nbs.olsr.pud.uplink.server.domainmodel</value>
+				<value>nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.domainmodel</value>
 			</list>
 		</property>
 		<property name="hibernateProperties">

@@ -3,8 +3,8 @@ package nl.mindef.c2sc.nbs.olsr.pud.uplink.server.handlers.impl;
 import java.net.InetAddress;
 
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.Nodes;
-import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.domainmodel.Node;
-import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.domainmodel.RelayServer;
+import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.domainmodel.Node;
+import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.domainmodel.RelayServer;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.handlers.ClusterLeaderHandler;
 
 import org.apache.log4j.Logger;

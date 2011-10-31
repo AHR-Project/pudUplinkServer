@@ -18,10 +18,10 @@ import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.RelayServerConfiguration;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.Nodes;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.Positions;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.RelayServers;
+import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.domainmodel.Node;
+import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.domainmodel.NodePosition;
+import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.domainmodel.RelayServer;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.distributor.Distributor;
-import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.domainmodel.Node;
-import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.domainmodel.NodePosition;
-import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.domainmodel.RelayServer;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Required;

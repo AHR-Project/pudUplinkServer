@@ -2,7 +2,7 @@ package nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao;
 
 import java.util.List;
 
-import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.domainmodel.RelayServer;
+import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.domainmodel.RelayServer;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;

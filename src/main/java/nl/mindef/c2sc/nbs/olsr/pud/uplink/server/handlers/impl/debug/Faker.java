@@ -4,7 +4,7 @@ import org.olsr.plugin.pud.ClusterLeader;
 import org.olsr.plugin.pud.PositionUpdate;
 import org.springframework.beans.factory.annotation.Required;
 
-import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.domainmodel.RelayServer;
+import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.domainmodel.RelayServer;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.handlers.ClusterLeaderHandler;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.handlers.PositionUpdateHandler;
 

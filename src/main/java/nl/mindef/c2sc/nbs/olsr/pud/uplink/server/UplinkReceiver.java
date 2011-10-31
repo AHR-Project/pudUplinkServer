@@ -8,6 +8,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.Nodes;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.Positions;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.RelayServers;
+import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.domainmodel.RelayServer;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.distributor.Distributor;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.handlers.PacketHandler;
 
@@ -25,7 +26,7 @@ public class UplinkReceiver extends Thread implements SignalHandler {
 	static private int BUFFERSIZE = 4000;
 
 	/** the UDP port to listen on for uplink messages */
-	private int uplinkUdpPort = nl.mindef.c2sc.nbs.olsr.pud.uplink.server.domainmodel.RelayServer.PORT_DEFAULT;
+	private int uplinkUdpPort = RelayServer.PORT_DEFAULT;
 
 	/**
 	 * @param uplinkUdpPort

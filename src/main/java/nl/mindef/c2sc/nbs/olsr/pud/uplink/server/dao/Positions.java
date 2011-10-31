@@ -3,8 +3,8 @@ package nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao;
 import java.net.InetAddress;
 import java.util.List;
 
-import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.domainmodel.Node;
-import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.domainmodel.NodePosition;
+import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.domainmodel.Node;
+import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.domainmodel.NodePosition;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
