@@ -1,7 +1,9 @@
-package nl.mindef.c2sc.nbs.olsr.pud.uplink.server.signals;
+package nl.mindef.c2sc.nbs.olsr.pud.uplink.server.signals.impl;
 
 import java.util.HashSet;
 import java.util.Set;
+
+import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.signals.StopHandlerConsumer;
 
 import org.springframework.beans.factory.annotation.Required;
 
@@ -21,24 +23,26 @@ public class StopHandlerImpl implements SignalHandler {
 		this.signal = new Signal(signal);
 	}
 
-	private Set<SignalHandler> handlers = new HashSet<SignalHandler>();
+	private Set<StopHandlerConsumer> handlers = new HashSet<StopHandlerConsumer>();
 
 	/**
 	 * @param handlers
 	 *            the handlers to set
 	 */
 	@Required
-	public final void setHandlers(Set<SignalHandler> handlers) {
+	public final void setHandlers(Set<StopHandlerConsumer> handlers) {
 		this.handlers = handlers;
 	}
 
 	@Override
 	public void handle(Signal signal) {
-		for (SignalHandler handler : handlers) {
-			try {
-				handler.handle(signal);
-			} catch (Exception e) {
-				e.printStackTrace();
+		if (signal.equals(intSignal)) {
+			for (StopHandlerConsumer handler : handlers) {
+				try {
+					handler.signalStop();
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
 			}
 		}
 
@@ -54,6 +58,8 @@ public class StopHandlerImpl implements SignalHandler {
 	}
 
 	private SignalHandler oldHandler = null;
+
+	private Signal intSignal = new Signal("INT");
 
 	public void init() {
 		oldHandler = Signal.handle(signal, this);

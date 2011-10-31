@@ -11,16 +11,13 @@ import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.RelayServers;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.domainmodel.RelayServer;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.distributor.Distributor;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.handlers.PacketHandler;
+import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.signals.StopHandlerConsumer;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Required;
 
-import sun.misc.Signal;
-import sun.misc.SignalHandler;
-
-@SuppressWarnings("restriction")
-public class UplinkReceiver extends Thread implements SignalHandler {
+public class UplinkReceiver extends Thread implements StopHandlerConsumer {
 	private Logger logger = Logger.getLogger(this.getClass().getName());
 
 	static private int BUFFERSIZE = 4000;
@@ -164,7 +161,7 @@ public class UplinkReceiver extends Thread implements SignalHandler {
 	 */
 
 	@Override
-	public void handle(Signal signal) {
+	public void signalStop() {
 		run.set(false);
 		if (sock != null) {
 			/* this is crude but effective */
