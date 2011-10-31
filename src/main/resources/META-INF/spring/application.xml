@@ -11,23 +11,24 @@
 	<import resource="classpath:META-INF/spring/faker.xml" />
 
 	<!-- Beans -->
-	<import resource="classpath:META-INF/spring/clusterLeaderHandler.xml" />
-	<import resource="classpath:META-INF/spring/packetHandler.xml" />
-	<import resource="classpath:META-INF/spring/positionUpdateHandler.xml" />
-	
-	<import resource="classpath:META-INF/spring/expiry.xml" />
-	
-	<import resource="classpath:META-INF/spring/hibernate.xml" />
 	<import resource="classpath:META-INF/spring/jmx.xml" />
-	
+
+	<import resource="classpath:META-INF/spring/stopHandler.xml" />
+
+	<import resource="classpath:META-INF/spring/hibernate.xml" />
 	<import resource="classpath:META-INF/spring/nodes.xml" />
 	<import resource="classpath:META-INF/spring/positions.xml" />
-	<import resource="classpath:META-INF/spring/relayCluster.xml" />
 	<import resource="classpath:META-INF/spring/relayServers.xml" />
-	
+	<import resource="classpath:META-INF/spring/expiry.xml" />
+
+	<import resource="classpath:META-INF/spring/clusterLeaderHandler.xml" />
+	<import resource="classpath:META-INF/spring/positionUpdateHandler.xml" />
+	<import resource="classpath:META-INF/spring/packetHandler.xml" />
+
+	<import resource="classpath:META-INF/spring/distributor.xml" />
+
 	<import resource="classpath:META-INF/spring/uplinkReceiver.xml" />
-	<import resource="classpath:META-INF/spring/relayServerConfiguration.xml"/>
-	
-	<import resource="classpath:META-INF/spring/stopHandler.xml" />
+
+	<import resource="classpath:META-INF/spring/relayServerConfiguration.xml" />
 
 </beans>

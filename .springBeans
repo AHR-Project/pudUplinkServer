@@ -9,20 +9,28 @@
 	<configs>
 		<config>src/main/resources/META-INF/spring/application.xml</config>
 		<config>src/main/resources/META-INF/spring/application-context.xml</config>
-		<config>src/main/resources/META-INF/spring/clusterLeaderHandler.xml</config>
-		<config>src/main/resources/META-INF/spring/expiry.xml</config>
+
 		<config>src/main/resources/META-INF/spring/faker.xml</config>
-		<config>src/main/resources/META-INF/spring/hibernate.xml</config>
+
 		<config>src/main/resources/META-INF/spring/jmx.xml</config>
-		<config>src/main/resources/META-INF/spring/nodes.xml</config>
-		<config>src/main/resources/META-INF/spring/packetHandler.xml</config>
-		<config>src/main/resources/META-INF/spring/positions.xml</config>
-		<config>src/main/resources/META-INF/spring/positionUpdateHandler.xml</config>
-		<config>src/main/resources/META-INF/spring/relayCluster.xml</config>
-		<config>src/main/resources/META-INF/spring/relayServerConfiguration.xml</config>
-		<config>src/main/resources/META-INF/spring/relayServers.xml</config>
+
 		<config>src/main/resources/META-INF/spring/stopHandler.xml</config>
+
+		<config>src/main/resources/META-INF/spring/hibernate.xml</config>
+		<config>src/main/resources/META-INF/spring/nodes.xml</config>
+		<config>src/main/resources/META-INF/spring/positions.xml</config>
+		<config>src/main/resources/META-INF/spring/relayServers.xml</config>
+		<config>src/main/resources/META-INF/spring/expiry.xml</config>
+
+		<config>src/main/resources/META-INF/spring/clusterLeaderHandler.xml</config>
+		<config>src/main/resources/META-INF/spring/positionUpdateHandler.xml</config>
+		<config>src/main/resources/META-INF/spring/packetHandler.xml</config>
+
+		<config>src/main/resources/META-INF/spring/distributor.xml</config>
+
 		<config>src/main/resources/META-INF/spring/uplinkReceiver.xml</config>
+
+		<config>src/main/resources/META-INF/spring/relayServerConfiguration.xml</config>
 	</configs>
 	<configSets>
 	</configSets>
