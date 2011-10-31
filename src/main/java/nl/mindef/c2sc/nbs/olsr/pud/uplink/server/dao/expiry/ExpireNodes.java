@@ -1,4 +1,4 @@
-package nl.mindef.c2sc.nbs.olsr.pud.uplink.server.expiry;
+package nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.expiry;
 
 import java.util.Timer;
 import java.util.TimerTask;
