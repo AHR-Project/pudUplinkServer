@@ -13,6 +13,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.locks.ReentrantLock;
 
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.RelayServerConfiguration;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.Nodes;
@@ -39,6 +40,17 @@ public class DistributorImpl extends Thread implements Distributor {
 	 */
 	public final void setPacketMaxSize(int packetMaxSize) {
 		this.packetMaxSize = packetMaxSize;
+	}
+
+	private ReentrantLock dataLock;
+
+	/**
+	 * @param dataLock
+	 *            the dataLock to set
+	 */
+	@Required
+	public final void setDataLock(ReentrantLock dataLock) {
+		this.dataLock = dataLock;
 	}
 
 	private RelayServerConfiguration config;
@@ -214,11 +226,11 @@ public class DistributorImpl extends Thread implements Distributor {
 				}
 			}
 			if (distribute.getAndSet(false)) {
-				config.getDataLock().lock();
+				dataLock.lock();
 				try {
 					distribute();
 				} finally {
-					config.getDataLock().unlock();
+					dataLock.unlock();
 				}
 			}
 		}

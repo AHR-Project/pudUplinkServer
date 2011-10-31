@@ -6,18 +6,8 @@ import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
-import java.util.concurrent.locks.ReentrantLock;
 
 public class RelayServerConfiguration {
-	private ReentrantLock dataLock = new ReentrantLock();
-
-	/**
-	 * @return the dataLock
-	 */
-	public final ReentrantLock getDataLock() {
-		return dataLock;
-	}
-
 	private List<InetAddress> addrList = new ArrayList<InetAddress>();
 
 	public boolean isMe(InetAddress ip) {

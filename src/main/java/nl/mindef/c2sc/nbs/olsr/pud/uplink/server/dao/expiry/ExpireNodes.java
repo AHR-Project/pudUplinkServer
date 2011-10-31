@@ -2,8 +2,8 @@ package nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.expiry;
 
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.locks.ReentrantLock;
 
-import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.RelayServerConfiguration;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.Nodes;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.Positions;
 
@@ -13,21 +13,21 @@ import org.springframework.beans.factory.annotation.Required;
 public class ExpireNodes {
 	private Logger logger = Logger.getLogger(this.getClass().getName());
 
-	private RelayServerConfiguration config;
+	private ReentrantLock dataLock;
 
 	/**
-	 * @param config
-	 *            the config to set
+	 * @param dataLock
+	 *            the dataLock to set
 	 */
 	@Required
-	public final void setConfig(RelayServerConfiguration config) {
-		this.config = config;
+	public final void setDataLock(ReentrantLock dataLock) {
+		this.dataLock = dataLock;
 	}
 
 	protected class ExpiryTimerTask extends TimerTask {
 		@Override
 		public void run() {
-			config.getDataLock().lock();
+			dataLock.lock();
 
 			if (logger.isDebugEnabled()) {
 				logger.debug("************************** expiry");
@@ -48,7 +48,7 @@ public class ExpireNodes {
 					e.printStackTrace();
 				}
 			} finally {
-				config.getDataLock().unlock();
+				dataLock.unlock();
 			}
 		}
 	}

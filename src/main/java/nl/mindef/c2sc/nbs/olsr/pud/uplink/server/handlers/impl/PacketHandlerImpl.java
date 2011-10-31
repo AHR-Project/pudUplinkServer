@@ -2,8 +2,8 @@ package nl.mindef.c2sc.nbs.olsr.pud.uplink.server.handlers.impl;
 
 import java.net.DatagramPacket;
 import java.util.Arrays;
+import java.util.concurrent.locks.ReentrantLock;
 
-import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.RelayServerConfiguration;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.domainmodel.RelayServer;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.handlers.ClusterLeaderHandler;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.handlers.PacketHandler;
@@ -23,17 +23,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Repository
 public class PacketHandlerImpl implements PacketHandler {
 	private Logger logger = Logger.getLogger(this.getClass().getName());
-
-	private RelayServerConfiguration config;
-
-	/**
-	 * @param config
-	 *            the config to set
-	 */
-	@Required
-	public final void setConfig(RelayServerConfiguration config) {
-		this.config = config;
-	}
 
 	private ClusterLeaderHandler clusterLeaderHandler;
 
@@ -84,6 +73,17 @@ public class PacketHandlerImpl implements PacketHandler {
 		this.faker = faker;
 	}
 
+	private ReentrantLock dataLock;
+
+	/**
+	 * @param dataLock
+	 *            the dataLock to set
+	 */
+	@Required
+	public final void setDataLock(ReentrantLock dataLock) {
+		this.dataLock = dataLock;
+	}
+
 	/*
 	 * end fake
 	 */
@@ -94,7 +94,7 @@ public class PacketHandlerImpl implements PacketHandler {
 		boolean updated = false;
 		long utcTimestamp = System.currentTimeMillis();
 
-		config.getDataLock().lock();
+		dataLock.lock();
 		try {
 			if (logger.isDebugEnabled()) {
 				logger.debug("Received " + packet.getLength()
@@ -143,7 +143,7 @@ public class PacketHandlerImpl implements PacketHandler {
 
 			return updated;
 		} finally {
-			config.getDataLock().unlock();
+			dataLock.unlock();
 			if (useFaker) {
 				faker.setFirstFake(false);
 			}

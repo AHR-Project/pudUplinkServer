@@ -17,6 +17,7 @@
 		<config>src/main/resources/META-INF/spring/stopHandler.xml</config>
 
 		<config>src/main/resources/META-INF/spring/hibernate.xml</config>
+		<config>src/main/resources/META-INF/spring/daoDataLock.xml</config>
 		<config>src/main/resources/META-INF/spring/nodes.xml</config>
 		<config>src/main/resources/META-INF/spring/positions.xml</config>
 		<config>src/main/resources/META-INF/spring/relayServers.xml</config>

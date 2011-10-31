@@ -8,6 +8,7 @@
 		init-method="init" destroy-method="destroy">
 		<property name="config" ref="RelayServerConfiguration" />
 		<property name="configuredRelayServers" value="${relaycluster.servers}" />
+		<property name="dataLock" ref="DaoDataLock" />
 		<property name="distributionDelay" value="${distribution.delay}" />
 		<property name="nodes" ref="Nodes" />
 		<property name="packetMaxSize" value="${distribution.packet.max.size}" />
