@@ -185,8 +185,13 @@ public class DistributorImpl extends Thread implements Distributor {
 
 	public void init() throws SocketException, UnknownHostException {
 		this.setName(this.getClass().getSimpleName());
-
-		me.setIp(InetAddress.getLocalHost());
+		InetAddress ip;
+		try {
+			ip = InetAddress.getLocalHost();
+		} catch (UnknownHostException e) {
+			ip = InetAddress.getByName("localhost");
+		}
+		me.setIp(ip);
 		this.configuredRelayServers.add(me);
 
 		/* save into database */
