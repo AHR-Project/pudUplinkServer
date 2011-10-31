@@ -8,7 +8,7 @@ import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.domainmodel.Node;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.domainmodel.NodePosition;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.domainmodel.RelayServer;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.handlers.PositionUpdateHandler;
-import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.util.Util;
+import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.util.TimeZoneUtil;
 
 import org.apache.log4j.Logger;
 import org.olsr.plugin.pud.PositionUpdate;
@@ -86,12 +86,12 @@ public class PositionUpdateHandlerImpl implements PositionUpdateHandler {
 		if (storedPosition.getPositionUpdate() != null) {
 			storedTimestamp = storedPosition.getPositionUpdate()
 					.getPositionUpdateTime(utcTimestamp,
-							Util.getTimezoneOffset());
+							TimeZoneUtil.getTimezoneOffset());
 		}
 
 		/* get the received timestamp */
 		long receivedTimeStamp = posUpMsg.getPositionUpdateTime(utcTimestamp,
-				Util.getTimezoneOffset());
+				TimeZoneUtil.getTimezoneOffset());
 
 		/* check that received timestamp is later than stored timestamp */
 		if (receivedTimeStamp <= storedTimestamp) {

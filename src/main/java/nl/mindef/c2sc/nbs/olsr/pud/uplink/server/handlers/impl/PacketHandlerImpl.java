@@ -9,7 +9,7 @@ import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.handlers.ClusterLeaderHandler;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.handlers.PacketHandler;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.handlers.PositionUpdateHandler;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.handlers.impl.debug.Faker;
-import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.util.Util;
+import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.util.DumpUtil;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -114,7 +114,7 @@ public class PacketHandlerImpl implements PacketHandler {
 
 				byte[] data1 = Arrays.copyOfRange(packetData, from, from
 						+ length);
-				Util.dumpUplinkMessage(logger, Level.DEBUG, data1, packet,
+				DumpUtil.dumpUplinkMessage(logger, Level.DEBUG, data1, packet,
 						type, utcTimestamp);
 				if (type == UplinkMessage.getUplinkMessageTypePosition()) {
 					PositionUpdate pu = new PositionUpdate(data1, length);

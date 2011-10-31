@@ -1,8 +1,6 @@
 package nl.mindef.c2sc.nbs.olsr.pud.uplink.server.util;
 
 import java.net.DatagramPacket;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -10,29 +8,7 @@ import org.olsr.plugin.pud.ClusterLeader;
 import org.olsr.plugin.pud.PositionUpdate;
 import org.olsr.plugin.pud.UplinkMessage;
 
-public class Util {
-	static {
-		GregorianCalendar cal = new GregorianCalendar();
-		timezoneOffset = -(cal.get(Calendar.ZONE_OFFSET)
-		/* + cal .get(Calendar.DST_OFFSET) */);
-	}
-
-	private static final long timezoneOffset;
-
-	/**
-	 * @return the timezoneOffset
-	 */
-	public static final long getTimezoneOffset() {
-		return timezoneOffset;
-	}
-
-	public static double nmeaDeg2Ndeg(double degrees) {
-		long deg = (long) degrees;
-		double fra_part = degrees - deg;
-		return ((deg * 100.0) + (fra_part * 60.0));
-
-	}
-
+public class DumpUtil {
 	public static void dumpUplinkMessage(Logger logger, Level level,
 			byte[] data, DatagramPacket packet, int type, long utcTimestamp) {
 		if (!logger.isEnabledFor(level)) {
@@ -86,12 +62,14 @@ public class Util {
 					pu.getPositionUpdateFlags()));
 
 			s.append("        *** GpsInfo ***\n");
-			s.append(String.format("        time       = %d\n",
-					pu.getPositionUpdateTime(utcTimestamp, timezoneOffset)));
+			s.append(String.format(
+					"        time       = %d\n",
+					pu.getPositionUpdateTime(utcTimestamp,
+							TimeZoneUtil.getTimezoneOffset())));
 			s.append(String.format("        lat        = %f\n",
-					nmeaDeg2Ndeg(pu.getPositionUpdateLatitude())));
+					NmeaUtil.nmeaDeg2Ndeg(pu.getPositionUpdateLatitude())));
 			s.append(String.format("        lon        = %f\n",
-					nmeaDeg2Ndeg(pu.getPositionUpdateLongitude())));
+					NmeaUtil.nmeaDeg2Ndeg(pu.getPositionUpdateLongitude())));
 			s.append(String.format("        alt        = %d m\n",
 					pu.getPositionUpdateAltitude()));
 			s.append(String.format("        speed      = %d kph\n",
