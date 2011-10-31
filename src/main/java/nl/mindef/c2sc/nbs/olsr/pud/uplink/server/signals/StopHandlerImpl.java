@@ -9,7 +9,7 @@ import sun.misc.Signal;
 import sun.misc.SignalHandler;
 
 @SuppressWarnings("restriction")
-public class StopHandler implements SignalHandler {
+public class StopHandlerImpl implements SignalHandler {
 	private Signal signal = null;
 
 	/**
