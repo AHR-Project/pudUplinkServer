@@ -192,15 +192,16 @@ public class Node implements Serializable {
 		builder.append(this.getClass().getSimpleName() + " [id=");
 		builder.append(id);
 		builder.append(", mainIp=");
-		builder.append((mainIp != null) ? mainIp.getHostAddress() : "null");
+		builder.append((mainIp == null) ? "-" : mainIp.getHostAddress());
 		builder.append(", downlinkPort=");
-		builder.append(downlinkPort);
+		builder.append((downlinkPort == DOWNLINK_PORT_INVALID) ? "-"
+				: downlinkPort);
 		builder.append(", position=");
-		builder.append((position != null) ? position.getId() : "null");
+		builder.append((position == null) ? "-" : position.getId());
 		builder.append(", clusterLeader=");
 		builder.append((clusterLeader == null) ? "-" : clusterLeader.getId());
 		builder.append(", relayServer=");
-		builder.append((relayServer != null) ? relayServer.getId() : "null");
+		builder.append((relayServer == null) ? "-" : relayServer.getId());
 		builder.append(", receptionTime=");
 		builder.append(receptionTime);
 		builder.append(", validityTime=");
