@@ -169,14 +169,15 @@ public class RelayClusterImpl extends Thread implements RelayCluster {
 
 			this.configuredRelayServers.add(relayServer);
 		}
+	}
+
+	public void init() throws SocketException, UnknownHostException {
+		this.setName(this.getClass().getSimpleName());
 
 		me.setIp(InetAddress.getLocalHost());
 		this.configuredRelayServers.add(me);
-	}
 
-	public void init() throws SocketException {
-		this.setName(this.getClass().getSimpleName());
-
+		/* save into database */
 		for (RelayServer relayServer : configuredRelayServers) {
 			relayServers.addRelayServer(relayServer);
 		}
