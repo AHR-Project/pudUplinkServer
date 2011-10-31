@@ -1,5 +1,7 @@
 package nl.mindef.c2sc.nbs.olsr.pud.uplink.server;
 
+import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.uplink.UplinkReceiver;
+
 import org.apache.log4j.Logger;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 

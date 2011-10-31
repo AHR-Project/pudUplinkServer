@@ -1,4 +1,4 @@
-package nl.mindef.c2sc.nbs.olsr.pud.uplink.server;
+package nl.mindef.c2sc.nbs.olsr.pud.uplink.server.uplink;
 
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
