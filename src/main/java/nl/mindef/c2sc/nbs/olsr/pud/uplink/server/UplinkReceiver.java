@@ -19,7 +19,7 @@ import sun.misc.Signal;
 import sun.misc.SignalHandler;
 
 @SuppressWarnings("restriction")
-public class RelayServer extends Thread implements SignalHandler {
+public class UplinkReceiver extends Thread implements SignalHandler {
 	private Logger logger = Logger.getLogger(this.getClass().getName());
 
 	static private int BUFFERSIZE = 4000;

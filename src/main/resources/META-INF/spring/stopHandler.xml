@@ -7,7 +7,7 @@
 		init-method="init" destroy-method="destroy">
 		<property name="handlers">
 			<set>
-				<ref bean="RelayServer" />
+				<ref bean="UplinkReceiver" />
 			</set>
 		</property>
 		<property name="signal" value="INT" />

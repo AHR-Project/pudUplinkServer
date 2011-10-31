@@ -15,10 +15,10 @@ public class Main {
 
 			logger.info("RelayServer started");
 
-			RelayServer relayServer = (RelayServer) context
-					.getBean("RelayServer");
+			UplinkReceiver uplinkReceiver = (UplinkReceiver) context
+					.getBean("UplinkReceiver");
 
-			relayServer.join();
+			uplinkReceiver.join();
 
 			logger.info("RelayServer stopped");
 

@@ -25,7 +25,7 @@
 	<import resource="classpath:META-INF/spring/relayCluster.xml" />
 	<import resource="classpath:META-INF/spring/relayServers.xml" />
 	
-	<import resource="classpath:META-INF/spring/relayServer.xml" />
+	<import resource="classpath:META-INF/spring/uplinkReceiver.xml" />
 	<import resource="classpath:META-INF/spring/relayServerConfiguration.xml"/>
 	
 	<import resource="classpath:META-INF/spring/stopHandler.xml" />
