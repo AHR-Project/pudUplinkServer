@@ -1,4 +1,4 @@
-package nl.mindef.c2sc.nbs.olsr.pud.uplink.server;
+package nl.mindef.c2sc.nbs.olsr.pud.uplink.server.signals;
 
 import java.util.HashSet;
 import java.util.Set;
