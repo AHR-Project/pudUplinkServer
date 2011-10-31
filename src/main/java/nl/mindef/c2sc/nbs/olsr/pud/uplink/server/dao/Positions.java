@@ -1,5 +1,7 @@
 package nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao;
 
+import java.io.IOException;
+import java.io.OutputStream;
 import java.net.InetAddress;
 import java.util.List;
 
@@ -20,4 +22,5 @@ public interface Positions {
 	public void removeExpiredNodePosition(double validityTimeMultiplier);
 
 	public void log(Logger logger, Level level);
+	public void print(OutputStream out) throws IOException;
 }

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<bean id="DatabaseLogger"
+		class="nl.mindef.c2sc.nbs.olsr.pud.uplink.server.logger.DatabaseLogger"
+		init-method="init" destroy-method="destroy">
+		<property name="databaseLogFile" value="${database.logger.filename}" />
+		<property name="enabled" value="${database.logger.enabled}" />
+		<property name="nodes" ref="Nodes" />
+		<property name="positions" ref="Positions" />
+		<property name="relayServers" ref="RelayServers" />
+		<property name="updateIntervalMs" value="${database.logger.updateintervalms}" />
+	</bean>
+
+</beans>

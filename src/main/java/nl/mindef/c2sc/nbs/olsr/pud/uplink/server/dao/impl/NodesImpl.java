@@ -1,5 +1,7 @@
 package nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.impl;
 
+import java.io.IOException;
+import java.io.OutputStream;
 import java.net.InetAddress;
 import java.util.List;
 
@@ -108,24 +110,32 @@ public class NodesImpl implements Nodes {
 		return;
 	}
 
+	private String getNodesDump() {
+		@SuppressWarnings("unchecked")
+		List<Node> result = sessionFactory.getCurrentSession()
+				.createQuery("from Node node").list();
+
+		StringBuilder s = new StringBuilder();
+		s.append("[Nodes]\n");
+		for (Node node : result) {
+			s.append(node.toString() + "\n");
+		}
+
+		return s.toString();
+	}
+
 	@Override
 	@Transactional
 	public void log(Logger logger, Level level) {
 		if (logger.isEnabledFor(level)) {
-			@SuppressWarnings("unchecked")
-			List<Node> result = sessionFactory.getCurrentSession()
-					.createQuery("from Node node").list();
-
-			if (result.size() == 0) {
-				return;
-			}
-
-			StringBuilder s = new StringBuilder();
-			s.append("*** Nodes ***\n");
-			for (Node node : result) {
-				s.append(node.toString()+"\n");
-			}
-			logger.log(level, s.toString());
+			logger.log(level, getNodesDump());
 		}
+	}
+
+	@Override
+	@Transactional
+	public void print(OutputStream out) throws IOException {
+		String s = getNodesDump();
+		out.write(s.getBytes(), 0, s.length());
 	}
 }

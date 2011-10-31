@@ -1,5 +1,7 @@
 package nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.impl;
 
+import java.io.IOException;
+import java.io.OutputStream;
 import java.net.InetAddress;
 import java.util.List;
 
@@ -114,24 +116,32 @@ public class PositionsImpl implements Positions {
 		return;
 	}
 
+	private String getPositionsDump() {
+		@SuppressWarnings("unchecked")
+		List<NodePosition> result = sessionFactory.getCurrentSession()
+				.createQuery("from NodePosition node").list();
+
+		StringBuilder s = new StringBuilder();
+		s.append("[Positions]\n");
+		for (NodePosition node : result) {
+			s.append(node.toString() + "\n");
+		}
+
+		return s.toString();
+	}
+
 	@Override
 	@Transactional
 	public void log(Logger logger, Level level) {
 		if (logger.isEnabledFor(level)) {
-			@SuppressWarnings("unchecked")
-			List<NodePosition> result = sessionFactory.getCurrentSession()
-					.createQuery("from NodePosition node").list();
-
-			if (result.size() == 0) {
-				return;
-			}
-
-			StringBuilder s = new StringBuilder();
-			s.append("*** Positions ***\n");
-			for (NodePosition node : result) {
-				s.append(node.toString());
-			}
-			logger.log(level, s.toString());
+			logger.log(level, getPositionsDump());
 		}
+	}
+
+	@Override
+	@Transactional
+	public void print(OutputStream out) throws IOException {
+		String s = getPositionsDump();
+		out.write(s.getBytes(), 0, s.length());
 	}
 }

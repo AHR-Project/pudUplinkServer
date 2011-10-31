@@ -22,6 +22,7 @@
 		<config>src/main/resources/META-INF/spring/positions.xml</config>
 		<config>src/main/resources/META-INF/spring/relayServers.xml</config>
 		<config>src/main/resources/META-INF/spring/expiry.xml</config>
+		<config>src/main/resources/META-INF/spring/databaseLogger.xml</config>
 
 		<config>src/main/resources/META-INF/spring/clusterLeaderHandler.xml</config>
 		<config>src/main/resources/META-INF/spring/positionUpdateHandler.xml</config>

@@ -1,5 +1,7 @@
 package nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.impl;
 
+import java.io.IOException;
+import java.io.OutputStream;
 import java.util.List;
 
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.RelayServers;
@@ -98,24 +100,32 @@ public class RelayServersImpl implements RelayServers {
 		saveRelayServer(relayServer, true);
 	}
 
+	private String getRelayServersDump() {
+		@SuppressWarnings("unchecked")
+		List<RelayServer> result = sessionFactory.getCurrentSession()
+				.createQuery("from RelayServer rs").list();
+
+		StringBuilder s = new StringBuilder();
+		s.append("[RelayServers]\n");
+		for (RelayServer rs : result) {
+			s.append(rs.toString() + "\n");
+		}
+
+		return s.toString();
+	}
+
 	@Override
 	@Transactional
 	public void log(Logger logger, Level level) {
 		if (logger.isEnabledFor(level)) {
-			@SuppressWarnings("unchecked")
-			List<RelayServer> result = sessionFactory.getCurrentSession()
-					.createQuery("from RelayServer rs").list();
-
-			if (result.size() == 0) {
-				return;
-			}
-
-			StringBuilder s = new StringBuilder();
-			s.append("*** RelayServers ***\n");
-			for (RelayServer rs : result) {
-				s.append(rs.toString());
-			}
-			logger.log(level, s.toString());
+			logger.log(level, getRelayServersDump());
 		}
+	}
+
+	@Override
+	@Transactional
+	public void print(OutputStream out) throws IOException {
+		String s = getRelayServersDump();
+		out.write(s.getBytes(), 0, s.length());
 	}
 }

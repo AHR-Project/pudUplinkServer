@@ -1,4 +1,5 @@
 /build.jni/
 /dist/
 /target/
+/database.txt
 /relayserver.log
