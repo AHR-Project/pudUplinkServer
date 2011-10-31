@@ -15,7 +15,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReentrantLock;
 
-import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.RelayServerConfiguration;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.Nodes;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.Positions;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.RelayServers;
@@ -23,6 +22,7 @@ import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.domainmodel.Node;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.domainmodel.NodePosition;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.domainmodel.RelayServer;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.distributor.Distributor;
+import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.util.MyIPAddresses;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Required;
@@ -53,15 +53,15 @@ public class DistributorImpl extends Thread implements Distributor {
 		this.dataLock = dataLock;
 	}
 
-	private RelayServerConfiguration config;
+	private MyIPAddresses myIPAddresses;
 
 	/**
-	 * @param config
-	 *            the config to set
+	 * @param myIPAddresses
+	 *            the myIPAddresses to set
 	 */
 	@Required
-	public final void setConfig(RelayServerConfiguration config) {
-		this.config = config;
+	public final void setMyIPAddresses(MyIPAddresses config) {
+		this.myIPAddresses = config;
 	}
 
 	/** the UDP port to listen on for uplink messages */
@@ -401,7 +401,7 @@ public class DistributorImpl extends Thread implements Distributor {
 								+ ":" + clusterLeader.getDownlinkPort());
 					}
 
-					if (config.isMe(clusterLeader.getMainIp())
+					if (myIPAddresses.isMe(clusterLeader.getMainIp())
 							&& (clusterLeader.getDownlinkPort() == uplinkUdpPort)) {
 						/* do not relay to ourselves */
 						if (logger.isDebugEnabled()) {

@@ -30,6 +30,6 @@
 
 	<import resource="classpath:META-INF/spring/uplinkReceiver.xml" />
 
-	<import resource="classpath:META-INF/spring/relayServerConfiguration.xml" />
+	<import resource="classpath:META-INF/spring/myIPAddresses.xml" />
 
 </beans>

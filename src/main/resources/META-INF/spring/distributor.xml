@@ -6,7 +6,7 @@
 	<bean id="Distributor"
 		class="nl.mindef.c2sc.nbs.olsr.pud.uplink.server.distributor.impl.DistributorImpl"
 		init-method="init" destroy-method="destroy">
-		<property name="config" ref="RelayServerConfiguration" />
+		<property name="myIPAddresses" ref="RelayServerConfiguration" />
 		<property name="configuredRelayServers" value="${relaycluster.servers}" />
 		<property name="dataLock" ref="DaoDataLock" />
 		<property name="distributionDelay" value="${distribution.delay}" />

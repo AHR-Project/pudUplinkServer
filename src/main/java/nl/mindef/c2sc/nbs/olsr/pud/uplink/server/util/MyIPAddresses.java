@@ -1,4 +1,4 @@
-package nl.mindef.c2sc.nbs.olsr.pud.uplink.server;
+package nl.mindef.c2sc.nbs.olsr.pud.uplink.server.util;
 
 import java.net.InetAddress;
 import java.net.NetworkInterface;
@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
 
-public class RelayServerConfiguration {
+public class MyIPAddresses {
 	private List<InetAddress> addrList = new ArrayList<InetAddress>();
 
 	public boolean isMe(InetAddress ip) {

@@ -31,7 +31,7 @@
 
 		<config>src/main/resources/META-INF/spring/uplinkReceiver.xml</config>
 
-		<config>src/main/resources/META-INF/spring/relayServerConfiguration.xml</config>
+		<config>src/main/resources/META-INF/spring/myIPAddresses.xml</config>
 	</configs>
 	<configSets>
 	</configSets>
