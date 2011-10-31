@@ -8,8 +8,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.Nodes;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.Positions;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.RelayServers;
+import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.distributor.Distributor;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.handlers.PacketHandler;
-import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.relaycluster.RelayCluster;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -46,15 +46,15 @@ public class UplinkReceiver extends Thread implements SignalHandler {
 		this.packetHandler = packetHandler;
 	}
 
-	private RelayCluster relayCluster;
+	private Distributor distributor;
 
 	/**
-	 * @param relayCluster
-	 *            the relayCluster to set
+	 * @param distributor
+	 *            the distributor to set
 	 */
 	@Required
-	public final void setRelayCluster(RelayCluster relayCluster) {
-		this.relayCluster = relayCluster;
+	public final void setRelayCluster(Distributor distributor) {
+		this.distributor = distributor;
 	}
 
 	/*
@@ -139,14 +139,14 @@ public class UplinkReceiver extends Thread implements SignalHandler {
 		while (run.get()) {
 			try {
 				sock.receive(packet);
-				if (packetHandler.processPacket(packet, relayCluster.getMe())) {
+				if (packetHandler.processPacket(packet, distributor.getMe())) {
 					if (logger.isDebugEnabled()) {
 						nodes.log(logger, Level.DEBUG);
 						positions.log(logger, Level.DEBUG);
 						relayServers.log(logger, Level.DEBUG);
 					}
 
-					relayCluster.signalUpdate();
+					distributor.signalUpdate();
 				}
 			} catch (Exception e) {
 				if (!SocketException.class.equals(e.getClass())) {

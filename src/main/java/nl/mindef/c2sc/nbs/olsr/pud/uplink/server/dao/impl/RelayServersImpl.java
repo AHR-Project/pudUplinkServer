@@ -3,8 +3,8 @@ package nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.impl;
 import java.util.List;
 
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.RelayServers;
+import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.distributor.Distributor;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.domainmodel.RelayServer;
-import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.relaycluster.RelayCluster;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -13,15 +13,15 @@ import org.springframework.beans.factory.annotation.Required;
 import org.springframework.transaction.annotation.Transactional;
 
 public class RelayServersImpl implements RelayServers {
-	private RelayCluster relayCluster;
+	private Distributor distributor;
 
 	/**
-	 * @param relayCluster
-	 *            the relayCluster to set
+	 * @param distributor
+	 *            the distributor to set
 	 */
 	@Required
-	public final void setRelayCluster(RelayCluster relayCluster) {
-		this.relayCluster = relayCluster;
+	public final void setRelayCluster(Distributor distributor) {
+		this.distributor = distributor;
 	}
 
 	private SessionFactory sessionFactory;
@@ -77,7 +77,7 @@ public class RelayServersImpl implements RelayServers {
 				.getCurrentSession()
 				.createQuery(
 						"select rs from RelayServer rs" + " where rs.id != "
-								+ relayCluster.getMe().getId()).list();
+								+ distributor.getMe().getId()).list();
 
 		return result;
 	}

@@ -1,4 +1,4 @@
-package nl.mindef.c2sc.nbs.olsr.pud.uplink.server.relaycluster.impl;
+package nl.mindef.c2sc.nbs.olsr.pud.uplink.server.distributor.impl;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
@@ -18,15 +18,15 @@ import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.RelayServerConfiguration;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.Nodes;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.Positions;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.RelayServers;
+import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.distributor.Distributor;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.domainmodel.Node;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.domainmodel.NodePosition;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.domainmodel.RelayServer;
-import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.relaycluster.RelayCluster;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Required;
 
-public class RelayClusterImpl extends Thread implements RelayCluster {
+public class DistributorImpl extends Thread implements Distributor {
 	private Logger logger = Logger.getLogger(this.getClass().getName());
 
 	public static final int packetMaxSizeDefault = 1500;
