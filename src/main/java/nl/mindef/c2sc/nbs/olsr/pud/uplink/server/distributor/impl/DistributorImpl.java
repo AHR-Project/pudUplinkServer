@@ -415,6 +415,16 @@ public class DistributorImpl extends Thread implements Distributor {
 									+ " skipped because of invalid IP address"
 									+ " or port");
 						}
+
+						/*
+						 * FIXME find a substitute clusterleader (from that
+						 * cluster) that allows downlink: (clusterLeaderIp !=
+						 * null) && (clusterLeaderDownlinkPort !=
+						 * Node.DOWNLINK_PORT_INVALID) && not(me). when found: re-determine
+						 * clusterLeaderIp and clusterLeaderDownlinkPort from
+						 * the substitute clusterleader.
+						 */
+
 						continue;
 					}
 
