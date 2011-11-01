@@ -112,7 +112,7 @@ public class NodePosition implements Serializable {
 	private Node node = null;
 
 	/**
-	 * @return the position
+	 * @return the node
 	 */
 	public final Node getNode() {
 		return node;
