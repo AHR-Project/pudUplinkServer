@@ -31,6 +31,9 @@
 		<project.gitsha>${project.build.directory}/gitsha</project.gitsha>
 		<project.startscript>relayserver</project.startscript>
 		<project.sysvscript>ahrrs</project.sysvscript>
+
+		<!-- DEBUG settings -->
+		<project.faker.use.boolean>false</project.faker.use.boolean>
 	</properties>
 
 	<issueManagement>
@@ -296,7 +299,7 @@
 							<replacements>
 								<replacement>
 									<token>^\s*faker\.use\s*=.*</token>
-									<value>faker.use=false</value>
+									<value>faker.use=${project.faker.use.boolean}</value>
 								</replacement>
 							</replacements>
 						</configuration>
