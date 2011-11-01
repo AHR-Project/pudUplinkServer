@@ -47,7 +47,7 @@ public class PositionUpdateHandlerImpl implements PositionUpdateHandler {
 
 	@Override
 	@Transactional
-	public boolean handlePositionMessage(long utcTimestamp,
+	public boolean handlePositionMessage(InetAddress srcIp, long utcTimestamp,
 			PositionUpdate posUpMsg, RelayServer relayServer) {
 		assert (relayServer != null);
 
@@ -64,7 +64,9 @@ public class PositionUpdateHandlerImpl implements PositionUpdateHandler {
 		/* retrieve the node that sent the position update */
 		Node originatorNode = nodes.getNode(originator);
 		if (originatorNode == null) {
+			/* new node */
 			originatorNode = new Node();
+			originatorNode.setIp(srcIp);
 			originatorNode.setMainIp(originator);
 			originatorNode.setReceptionTime(utcTimestamp);
 			originatorNode.setValidityTime(posUpMsg
@@ -77,6 +79,7 @@ public class PositionUpdateHandlerImpl implements PositionUpdateHandler {
 		NodePosition storedPosition = originatorNode.getPosition();
 		boolean storedPositionIsNew = false;
 		if (storedPosition == null) {
+			/* new position */
 			storedPosition = new NodePosition();
 			storedPositionIsNew = true;
 		}

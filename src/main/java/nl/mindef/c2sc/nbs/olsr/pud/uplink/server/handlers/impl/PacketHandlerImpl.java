@@ -1,6 +1,7 @@
 package nl.mindef.c2sc.nbs.olsr.pud.uplink.server.handlers.impl;
 
 import java.net.DatagramPacket;
+import java.net.InetAddress;
 import java.util.Arrays;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -96,14 +97,15 @@ public class PacketHandlerImpl implements PacketHandler {
 
 		dataLock.lock();
 		try {
+			InetAddress srcIp = packet.getAddress();
+			byte[] packetData = packet.getData();
+			int packetLength = packet.getLength();
+
 			if (logger.isDebugEnabled()) {
 				logger.debug("Received " + packet.getLength()
 						+ " bytes on timestamp " + utcTimestamp + " from "
-						+ packet.getAddress().getHostAddress());
+						+ srcIp.getHostAddress());
 			}
-
-			byte[] packetData = packet.getData();
-			int packetLength = packet.getLength();
 
 			int from = 0;
 			while (from < packetLength) {
@@ -119,7 +121,7 @@ public class PacketHandlerImpl implements PacketHandler {
 				if (type == UplinkMessage.getUplinkMessageTypePosition()) {
 					PositionUpdate pu = new PositionUpdate(data1, length);
 					updated |= positionUpdateHandler.handlePositionMessage(
-							utcTimestamp, pu, relayServer);
+							srcIp, utcTimestamp, pu, relayServer);
 					if (useFaker) {
 						faker.fakeit(Faker.MSGTYPE.PU, utcTimestamp, pu,
 								relayServer);
@@ -128,7 +130,7 @@ public class PacketHandlerImpl implements PacketHandler {
 						.getUplinkMessageTypeClusterLeader()) {
 					ClusterLeader cl = new ClusterLeader(data1, length);
 					updated |= clusterLeaderHandler.handleClusterLeaderMessage(
-							utcTimestamp, cl, relayServer);
+							srcIp, utcTimestamp, cl, relayServer);
 					if (useFaker) {
 						faker.fakeit(Faker.MSGTYPE.CL, utcTimestamp, cl,
 								relayServer);

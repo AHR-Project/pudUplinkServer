@@ -47,7 +47,8 @@ public class Faker {
 	}
 
 	/**
-	 * @param firstFake the firstFake to set
+	 * @param firstFake
+	 *            the firstFake to set
 	 */
 	public final void setFirstFake(boolean firstFake) {
 		this.firstFake = firstFake;
@@ -97,9 +98,11 @@ public class Faker {
 						pumsgClone[10] = (byte) network;
 						pumsgClone[11] = (byte) node;
 
+						PositionUpdate pu = new PositionUpdate(pumsgClone,
+								pumsgClone.length);
 						positionUpdateHandler.handlePositionMessage(
-								utcTimestamp, new PositionUpdate(pumsgClone,
-										pumsgClone.length), relayServer);
+								pu.getOlsrMessageOriginator(), utcTimestamp,
+								pu, relayServer);
 					}
 
 					/*
@@ -115,9 +118,11 @@ public class Faker {
 						clmsgClone[14] = (byte) network;
 						clmsgClone[15] = (byte) clusterLeaderNode;
 
+						ClusterLeader cl = new ClusterLeader(clmsgClone,
+								clmsgClone.length);
 						clusterLeaderHandler.handleClusterLeaderMessage(
-								utcTimestamp, new ClusterLeader(clmsgClone,
-										clmsgClone.length), relayServer);
+								cl.getClusterLeaderOriginator(), utcTimestamp,
+								cl, relayServer);
 					}
 				} else {
 					firstNode = false;
@@ -142,8 +147,10 @@ public class Faker {
 			pumsgClone[10] = (byte) network;
 			pumsgClone[11] = (byte) node;
 
-			positionUpdateHandler.handlePositionMessage(utcTimestamp,
-					new PositionUpdate(pumsgClone, pumsgClone.length),
+			PositionUpdate pu = new PositionUpdate(pumsgClone,
+					pumsgClone.length);
+			positionUpdateHandler.handlePositionMessage(
+					pu.getOlsrMessageOriginator(), utcTimestamp, pu,
 					relayServer);
 		}
 
@@ -160,8 +167,9 @@ public class Faker {
 			clmsgClone[14] = (byte) (network - 1);
 			clmsgClone[15] = (byte) (clusterLeaderNode + nodeCountMax - 1);
 
-			clusterLeaderHandler.handleClusterLeaderMessage(utcTimestamp,
-					new ClusterLeader(clmsgClone, clmsgClone.length),
+			ClusterLeader cl = new ClusterLeader(clmsgClone, clmsgClone.length);
+			clusterLeaderHandler.handleClusterLeaderMessage(
+					cl.getClusterLeaderOriginator(), utcTimestamp, cl,
 					relayServer);
 		}
 	}

@@ -32,8 +32,8 @@ public class ClusterLeaderHandlerImpl implements ClusterLeaderHandler {
 
 	@Override
 	@Transactional
-	public boolean handleClusterLeaderMessage(long utcTimestamp,
-			ClusterLeader clUpMsg, RelayServer relayServer) {
+	public boolean handleClusterLeaderMessage(InetAddress srcIp,
+			long utcTimestamp, ClusterLeader clUpMsg, RelayServer relayServer) {
 		assert (relayServer != null);
 
 		if (clUpMsg.getClusterLeaderVersion() != WireFormatConstants.VERSION) {
@@ -75,6 +75,7 @@ public class ClusterLeaderHandlerImpl implements ClusterLeaderHandler {
 			}
 		}
 
+		originatorNode.setIp(srcIp);
 		originatorNode.setMainIp(originator);
 		originatorNode.setDownlinkPort(downlinkPort);
 		originatorNode.setReceptionTime(utcTimestamp);
