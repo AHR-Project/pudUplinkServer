@@ -357,20 +357,23 @@ public class DistributorImpl extends Thread implements Distributor {
 				Set<DatagramPacket> packets = positionsToPackets(p4ds);
 				if ((packets != null) && (packets.size() > 0)) {
 					for (RelayServer otherRelayServer : otherRelayServers) {
+						InetAddress otherRelayServerIp = otherRelayServer
+								.getIp();
+						int otherRelayServerPort = otherRelayServer.getPort();
+
 						s.setLength(0);
 						if (logger.isDebugEnabled()) {
 							s.append("  tx " + packets.size()
 									+ " packet(s) to "
-									+ otherRelayServer.getIp().getHostAddress()
-									+ ":" + otherRelayServer.getPort()
-									+ ", sizes=");
+									+ otherRelayServerIp.getHostAddress() + ":"
+									+ otherRelayServerPort + ", sizes=");
 						}
 						for (DatagramPacket packet : packets) {
 							if (logger.isDebugEnabled()) {
 								s.append(" " + packet.getLength());
 							}
-							packet.setAddress(otherRelayServer.getIp());
-							packet.setPort(otherRelayServer.getPort());
+							packet.setAddress(otherRelayServerIp);
+							packet.setPort(otherRelayServerPort);
 							try {
 								sock.send(packet);
 							} catch (IOException e) {
@@ -381,8 +384,8 @@ public class DistributorImpl extends Thread implements Distributor {
 									s.setLength(0);
 								}
 								logger.error("Could not send to relay server "
-										+ otherRelayServer.getIp() + ":"
-										+ otherRelayServer.getPort());
+										+ otherRelayServerIp + ":"
+										+ otherRelayServerPort);
 							}
 						}
 						if (logger.isDebugEnabled()) {
@@ -399,6 +402,7 @@ public class DistributorImpl extends Thread implements Distributor {
 			List<Node> clusterLeaders = nodes.getClusterLeaders();
 			if ((clusterLeaders != null) && (clusterLeaders.size() > 0)) {
 				for (Node clusterLeader : clusterLeaders) {
+					InetAddress clusterLeaderMainIp = clusterLeader.getMainIp();
 					InetAddress clusterLeaderIp = clusterLeader.getIp();
 					int clusterLeaderDownlinkPort = clusterLeader
 							.getDownlinkPort();
@@ -406,8 +410,7 @@ public class DistributorImpl extends Thread implements Distributor {
 					if (clusterLeaderIp == null) {
 						if (logger.isDebugEnabled()) {
 							logger.debug("  *** cluster leader "
-									+ clusterLeader.getMainIp()
-											.getHostAddress()
+									+ clusterLeaderMainIp.getHostAddress()
 									+ " skipped because of"
 									+ " invalid IP address");
 						}
@@ -416,8 +419,7 @@ public class DistributorImpl extends Thread implements Distributor {
 					if (clusterLeaderDownlinkPort == Node.DOWNLINK_PORT_INVALID) {
 						if (logger.isDebugEnabled()) {
 							logger.debug("  *** cluster leader "
-									+ clusterLeader.getMainIp()
-											.getHostAddress()
+									+ clusterLeaderMainIp.getHostAddress()
 									+ " skipped because of"
 									+ " invalid downlink port");
 						}
@@ -426,13 +428,13 @@ public class DistributorImpl extends Thread implements Distributor {
 
 					if (logger.isDebugEnabled()) {
 						logger.debug("  *** cluster leader "
-								+ clusterLeader.getMainIp().getHostAddress()
-								+ ":" + clusterLeader.getDownlinkPort());
+								+ clusterLeaderMainIp.getHostAddress() + ":"
+								+ clusterLeaderDownlinkPort);
 					}
 
 					if ((myIPAddresses.isMe(clusterLeaderIp) || myIPAddresses
-							.isMe(clusterLeader.getMainIp()))
-							&& (clusterLeader.getDownlinkPort() == uplinkUdpPort)) {
+							.isMe(clusterLeaderMainIp))
+							&& (clusterLeaderDownlinkPort == uplinkUdpPort)) {
 						/* do not relay to ourselves */
 						if (logger.isDebugEnabled()) {
 							logger.debug("  this is me: skipping");
@@ -463,13 +465,11 @@ public class DistributorImpl extends Thread implements Distributor {
 					if ((packets != null) && (packets.size() > 0)) {
 						s.setLength(0);
 						if (logger.isDebugEnabled()) {
-							s.append("    tx "
-									+ packets.size()
+							s.append("    tx " + packets.size()
 									+ " packet(s) to "
-									+ clusterLeader.getMainIp()
-											.getHostAddress() + ":"
-									+ clusterLeader.getDownlinkPort() + " (ip="
-									+ clusterLeader.getIp().getHostAddress()
+									+ clusterLeaderMainIp.getHostAddress()
+									+ ":" + clusterLeaderDownlinkPort + " (ip="
+									+ clusterLeaderIp.getHostAddress()
 									+ "), sizes=");
 						}
 
@@ -477,7 +477,7 @@ public class DistributorImpl extends Thread implements Distributor {
 							if (logger.isDebugEnabled()) {
 								s.append(" " + packet.getLength());
 							}
-							packet.setAddress(clusterLeader.getIp());
+							packet.setAddress(clusterLeaderIp);
 							packet.setPort(clusterLeaderDownlinkPort);
 							try {
 								sock.send(packet);
@@ -489,9 +489,9 @@ public class DistributorImpl extends Thread implements Distributor {
 									s.setLength(0);
 								}
 								logger.error("Could not send to cluster leader "
-										+ clusterLeader.getMainIp()
+										+ clusterLeaderMainIp
 										+ ":"
-										+ clusterLeader.getDownlinkPort());
+										+ clusterLeaderDownlinkPort);
 							}
 						}
 						if (logger.isDebugEnabled()) {
