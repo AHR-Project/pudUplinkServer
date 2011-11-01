@@ -16,7 +16,7 @@ import javax.persistence.OneToOne;
 
 @Entity
 public class Node implements Serializable {
-	private static final long serialVersionUID = -5972046138211714143L;
+	private static final long serialVersionUID = -3839307955439253264L;
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
@@ -35,6 +35,24 @@ public class Node implements Serializable {
 	 */
 	public final void setId(Long id) {
 		this.id = id;
+	}
+
+	/** the destination IP of the node */
+	private InetAddress ip = null;
+
+	/**
+	 * @return the ip
+	 */
+	public final InetAddress getIp() {
+		return ip;
+	}
+
+	/**
+	 * @param ip
+	 *            the ip to set
+	 */
+	public final void setIp(InetAddress ip) {
+		this.ip = ip;
 	}
 
 	/** the main IP of the node */
@@ -191,6 +209,8 @@ public class Node implements Serializable {
 		StringBuilder builder = new StringBuilder();
 		builder.append(this.getClass().getSimpleName() + " [id=");
 		builder.append(id);
+		builder.append(", ip=");
+		builder.append((ip == null) ? "-" : ip.getHostAddress());
 		builder.append(", mainIp=");
 		builder.append((mainIp == null) ? "-" : mainIp.getHostAddress());
 		builder.append(", downlinkPort=");
