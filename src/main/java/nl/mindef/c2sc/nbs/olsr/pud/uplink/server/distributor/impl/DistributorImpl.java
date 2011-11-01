@@ -407,21 +407,13 @@ public class DistributorImpl extends Thread implements Distributor {
 					int clusterLeaderDownlinkPort = clusterLeader
 							.getDownlinkPort();
 
-					if (clusterLeaderIp == null) {
+					if ((clusterLeaderIp == null)
+							|| (clusterLeaderDownlinkPort == Node.DOWNLINK_PORT_INVALID)) {
 						if (logger.isDebugEnabled()) {
 							logger.debug("  *** cluster leader "
 									+ clusterLeaderMainIp.getHostAddress()
-									+ " skipped because of"
-									+ " invalid IP address");
-						}
-						continue;
-					}
-					if (clusterLeaderDownlinkPort == Node.DOWNLINK_PORT_INVALID) {
-						if (logger.isDebugEnabled()) {
-							logger.debug("  *** cluster leader "
-									+ clusterLeaderMainIp.getHostAddress()
-									+ " skipped because of"
-									+ " invalid downlink port");
+									+ " skipped because of invalid IP address"
+									+ " or port");
 						}
 						continue;
 					}
