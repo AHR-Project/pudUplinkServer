@@ -73,9 +73,7 @@ public class PositionsImpl implements Positions {
 										: " and pos.node != null"
 												+ " and pos.node.clusterLeader != null"
 												+ " and pos.node.clusterLeader.id != "
-												+ clusterLeader.getId()
-												+ " and pos.node.downlinkPort != "
-												+ Node.DOWNLINK_PORT_INVALID))
+												+ clusterLeader.getId()))
 				.setParameter("startTime", startTime)
 				.setParameter("endTime", endTime).list();
 
