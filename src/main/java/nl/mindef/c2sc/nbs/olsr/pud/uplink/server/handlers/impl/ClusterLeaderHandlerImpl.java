@@ -71,6 +71,7 @@ public class ClusterLeaderHandlerImpl implements ClusterLeaderHandler {
 				clusterleaderNode.setValidityTime(clUpMsg
 						.getClusterLeaderValidityTime() * 1000);
 				clusterleaderNode.setRelayServer(relayServer);
+				clusterleaderNode.setClusterLeader(clusterleaderNode);
 				nodes.saveNode(clusterleaderNode, true);
 			}
 		}
