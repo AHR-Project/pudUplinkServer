@@ -326,8 +326,7 @@ public class DistributorImpl extends Thread implements Distributor {
 			StringBuilder s = new StringBuilder();
 
 			if (logger.isDebugEnabled()) {
-				logger.debug(this.getClass().getSimpleName()
-						+ ": have to distribute [" + lastDistributionTime
+				logger.debug("Have to distribute [" + lastDistributionTime
 						+ ", " + currentTime + "]\n");
 			}
 
