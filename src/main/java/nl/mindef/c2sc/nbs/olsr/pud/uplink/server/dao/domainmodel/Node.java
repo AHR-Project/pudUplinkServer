@@ -211,11 +211,11 @@ public class Node implements Serializable {
 		builder.append(id);
 		builder.append(", ip=");
 		builder.append((ip == null) ? "-" : ip.getHostAddress());
-		builder.append(", mainIp=");
-		builder.append((mainIp == null) ? "-" : mainIp.getHostAddress());
 		builder.append(", downlinkPort=");
 		builder.append((downlinkPort == DOWNLINK_PORT_INVALID) ? "-"
 				: downlinkPort);
+		builder.append(", mainIp=");
+		builder.append((mainIp == null) ? "-" : mainIp.getHostAddress());
 		builder.append(", position=");
 		builder.append((position == null) ? "-" : position.getId());
 		builder.append(", clusterLeader=");
