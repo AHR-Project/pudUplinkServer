@@ -9,7 +9,10 @@ import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.Positions;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Required;
+import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
+@Repository
 public class ExpireNodes {
 	private Logger logger = Logger.getLogger(this.getClass().getName());
 
@@ -20,10 +23,11 @@ public class ExpireNodes {
 	 *            the dataLock to set
 	 */
 	@Required
-	public final void setDataLock(ReentrantLock dataLock) {
+	public void setDataLock(ReentrantLock dataLock) {
 		this.dataLock = dataLock;
 	}
 
+	@Transactional
 	protected class ExpiryTimerTask extends TimerTask {
 		@Override
 		public void run() {
@@ -59,7 +63,7 @@ public class ExpireNodes {
 	/**
 	 * @return the interval
 	 */
-	public final long getInterval() {
+	public long getInterval() {
 		return interval;
 	}
 
@@ -68,7 +72,7 @@ public class ExpireNodes {
 	 *            the interval to set
 	 */
 	@Required
-	public final void setInterval(long interval) {
+	public void setInterval(long interval) {
 		this.interval = interval;
 	}
 
@@ -82,7 +86,7 @@ public class ExpireNodes {
 	 * @param validityTimeMultiplier
 	 *            the validityTimeMultiplier to set
 	 */
-	public final void setValidityTimeMultiplier(double validityTimeMultiplier) {
+	public void setValidityTimeMultiplier(double validityTimeMultiplier) {
 		this.validityTimeMultiplier = validityTimeMultiplier;
 	}
 
@@ -91,7 +95,7 @@ public class ExpireNodes {
 	/**
 	 * @return the nodes
 	 */
-	public final Nodes getNodes() {
+	public Nodes getNodes() {
 		return nodes;
 	}
 
@@ -100,7 +104,7 @@ public class ExpireNodes {
 	 *            the nodes to set
 	 */
 	@Required
-	public final void setNodes(Nodes nodes) {
+	public void setNodes(Nodes nodes) {
 		this.nodes = nodes;
 	}
 
@@ -112,7 +116,7 @@ public class ExpireNodes {
 	 *            the positions to set
 	 */
 	@Required
-	public final void setPositions(Positions positions) {
+	public void setPositions(Positions positions) {
 		this.positions = positions;
 	}
 
