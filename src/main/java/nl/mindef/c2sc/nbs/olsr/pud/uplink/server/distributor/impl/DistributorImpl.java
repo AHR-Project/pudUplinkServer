@@ -400,8 +400,20 @@ public class DistributorImpl extends Thread implements Distributor {
 			List<Node> clusterLeaders = nodes.getClusterLeaders();
 			if ((clusterLeaders != null) && (clusterLeaders.size() > 0)) {
 				for (Node clusterLeader : clusterLeaders) {
+					InetAddress clusterLeaderIp = clusterLeader.getIp();
 					int clusterLeaderDownlinkPort = clusterLeader
 							.getDownlinkPort();
+
+					if (clusterLeaderIp == null) {
+						if (logger.isDebugEnabled()) {
+							logger.debug("  *** cluster leader "
+									+ clusterLeader.getMainIp()
+											.getHostAddress()
+									+ " skipped because of"
+									+ " invalid IP address");
+						}
+						continue;
+					}
 					if (clusterLeaderDownlinkPort == Node.DOWNLINK_PORT_INVALID) {
 						if (logger.isDebugEnabled()) {
 							logger.debug("  *** cluster leader "
@@ -419,7 +431,8 @@ public class DistributorImpl extends Thread implements Distributor {
 								+ ":" + clusterLeader.getDownlinkPort());
 					}
 
-					if (myIPAddresses.isMe(clusterLeader.getMainIp())
+					if ((myIPAddresses.isMe(clusterLeaderIp) || myIPAddresses
+							.isMe(clusterLeader.getMainIp()))
 							&& (clusterLeader.getDownlinkPort() == uplinkUdpPort)) {
 						/* do not relay to ourselves */
 						if (logger.isDebugEnabled()) {
@@ -456,15 +469,16 @@ public class DistributorImpl extends Thread implements Distributor {
 									+ " packet(s) to "
 									+ clusterLeader.getMainIp()
 											.getHostAddress() + ":"
-									+ clusterLeader.getDownlinkPort()
-									+ ", sizes=");
+									+ clusterLeader.getDownlinkPort() + " (ip="
+									+ clusterLeader.getIp().getHostAddress()
+									+ "), sizes=");
 						}
 
 						for (DatagramPacket packet : packets) {
 							if (logger.isDebugEnabled()) {
 								s.append(" " + packet.getLength());
 							}
-							packet.setAddress(clusterLeader.getMainIp());
+							packet.setAddress(clusterLeader.getIp());
 							packet.setPort(clusterLeaderDownlinkPort);
 							try {
 								sock.send(packet);
