@@ -62,6 +62,23 @@ public interface Nodes {
 	 */
 	public List<Node> getClusterLeaders();
 
+	/**
+	 * Get a substitute cluster leader for a given cluster leader.<br/>
+	 * <br/>
+	 * The substitute cluster leader is a Node that is in the same cluster as
+	 * the cluster leader, but is not the cluster leader itself. The substitute
+	 * cluster leader also has a valid IP address and a valid downlink port.<br/>
+	 * Only the substitute cluster leader node is retrieved, no linked objects
+	 * (non-eager fetching) <br/>
+	 * <br/>
+	 * 
+	 * @param clusterLeader
+	 *            the cluster leader for which a substitute is sought
+	 * @return the substitute cluster leader
+	 */
+	public Node getSubstituteClusterLeader(Node clusterLeader);
+
 	public void log(Logger logger, Level level);
+
 	public void print(OutputStream out) throws IOException;
 }

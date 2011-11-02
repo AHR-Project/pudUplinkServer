@@ -82,6 +82,30 @@ public class NodesImpl implements Nodes {
 
 	@Override
 	@Transactional
+	public Node getSubstituteClusterLeader(Node clusterLeader) {
+		@SuppressWarnings("unchecked")
+		List<Node> result = sessionFactory.getCurrentSession()
+				.createQuery("select node from Node node where "
+				/* it is not the cluster leader itself */
+				+ "id != " + clusterLeader.getId() + " and "
+				/* it points to cluster leader */
+				+ "clusterLeader.id = " + clusterLeader.getId() + " and "
+				/* it has a valid IP address */
+				+ "ip != null" + " and " +
+				/* it has a valid downlink port */
+				"downlinkPort != " + Node.DOWNLINK_PORT_INVALID
+				/* keep the most recent one on top of the list */
+				+ " order by receptionTime desc").list();
+
+		if (result.size() == 0) {
+			return null;
+		}
+
+		return result.get(0);
+	}
+
+	@Override
+	@Transactional
 	public void saveNode(Node node, boolean newObject) {
 		if (newObject) {
 			sessionFactory.getCurrentSession().saveOrUpdate(node);

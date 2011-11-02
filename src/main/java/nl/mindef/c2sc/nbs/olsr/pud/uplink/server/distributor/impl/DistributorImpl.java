@@ -409,29 +409,39 @@ public class DistributorImpl extends Thread implements Distributor {
 
 					if ((clusterLeaderIp == null)
 							|| (clusterLeaderDownlinkPort == Node.DOWNLINK_PORT_INVALID)) {
+						Node substituteClusterLeader = nodes
+								.getSubstituteClusterLeader(clusterLeader);
+
+						if (substituteClusterLeader == null) {
+							if (logger.isDebugEnabled()) {
+								logger.debug("  *** cluster leader "
+										+ clusterLeaderMainIp.getHostAddress()
+										+ " has an invalid IP address and/or port"
+										+ " and no substitute cluster leader:"
+										+ " skipped");
+							}
+
+							continue;
+						}
+
+						clusterLeaderIp = substituteClusterLeader.getIp();
+						clusterLeaderDownlinkPort = substituteClusterLeader
+								.getDownlinkPort();
 						if (logger.isDebugEnabled()) {
 							logger.debug("  *** cluster leader "
 									+ clusterLeaderMainIp.getHostAddress()
-									+ " skipped because of invalid IP address"
-									+ " or port");
+									+ " has an invalid IP address and/or port:"
+									+ " selected substitute cluster leader "
+									+ substituteClusterLeader.getMainIp()
+											.getHostAddress());
 						}
-
-						/*
-						 * FIXME find a substitute clusterleader (from that
-						 * cluster) that allows downlink: (clusterLeaderIp !=
-						 * null) && (clusterLeaderDownlinkPort !=
-						 * Node.DOWNLINK_PORT_INVALID) && not(me). when found: re-determine
-						 * clusterLeaderIp and clusterLeaderDownlinkPort from
-						 * the substitute clusterleader.
-						 */
-
-						continue;
 					}
 
 					if (logger.isDebugEnabled()) {
 						logger.debug("  *** cluster leader "
 								+ clusterLeaderMainIp.getHostAddress() + ":"
-								+ clusterLeaderDownlinkPort);
+								+ clusterLeaderDownlinkPort + " (ip="
+								+ clusterLeaderIp.getHostAddress() + ")");
 					}
 
 					if ((myIPAddresses.isMe(clusterLeaderIp) || myIPAddresses
