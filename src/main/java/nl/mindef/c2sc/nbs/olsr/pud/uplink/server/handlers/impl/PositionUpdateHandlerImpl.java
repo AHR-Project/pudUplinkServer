@@ -107,7 +107,7 @@ public class PositionUpdateHandlerImpl implements PositionUpdateHandler {
 
 		/* fill in the stored position with the received position */
 		storedPosition.setMainIp(originator);
-		storedPosition.setReceptionTime(receivedTimeStamp);
+		storedPosition.setReceptionTime(utcTimestamp);
 		storedPosition
 				.setValidityTime(posUpMsg.getPositionUpdateValidityTime() * 1000);
 		storedPosition.setPositionUpdate(posUpMsg);
