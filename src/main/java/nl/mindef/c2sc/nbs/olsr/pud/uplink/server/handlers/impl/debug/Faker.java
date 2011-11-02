@@ -1,5 +1,7 @@
 package nl.mindef.c2sc.nbs.olsr.pud.uplink.server.handlers.impl.debug;
 
+import java.util.Random;
+
 import org.olsr.plugin.pud.ClusterLeader;
 import org.olsr.plugin.pud.PositionUpdate;
 import org.springframework.beans.factory.annotation.Required;
@@ -60,6 +62,8 @@ public class Faker {
 			return;
 		}
 
+		Random random = new Random();
+		int randomRange = 100;
 		byte[] clmsg = null;
 		byte[] pumsg = null;
 		int initialNetwork = 0;
@@ -89,40 +93,45 @@ public class Faker {
 			nodeCount = 0;
 			while ((node < 255) && (nodeCount < nodeCountMax)) {
 				if (!firstNode) {
-					/*
-					 * Position Update Message
-					 */
-					if (type == MSGTYPE.PU) {
-						byte[] pumsgClone = pumsg.clone();
-						// olsr originator
-						pumsgClone[10] = (byte) network;
-						pumsgClone[11] = (byte) node;
+					boolean skipNode = ((network == (initialNetwork + 1)) && (node == initialNode));
+					if (!skipNode) {
+						/*
+						 * Position Update Message
+						 */
+						if (type == MSGTYPE.PU) {
+							byte[] pumsgClone = pumsg.clone();
+							// olsr originator
+							pumsgClone[10] = (byte) network;
+							pumsgClone[11] = (byte) node;
 
-						PositionUpdate pu = new PositionUpdate(pumsgClone,
-								pumsgClone.length);
-						positionUpdateHandler.handlePositionMessage(
-								pu.getOlsrMessageOriginator(), utcTimestamp,
-								pu, relayServer);
-					}
+							PositionUpdate pu = new PositionUpdate(pumsgClone,
+									pumsgClone.length);
+							positionUpdateHandler.handlePositionMessage(
+									pu.getOlsrMessageOriginator(), utcTimestamp
+											+ random.nextInt(randomRange), pu,
+									relayServer);
+						}
 
-					/*
-					 * Cluster Leader Message
-					 */
-					if (type == MSGTYPE.CL) {
-						byte[] clmsgClone = clmsg.clone();
-						// originator
-						clmsgClone[10] = (byte) network;
-						clmsgClone[11] = (byte) node;
+						/*
+						 * Cluster Leader Message
+						 */
+						if (type == MSGTYPE.CL) {
+							byte[] clmsgClone = clmsg.clone();
+							// originator
+							clmsgClone[10] = (byte) network;
+							clmsgClone[11] = (byte) node;
 
-						// clusterLeader
-						clmsgClone[14] = (byte) network;
-						clmsgClone[15] = (byte) clusterLeaderNode;
+							// clusterLeader
+							clmsgClone[14] = (byte) network;
+							clmsgClone[15] = (byte) clusterLeaderNode;
 
-						ClusterLeader cl = new ClusterLeader(clmsgClone,
-								clmsgClone.length);
-						clusterLeaderHandler.handleClusterLeaderMessage(
-								cl.getClusterLeaderOriginator(), utcTimestamp,
-								cl, relayServer);
+							ClusterLeader cl = new ClusterLeader(clmsgClone,
+									clmsgClone.length);
+							clusterLeaderHandler.handleClusterLeaderMessage(
+									cl.getClusterLeaderOriginator(),
+									utcTimestamp + random.nextInt(randomRange),
+									cl, relayServer);
+						}
 					}
 				} else {
 					firstNode = false;
