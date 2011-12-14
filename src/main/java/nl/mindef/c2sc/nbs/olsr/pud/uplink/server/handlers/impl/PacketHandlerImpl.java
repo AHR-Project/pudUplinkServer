@@ -120,8 +120,9 @@ public class PacketHandlerImpl implements PacketHandler {
 						type, utcTimestamp);
 				if (type == UplinkMessage.getUplinkMessageTypePosition()) {
 					PositionUpdate pu = new PositionUpdate(data1, length);
-					updated |= positionUpdateHandler.handlePositionMessage(
-							srcIp, utcTimestamp, pu, relayServer);
+					updated = updated
+							|| positionUpdateHandler.handlePositionMessage(
+									srcIp, utcTimestamp, pu, relayServer);
 					if (useFaker) {
 						faker.fakeit(Faker.MSGTYPE.PU, utcTimestamp, pu,
 								relayServer);
@@ -129,8 +130,9 @@ public class PacketHandlerImpl implements PacketHandler {
 				} else if (type == PositionUpdate
 						.getUplinkMessageTypeClusterLeader()) {
 					ClusterLeader cl = new ClusterLeader(data1, length);
-					updated |= clusterLeaderHandler.handleClusterLeaderMessage(
-							srcIp, utcTimestamp, cl, relayServer);
+					updated = updated
+							|| clusterLeaderHandler.handleClusterLeaderMessage(
+									srcIp, utcTimestamp, cl, relayServer);
 					if (useFaker) {
 						faker.fakeit(Faker.MSGTYPE.CL, utcTimestamp, cl,
 								relayServer);

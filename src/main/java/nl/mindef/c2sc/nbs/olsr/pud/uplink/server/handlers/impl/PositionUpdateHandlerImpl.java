@@ -54,7 +54,7 @@ public class PositionUpdateHandlerImpl implements PositionUpdateHandler {
 		if (posUpMsg.getPositionUpdateVersion() != WireFormatConstants.VERSION) {
 			logger.warn("Received wrong version of position update"
 					+ " message, expected version "
-					+ WireFormatConstants.VERSION + ", received" + " version "
+					+ WireFormatConstants.VERSION + ", received version "
 					+ posUpMsg.getPositionUpdateVersion() + ": ignored");
 			return false;
 		}
