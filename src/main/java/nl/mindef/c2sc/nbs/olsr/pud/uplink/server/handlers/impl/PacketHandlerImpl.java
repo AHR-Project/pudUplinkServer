@@ -104,7 +104,7 @@ public class PacketHandlerImpl implements PacketHandler {
 			if (logger.isDebugEnabled()) {
 				logger.debug("Received " + packet.getLength()
 						+ " bytes on timestamp " + utcTimestamp + " from "
-						+ srcIp.getHostAddress());
+						+ srcIp.getHostAddress() + ":" + packet.getPort());
 			}
 
 			int from = 0;

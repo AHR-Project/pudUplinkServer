@@ -33,8 +33,8 @@ public class DumpUtil {
 			s.append(String.format(" %02x", data[index]));
 		}
 		s.append("\n");
-		s.append(String.format("  sender = %s\n", packet.getAddress()
-				.getHostAddress()));
+		s.append(String.format("  sender = %s:%d\n", packet.getAddress()
+				.getHostAddress(), packet.getPort()));
 		s.append(String.format("  size   = %d bytes\n", data.length));
 
 		s.append("    *** UplinkHeader ***\n");
