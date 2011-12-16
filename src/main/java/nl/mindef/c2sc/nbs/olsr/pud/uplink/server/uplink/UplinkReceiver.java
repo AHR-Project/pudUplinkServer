@@ -48,10 +48,10 @@ public class UplinkReceiver extends Thread implements StopHandlerConsumer {
 
 	/**
 	 * @param distributor
-	 *            the distributor to set
+	 *          the distributor to set
 	 */
 	@Required
-	public final void setRelayCluster(Distributor distributor) {
+	public final void setDistributor(Distributor distributor) {
 		this.distributor = distributor;
 	}
 
