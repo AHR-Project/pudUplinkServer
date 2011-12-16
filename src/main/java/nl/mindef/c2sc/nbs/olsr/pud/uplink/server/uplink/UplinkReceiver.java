@@ -17,7 +17,7 @@ import org.springframework.beans.factory.annotation.Required;
 public class UplinkReceiver extends Thread implements StopHandlerConsumer {
 	private Logger logger = Logger.getLogger(this.getClass().getName());
 
-	static private int BUFFERSIZE = 4000;
+	static private int BUFFERSIZE = 16 * 1024; /* 16KB */
 
 	/** the UDP port to listen on for uplink messages */
 	private Integer uplinkUdpPort = null;
