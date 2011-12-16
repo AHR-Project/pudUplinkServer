@@ -4,13 +4,12 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 
 public class TimeZoneUtil {
+	private static final long timezoneOffset;
+
 	static {
 		GregorianCalendar cal = new GregorianCalendar();
-		timezoneOffset = -(cal.get(Calendar.ZONE_OFFSET)
-		/* + cal .get(Calendar.DST_OFFSET) */);
+		timezoneOffset = -(cal.get(Calendar.ZONE_OFFSET));
 	}
-
-	private static final long timezoneOffset;
 
 	/**
 	 * @return the timezoneOffset
