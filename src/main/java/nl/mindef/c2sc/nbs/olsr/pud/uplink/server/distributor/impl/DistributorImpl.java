@@ -121,15 +121,6 @@ public class DistributorImpl extends Thread implements Distributor {
 		this.distributionDelay = distributionDelay;
 	}
 
-	private final RelayServer me = new RelayServer();
-
-	/**
-	 * @return the me
-	 */
-	public RelayServer getMe() {
-		return me;
-	}
-
 	private Set<RelayServer> configuredRelayServers = new HashSet<RelayServer>();
 
 	private static final String ipMatcher = "(\\d{1,3}\\.){0,3}\\d{1,3}";
@@ -185,14 +176,8 @@ public class DistributorImpl extends Thread implements Distributor {
 
 	public void init() throws SocketException, UnknownHostException {
 		this.setName(this.getClass().getSimpleName());
-		InetAddress ip;
-		try {
-			ip = InetAddress.getLocalHost();
-		} catch (UnknownHostException e) {
-			ip = InetAddress.getByName("localhost");
-		}
-		me.setIp(ip);
-		this.configuredRelayServers.add(me);
+		
+		this.configuredRelayServers.add(relayServers.getMe());
 
 		/* save into database */
 		for (RelayServer relayServer : configuredRelayServers) {

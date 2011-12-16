@@ -11,10 +11,11 @@ import org.apache.log4j.Logger;
 
 public interface RelayServers {
 	public List<RelayServer> getRelayServers();
+	public void addRelayServer(RelayServer relayServer);
 
 	public List<RelayServer> getOtherRelayServers();
 
-	public void addRelayServer(RelayServer relayServer);
+	public RelayServer getMe();
 
 	public void log(Logger logger, Level level);
 	public void print(OutputStream out) throws IOException;

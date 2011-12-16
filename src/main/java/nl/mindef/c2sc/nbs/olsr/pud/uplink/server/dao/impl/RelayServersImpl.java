@@ -2,11 +2,12 @@ package nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.impl;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.List;
 
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.RelayServers;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.domainmodel.RelayServer;
-import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.distributor.Distributor;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -15,22 +16,11 @@ import org.springframework.beans.factory.annotation.Required;
 import org.springframework.transaction.annotation.Transactional;
 
 public class RelayServersImpl implements RelayServers {
-	private Distributor distributor;
-
-	/**
-	 * @param distributor
-	 *            the distributor to set
-	 */
-	@Required
-	public final void setRelayCluster(Distributor distributor) {
-		this.distributor = distributor;
-	}
-
 	private SessionFactory sessionFactory;
 
 	/**
 	 * @param sessionFactory
-	 *            the sessionFactory to set
+	 *          the sessionFactory to set
 	 */
 	@Required
 	public final void setSessionFactory(SessionFactory sessionFactory) {
@@ -41,8 +31,7 @@ public class RelayServersImpl implements RelayServers {
 	@Transactional
 	public List<RelayServer> getRelayServers() {
 		@SuppressWarnings("unchecked")
-		List<RelayServer> result = sessionFactory.getCurrentSession()
-				.createQuery("select rs from RelayServer rs").list();
+		List<RelayServer> result = sessionFactory.getCurrentSession().createQuery("select rs from RelayServer rs").list();
 
 		return result;
 	}
@@ -54,13 +43,9 @@ public class RelayServersImpl implements RelayServers {
 		}
 
 		@SuppressWarnings("unchecked")
-		List<RelayServer> result = sessionFactory
-				.getCurrentSession()
-				.createQuery(
-						"select rs from RelayServer rs where rs.ip = :par1"
-								+ " and rs.port = :par2")
-				.setParameter("par1", relayServer.getIp())
-				.setParameter("par2", relayServer.getPort()).list();
+		List<RelayServer> result = sessionFactory.getCurrentSession()
+				.createQuery("select rs from RelayServer rs where rs.ip = :par1" + " and rs.port = :par2")
+				.setParameter("par1", relayServer.getIp()).setParameter("par2", relayServer.getPort()).list();
 
 		if (result.size() == 0) {
 			return null;
@@ -75,11 +60,8 @@ public class RelayServersImpl implements RelayServers {
 	@Transactional
 	public List<RelayServer> getOtherRelayServers() {
 		@SuppressWarnings("unchecked")
-		List<RelayServer> result = sessionFactory
-				.getCurrentSession()
-				.createQuery(
-						"select rs from RelayServer rs" + " where rs.id != "
-								+ distributor.getMe().getId()).list();
+		List<RelayServer> result = sessionFactory.getCurrentSession()
+				.createQuery("select rs from RelayServer rs" + " where rs.id != " + me.getId()).list();
 
 		return result;
 	}
@@ -102,8 +84,7 @@ public class RelayServersImpl implements RelayServers {
 
 	private String getRelayServersDump() {
 		@SuppressWarnings("unchecked")
-		List<RelayServer> result = sessionFactory.getCurrentSession()
-				.createQuery("from RelayServer rs").list();
+		List<RelayServer> result = sessionFactory.getCurrentSession().createQuery("from RelayServer rs").list();
 
 		StringBuilder s = new StringBuilder();
 		s.append("[RelayServers]\n");
@@ -112,6 +93,27 @@ public class RelayServersImpl implements RelayServers {
 		}
 
 		return s.toString();
+	}
+
+	private static final RelayServer me = new RelayServer();
+
+	@Override
+	public RelayServer getMe() {
+		return me;
+	}
+
+	static {
+		try {
+			InetAddress ip;
+			try {
+				ip = InetAddress.getLocalHost();
+			} catch (UnknownHostException e) {
+				ip = InetAddress.getByName("localhost");
+			}
+			me.setIp(ip);
+		} catch (Exception e) {
+			throw new ExceptionInInitializerError(e);
+		}
 	}
 
 	@Override

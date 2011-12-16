@@ -5,6 +5,7 @@ import java.net.DatagramSocket;
 import java.net.SocketException;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.RelayServers;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.distributor.Distributor;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.handlers.PacketHandler;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.logger.DatabaseLogger;
@@ -64,6 +65,17 @@ public class UplinkReceiver extends Thread implements StopHandlerConsumer {
 		this.databaseLogger = databaseLogger;
 	}
 
+	private RelayServers relayServers = null;
+
+	/**
+	 * @param relayServers
+	 *          the relayServers to set
+	 */
+	@Required
+	public final void setRelayServers(RelayServers relayServers) {
+		this.relayServers = relayServers;
+	}
+
 	/*
 	 * Main
 	 */
@@ -105,7 +117,7 @@ public class UplinkReceiver extends Thread implements StopHandlerConsumer {
 		while (run.get()) {
 			try {
 				sock.receive(packet);
-				if (packetHandler.processPacket(packet, distributor.getMe())) {
+				if (packetHandler.processPacket(packet, relayServers.getMe())) {
 					if (logger.isDebugEnabled()) {
 						databaseLogger.log(logger, Level.DEBUG);
 					}
