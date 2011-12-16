@@ -11,6 +11,7 @@ import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.Nodes;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.Positions;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.RelayServers;
 
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Required;
 
@@ -23,7 +24,7 @@ public class DatabaseLogger {
 
 	/**
 	 * @param enabled
-	 *            the enabled to set
+	 *          the enabled to set
 	 */
 	public final void setEnabled(boolean enabled) {
 		this.enabled = enabled;
@@ -33,7 +34,7 @@ public class DatabaseLogger {
 
 	/**
 	 * @param updateIntervalMs
-	 *            the updateIntervalMs to set
+	 *          the updateIntervalMs to set
 	 */
 	public final void setUpdateIntervalMs(int updateIntervalMs) {
 		this.updateIntervalMs = updateIntervalMs;
@@ -45,7 +46,7 @@ public class DatabaseLogger {
 
 	/**
 	 * @param databaseLogFile
-	 *            the databaseLogFile to set
+	 *          the databaseLogFile to set
 	 */
 	public final void setDatabaseLogFile(String databaseLogFile) {
 		this.databaseLogFile = databaseLogFile;
@@ -56,7 +57,7 @@ public class DatabaseLogger {
 
 	/**
 	 * @param nodes
-	 *            the nodes to set
+	 *          the nodes to set
 	 */
 	@Required
 	public final void setNodes(Nodes nodes) {
@@ -68,7 +69,7 @@ public class DatabaseLogger {
 
 	/**
 	 * @param positions
-	 *            the positions to set
+	 *          the positions to set
 	 */
 	@Required
 	public final void setPositions(Positions positions) {
@@ -79,7 +80,7 @@ public class DatabaseLogger {
 
 	/**
 	 * @param relayServers
-	 *            the relayServers to set
+	 *          the relayServers to set
 	 */
 	@Required
 	public final void setRelayServers(RelayServers relayServers) {
@@ -143,5 +144,13 @@ public class DatabaseLogger {
 			/* ignore */
 		}
 		fos = null;
+	}
+
+	public void log(Logger logger, Level level) {
+		if (logger.isEnabledFor(level)) {
+			nodes.log(logger, Level.DEBUG);
+			positions.log(logger, Level.DEBUG);
+			relayServers.log(logger, Level.DEBUG);
+		}
 	}
 }

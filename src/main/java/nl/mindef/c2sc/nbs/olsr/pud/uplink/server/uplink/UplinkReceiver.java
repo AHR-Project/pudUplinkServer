@@ -5,11 +5,9 @@ import java.net.DatagramSocket;
 import java.net.SocketException;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.Nodes;
-import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.Positions;
-import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.RelayServers;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.distributor.Distributor;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.handlers.PacketHandler;
+import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.logger.DatabaseLogger;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.signals.StopHandlerConsumer;
 
 import org.apache.log4j.Level;
@@ -26,7 +24,7 @@ public class UplinkReceiver extends Thread implements StopHandlerConsumer {
 
 	/**
 	 * @param uplinkUdpPort
-	 *            the uplinkUdpPort to set
+	 *          the uplinkUdpPort to set
 	 */
 	@Required
 	public final void setUplinkUdpPort(int uplinkUdpPort) {
@@ -37,7 +35,7 @@ public class UplinkReceiver extends Thread implements StopHandlerConsumer {
 
 	/**
 	 * @param packetHandler
-	 *            the packetHandler to set
+	 *          the packetHandler to set
 	 */
 	@Required
 	public final void setPacketHandler(PacketHandler packetHandler) {
@@ -55,43 +53,15 @@ public class UplinkReceiver extends Thread implements StopHandlerConsumer {
 		this.distributor = distributor;
 	}
 
-	/*
-	 * The following setter are only needed for debug purposes
-	 */
-
-	/** the Node handler */
-	private Nodes nodes;
+	private DatabaseLogger databaseLogger;
 
 	/**
-	 * @param nodes
-	 *            the nodes to set
+	 * @param databaseLogger
+	 *          the databaseLogger to set
 	 */
 	@Required
-	public final void setNodes(Nodes nodes) {
-		this.nodes = nodes;
-	}
-
-	/** the Positions handler */
-	private Positions positions;
-
-	/**
-	 * @param positions
-	 *            the positions to set
-	 */
-	@Required
-	public final void setPositions(Positions positions) {
-		this.positions = positions;
-	}
-
-	private RelayServers relayServers;
-
-	/**
-	 * @param relayServers
-	 *            the relayServers to set
-	 */
-	@Required
-	public final void setRelayServers(RelayServers relayServers) {
-		this.relayServers = relayServers;
+	public final void setDatabaseLogger(DatabaseLogger databaseLogger) {
+		this.databaseLogger = databaseLogger;
 	}
 
 	/*
@@ -118,30 +88,26 @@ public class UplinkReceiver extends Thread implements StopHandlerConsumer {
 	 * Run the relay server.
 	 * 
 	 * @throws SocketException
-	 *             when the socket could not be created
+	 *           when the socket could not be created
 	 */
 	@Override
 	public void run() {
 		try {
 			sock = new DatagramSocket(uplinkUdpPort);
 		} catch (SocketException e1) {
-			System.err.println("Can't bind to uplink UDP port " + uplinkUdpPort
-					+ ": " + e1.getMessage());
+			System.err.println("Can't bind to uplink UDP port " + uplinkUdpPort + ": " + e1.getMessage());
 			return;
 		}
 
 		byte[] receiveBuffer = new byte[BUFFERSIZE];
-		DatagramPacket packet = new DatagramPacket(receiveBuffer,
-				receiveBuffer.length);
+		DatagramPacket packet = new DatagramPacket(receiveBuffer, receiveBuffer.length);
 
 		while (run.get()) {
 			try {
 				sock.receive(packet);
 				if (packetHandler.processPacket(packet, distributor.getMe())) {
 					if (logger.isDebugEnabled()) {
-						nodes.log(logger, Level.DEBUG);
-						positions.log(logger, Level.DEBUG);
-						relayServers.log(logger, Level.DEBUG);
+						databaseLogger.log(logger, Level.DEBUG);
 					}
 
 					distributor.signalUpdate();
