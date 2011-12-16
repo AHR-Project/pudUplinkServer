@@ -18,36 +18,24 @@ import org.springframework.beans.factory.annotation.Required;
 public class DatabaseLogger {
 	private Logger logger = Logger.getLogger(this.getClass().getName());
 
-	public static final int UPDATE_INTERVAL_MS_DEFAULT = 15000;
-
-	private boolean enabled = false;
-
-	/**
-	 * @param enabled
-	 *          the enabled to set
-	 */
-	public final void setEnabled(boolean enabled) {
-		this.enabled = enabled;
-	}
-
-	private int updateIntervalMs = UPDATE_INTERVAL_MS_DEFAULT;
+	private int updateIntervalMs = 0;
 
 	/**
 	 * @param updateIntervalMs
 	 *          the updateIntervalMs to set
 	 */
+	@Required
 	public final void setUpdateIntervalMs(int updateIntervalMs) {
 		this.updateIntervalMs = updateIntervalMs;
 	}
 
-	public static final String DATABASELOGFILE_DEFAULT = "database.txt";
-
-	private String databaseLogFile = DATABASELOGFILE_DEFAULT;
+	private String databaseLogFile = null;
 
 	/**
 	 * @param databaseLogFile
 	 *          the databaseLogFile to set
 	 */
+	@Required
 	public final void setDatabaseLogFile(String databaseLogFile) {
 		this.databaseLogFile = databaseLogFile;
 	}
@@ -93,12 +81,12 @@ public class DatabaseLogger {
 
 	private Timer timer = new Timer(this.getClass().getName());
 
-	private FileOutputStream fos;
+	private FileOutputStream fos = null;
 	private TimerTask task = null;
 	private static final byte[] eol = "\n".getBytes();
 
 	public void init() throws FileNotFoundException {
-		if (!enabled) {
+		if (updateIntervalMs <= 0) {
 			return;
 		}
 
@@ -138,12 +126,14 @@ public class DatabaseLogger {
 		}
 		timer.cancel();
 
-		try {
-			fos.close();
-		} catch (IOException e) {
-			/* ignore */
+		if (fos != null) {
+			try {
+				fos.close();
+			} catch (IOException e) {
+				/* ignore */
+			}
+			fos = null;
 		}
-		fos = null;
 	}
 
 	public void log(Logger logger, Level level) {
