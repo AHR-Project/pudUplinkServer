@@ -20,7 +20,7 @@ public class ExpireNodes {
 
 	/**
 	 * @param dataLock
-	 *            the dataLock to set
+	 *          the dataLock to set
 	 */
 	@Required
 	public void setDataLock(ReentrantLock dataLock) {
@@ -69,7 +69,7 @@ public class ExpireNodes {
 
 	/**
 	 * @param interval
-	 *            the interval to set
+	 *          the interval to set
 	 */
 	@Required
 	public void setInterval(long interval) {
@@ -84,7 +84,7 @@ public class ExpireNodes {
 
 	/**
 	 * @param validityTimeMultiplier
-	 *            the validityTimeMultiplier to set
+	 *          the validityTimeMultiplier to set
 	 */
 	public void setValidityTimeMultiplier(double validityTimeMultiplier) {
 		this.validityTimeMultiplier = validityTimeMultiplier;
@@ -101,7 +101,7 @@ public class ExpireNodes {
 
 	/**
 	 * @param nodes
-	 *            the nodes to set
+	 *          the nodes to set
 	 */
 	@Required
 	public void setNodes(Nodes nodes) {
@@ -113,7 +113,7 @@ public class ExpireNodes {
 
 	/**
 	 * @param positions
-	 *            the positions to set
+	 *          the positions to set
 	 */
 	@Required
 	public void setPositions(Positions positions) {

@@ -2,24 +2,23 @@ package nl.mindef.c2sc.nbs.olsr.pud.uplink.server.handlers.impl.debug;
 
 import java.util.Random;
 
-import org.olsr.plugin.pud.ClusterLeader;
-import org.olsr.plugin.pud.PositionUpdate;
-import org.springframework.beans.factory.annotation.Required;
-
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.domainmodel.RelayServer;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.handlers.ClusterLeaderHandler;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.handlers.PositionUpdateHandler;
+
+import org.olsr.plugin.pud.ClusterLeader;
+import org.olsr.plugin.pud.PositionUpdate;
+import org.springframework.beans.factory.annotation.Required;
 
 public class Faker {
 	private ClusterLeaderHandler clusterLeaderHandler;
 
 	/**
 	 * @param clusterLeaderHandler
-	 *            the clusterLeaderHandler to set
+	 *          the clusterLeaderHandler to set
 	 */
 	@Required
-	public final void setClusterLeaderHandler(
-			ClusterLeaderHandler clusterLeaderHandler) {
+	public final void setClusterLeaderHandler(ClusterLeaderHandler clusterLeaderHandler) {
 		this.clusterLeaderHandler = clusterLeaderHandler;
 	}
 
@@ -27,11 +26,10 @@ public class Faker {
 
 	/**
 	 * @param positionUpdateHandler
-	 *            the positionUpdateHandler to set
+	 *          the positionUpdateHandler to set
 	 */
 	@Required
-	public final void setPositionUpdateHandler(
-			PositionUpdateHandler positionUpdateHandler) {
+	public final void setPositionUpdateHandler(PositionUpdateHandler positionUpdateHandler) {
 		this.positionUpdateHandler = positionUpdateHandler;
 	}
 
@@ -50,14 +48,13 @@ public class Faker {
 
 	/**
 	 * @param firstFake
-	 *            the firstFake to set
+	 *          the firstFake to set
 	 */
 	public final void setFirstFake(boolean firstFake) {
 		this.firstFake = firstFake;
 	}
 
-	public void fakeit(MSGTYPE type, long utcTimestamp, Object msg,
-			RelayServer relayServer) {
+	public void fakeit(MSGTYPE type, long utcTimestamp, Object msg, RelayServer relayServer) {
 		if (!firstFake) {
 			return;
 		}
@@ -104,12 +101,9 @@ public class Faker {
 							pumsgClone[10] = (byte) network;
 							pumsgClone[11] = (byte) node;
 
-							PositionUpdate pu = new PositionUpdate(pumsgClone,
-									pumsgClone.length);
-							positionUpdateHandler.handlePositionMessage(
-									pu.getOlsrMessageOriginator(), utcTimestamp
-											+ random.nextInt(randomRange), pu,
-									relayServer);
+							PositionUpdate pu = new PositionUpdate(pumsgClone, pumsgClone.length);
+							positionUpdateHandler.handlePositionMessage(pu.getOlsrMessageOriginator(),
+									utcTimestamp + random.nextInt(randomRange), pu, relayServer);
 						}
 
 						/*
@@ -125,12 +119,9 @@ public class Faker {
 							clmsgClone[14] = (byte) network;
 							clmsgClone[15] = (byte) clusterLeaderNode;
 
-							ClusterLeader cl = new ClusterLeader(clmsgClone,
-									clmsgClone.length);
-							clusterLeaderHandler.handleClusterLeaderMessage(
-									cl.getClusterLeaderOriginator(),
-									utcTimestamp + random.nextInt(randomRange),
-									cl, relayServer);
+							ClusterLeader cl = new ClusterLeader(clmsgClone, clmsgClone.length);
+							clusterLeaderHandler.handleClusterLeaderMessage(cl.getClusterLeaderOriginator(),
+									utcTimestamp + random.nextInt(randomRange), cl, relayServer);
 						}
 					}
 				} else {
@@ -156,11 +147,8 @@ public class Faker {
 			pumsgClone[10] = (byte) network;
 			pumsgClone[11] = (byte) node;
 
-			PositionUpdate pu = new PositionUpdate(pumsgClone,
-					pumsgClone.length);
-			positionUpdateHandler.handlePositionMessage(
-					pu.getOlsrMessageOriginator(), utcTimestamp, pu,
-					relayServer);
+			PositionUpdate pu = new PositionUpdate(pumsgClone, pumsgClone.length);
+			positionUpdateHandler.handlePositionMessage(pu.getOlsrMessageOriginator(), utcTimestamp, pu, relayServer);
 		}
 
 		/*
@@ -177,9 +165,7 @@ public class Faker {
 			clmsgClone[15] = (byte) (clusterLeaderNode + nodeCountMax - 1);
 
 			ClusterLeader cl = new ClusterLeader(clmsgClone, clmsgClone.length);
-			clusterLeaderHandler.handleClusterLeaderMessage(
-					cl.getClusterLeaderOriginator(), utcTimestamp, cl,
-					relayServer);
+			clusterLeaderHandler.handleClusterLeaderMessage(cl.getClusterLeaderOriginator(), utcTimestamp, cl, relayServer);
 		}
 	}
 }

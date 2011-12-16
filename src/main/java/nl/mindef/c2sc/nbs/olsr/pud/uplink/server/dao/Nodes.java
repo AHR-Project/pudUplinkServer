@@ -18,7 +18,7 @@ public interface Nodes {
 	 * <br/>
 	 * 
 	 * @param mainIp
-	 *            the IP address of the node to fetch
+	 *          the IP address of the node to fetch
 	 * @return a list of all cluster leader nodes
 	 */
 	public Node getNode(InetAddress mainIp);
@@ -27,9 +27,9 @@ public interface Nodes {
 	 * Save a node.
 	 * 
 	 * @param node
-	 *            the node to save
+	 *          the node to save
 	 * @param newObject
-	 *            true when the node is new, false when already exists
+	 *          true when the node is new, false when already exists
 	 */
 	public void saveNode(Node node, boolean newObject);
 
@@ -40,7 +40,7 @@ public interface Nodes {
 	 * 'validityTime*validityTimeMultiplier' seconds in the past.
 	 * 
 	 * @param validityTimeMultiplier
-	 *            the validity time multiplier
+	 *          the validity time multiplier
 	 */
 	public void removeExpiredNodes(double validityTimeMultiplier);
 
@@ -65,15 +65,15 @@ public interface Nodes {
 	/**
 	 * Get a substitute cluster leader for a given cluster leader.<br/>
 	 * <br/>
-	 * The substitute cluster leader is a Node that is in the same cluster as
-	 * the cluster leader, but is not the cluster leader itself. The substitute
+	 * The substitute cluster leader is a Node that is in the same cluster as the
+	 * cluster leader, but is not the cluster leader itself. The substitute
 	 * cluster leader also has a valid IP address and a valid downlink port.<br/>
 	 * Only the substitute cluster leader node is retrieved, no linked objects
-	 * (non-eager fetching) <br/>
+	 * (non-eager fetching)<br/>
 	 * <br/>
 	 * 
 	 * @param clusterLeader
-	 *            the cluster leader for which a substitute is sought
+	 *          the cluster leader for which a substitute is sought
 	 * @return the substitute cluster leader
 	 */
 	public Node getSubstituteClusterLeader(Node clusterLeader);
