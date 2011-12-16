@@ -3,29 +3,32 @@ package nl.mindef.c2sc.nbs.olsr.pud.uplink.server.util;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
-import java.util.ArrayList;
 import java.util.Enumeration;
-import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 public class MyIPAddresses {
-	private List<InetAddress> addrList = new ArrayList<InetAddress>();
+	private static final Set<InetAddress> myIpAddresses = new TreeSet<InetAddress>();
 
-	public boolean isMe(InetAddress ip) {
-		return addrList.contains(ip);
-	}
-
-	void init() throws SocketException {
-		Enumeration<NetworkInterface> ifs = NetworkInterface
-				.getNetworkInterfaces();
-		while (ifs.hasMoreElements()) {
-			NetworkInterface ifc = ifs.nextElement();
-			if (ifc.isUp()) {
-				Enumeration<InetAddress> ips = ifc.getInetAddresses();
-				while (ips.hasMoreElements()) {
-					InetAddress addr = ips.nextElement();
-					addrList.add(addr);
+	static {
+		try {
+			Enumeration<NetworkInterface> networkInterfaces = NetworkInterface.getNetworkInterfaces();
+			while (networkInterfaces.hasMoreElements()) {
+				NetworkInterface networkInterface = networkInterfaces.nextElement();
+				if (networkInterface.isUp()) {
+					Enumeration<InetAddress> ipAddresses = networkInterface.getInetAddresses();
+					while (ipAddresses.hasMoreElements()) {
+						InetAddress ipAddress = ipAddresses.nextElement();
+						myIpAddresses.add(ipAddress);
+					}
 				}
 			}
+		} catch (SocketException e) {
+			throw new ExceptionInInitializerError(e);
 		}
+	}
+
+	public boolean isMe(InetAddress ip) {
+		return myIpAddresses.contains(ip);
 	}
 }
