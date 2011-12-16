@@ -18,9 +18,7 @@ public class Main {
 
 			logger.info("RelayServer started");
 
-			UplinkReceiver uplinkReceiver = (UplinkReceiver) context
-					.getBean("UplinkReceiver");
-
+			UplinkReceiver uplinkReceiver = (UplinkReceiver) context.getBean("UplinkReceiver");
 			uplinkReceiver.join();
 
 			logger.info("RelayServer stopped");
