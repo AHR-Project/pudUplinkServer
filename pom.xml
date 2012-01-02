@@ -25,7 +25,7 @@
 		<project.spring.directory>src/main/resources/META-INF/spring</project.spring.directory>
 		<project.javadoc.directory>doc/javadoc</project.javadoc.directory>
 
-		<project.wireformat.dir>../nbsolsrd/lib/pud/wireformat-java/lib</project.wireformat.dir>
+		<project.wireformat.dir>${project.basedir}/../nbsolsrd/lib/pud/wireformat-java/lib</project.wireformat.dir>
 		<project.wireformat.so>libOlsrdPudWireFormatJava.so</project.wireformat.so>
 		<project.wireformat.jar>OlsrdPudWireFormatJava.jar</project.wireformat.jar>
 		<project.gitsha>${project.build.directory}/gitsha</project.gitsha>
@@ -519,7 +519,7 @@
 			<artifactId>plugin.pud</artifactId>
 			<version>1.0.0</version>
 			<scope>system</scope>
-			<systemPath>${project.basedir}/${project.wireformat.dir}/${project.wireformat.jar}</systemPath>
+			<systemPath>${project.wireformat.dir}/${project.wireformat.jar}</systemPath>
 		</dependency>
 
 	</dependencies>
