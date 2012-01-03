@@ -9,7 +9,6 @@
 		<property name="databaseLogger" ref="DatabaseLogger" />
 		<property name="distributor" ref="Distributor" />
 		<property name="packetHandler" ref="PacketHandler" />
-		<property name="relayServers" ref="RelayServers" />
 		<property name="uplinkUdpPort" value="${uplink.listener.udp.port}" />
 	</bean>
 

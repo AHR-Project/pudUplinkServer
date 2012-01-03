@@ -9,6 +9,7 @@
 		<property name="dataLock" ref="DaoDataLock" />
 		<property name="faker" ref="Faker" />
 		<property name="positionUpdateHandler" ref="PositionUpdateHandler" />
+		<property name="relayServers" ref="RelayServers" />
 		<property name="useFaker" value="${faker.use}" />
 	</bean>
 

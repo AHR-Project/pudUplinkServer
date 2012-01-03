@@ -5,6 +5,7 @@ import java.net.InetAddress;
 import java.util.Arrays;
 import java.util.concurrent.locks.ReentrantLock;
 
+import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.RelayServers;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.domainmodel.RelayServer;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.handlers.ClusterLeaderHandler;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.handlers.PacketHandler;
@@ -49,6 +50,17 @@ public class PacketHandlerImpl implements PacketHandler {
 		this.positionUpdateHandler = positionUpdateHandler;
 	}
 
+	private RelayServers relayServers = null;
+
+	/**
+	 * @param relayServers
+	 *          the relayServers to set
+	 */
+	@Required
+	public final void setRelayServers(RelayServers relayServers) {
+		this.relayServers = relayServers;
+	}
+
 	/*
 	 * Fake data
 	 */
@@ -91,9 +103,10 @@ public class PacketHandlerImpl implements PacketHandler {
 
 	@Override
 	@Transactional
-	public boolean processPacket(DatagramPacket packet, RelayServer relayServer) {
+	public boolean processPacket(DatagramPacket packet) {
 		boolean updated = false;
 		long utcTimestamp = System.currentTimeMillis();
+		RelayServer relayServer = relayServers.getMe();
 
 		dataLock.lock();
 		try {
