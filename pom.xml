@@ -16,6 +16,9 @@
 		<project.source>1.6</project.source>
 		<project.target>1.6</project.target>
 
+		<!-- can be none, or a combination of source,lines,vars -->
+		<project.debug.level>source,lines,vars</project.debug.level>
+
 		<project.mainclass>nl.mindef.c2sc.nbs.olsr.pud.uplink.server.Main</project.mainclass>
 
 		<project.configdir>config</project.configdir>
@@ -141,6 +144,8 @@
 				<configuration>
 					<source>${project.source}</source>
 					<target>${project.target}</target>
+					<debug>true</debug>
+					<debuglevel>${project.debug.level}</debuglevel>
 				</configuration>
 			</plugin>
 
