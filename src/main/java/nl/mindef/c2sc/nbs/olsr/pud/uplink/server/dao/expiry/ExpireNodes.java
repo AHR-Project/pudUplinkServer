@@ -4,6 +4,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.locks.ReentrantLock;
 
+import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.Gateways;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.Nodes;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.Positions;
 
@@ -47,6 +48,16 @@ public class ExpireNodes {
 
 				try {
 					positions.removeExpiredNodePosition(validityTimeMultiplier);
+				} catch (Throwable e) {
+					/* swallow */
+					e.printStackTrace();
+				}
+
+				// remove empty Nodes
+
+				// remove empty Gateways
+				try {
+					gateways.removeExpiredGateways();
 				} catch (Throwable e) {
 					/* swallow */
 					e.printStackTrace();
@@ -118,6 +129,17 @@ public class ExpireNodes {
 	@Required
 	public void setPositions(Positions positions) {
 		this.positions = positions;
+	}
+
+	/** the Gateways handler */
+	private Gateways gateways;
+
+	/**
+	 * @param gateways the gateways to set
+	 */
+	@Required
+	public void setGateways(Gateways gateways) {
+		this.gateways = gateways;
 	}
 
 	private Timer timer;

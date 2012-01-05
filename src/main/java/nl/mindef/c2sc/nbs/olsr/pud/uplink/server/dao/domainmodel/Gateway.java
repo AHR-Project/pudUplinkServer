@@ -10,17 +10,18 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.validation.constraints.NotNull;
 
 @Entity
-public class RelayServer implements Serializable {
-	private static final long serialVersionUID = 3573019703164508653L;
+public class Gateway implements Serializable {
+	private static final long serialVersionUID = -7276838498590984721L;
 
 	/**
 	 * Default constructor
 	 */
-	public RelayServer() {
+	public Gateway() {
 		super();
 	}
 
@@ -28,12 +29,17 @@ public class RelayServer implements Serializable {
 	 * Constructor
 	 * 
 	 * @param ip
+	 *          the IP address of the gateway
 	 * @param port
+	 *          the port of the gateway
+	 * @param relayServer
+	 *          the relay server that received from the gateway
 	 */
-	public RelayServer(InetAddress ip, Integer port) {
+	public Gateway(InetAddress ip, Integer port, RelayServer relayServer) {
 		super();
 		this.ip = ip;
 		this.port = port;
+		this.relayServer = relayServer;
 	}
 
 	@Id
@@ -55,7 +61,7 @@ public class RelayServer implements Serializable {
 		this.id = id;
 	}
 
-	/** the IP address of the server */
+	/** the destination IP of the node */
 	@NotNull
 	private InetAddress ip = null;
 
@@ -74,7 +80,7 @@ public class RelayServer implements Serializable {
 		this.ip = ip;
 	}
 
-	/** the port of the server */
+	/** the UDP port for the node */
 	@NotNull
 	private Integer port = null;
 
@@ -93,23 +99,43 @@ public class RelayServer implements Serializable {
 		this.port = port;
 	}
 
-	/** the gateways associated with the relay server */
-	@OneToMany(cascade = CascadeType.ALL, mappedBy = "relayServer", orphanRemoval = true)
-	private Set<Gateway> gateways = new TreeSet<Gateway>();
+	/** the associated nodes */
+	@OneToMany(cascade = CascadeType.ALL, mappedBy = "gateway", orphanRemoval = true)
+	private Set<Node> nodes = new TreeSet<Node>();
 
 	/**
-	 * @return the gateways
+	 * @return the nodes
 	 */
-	public final Set<Gateway> getGateways() {
-		return gateways;
+	public final Set<Node> getNodes() {
+		return nodes;
 	}
 
 	/**
-	 * @param gateways
-	 *          the gateways to set
+	 * @param nodes
+	 *          the nodes to set
 	 */
-	public final void setGateways(Set<Gateway> nodes) {
-		this.gateways = nodes;
+	public final void setNodes(Set<Node> nodes) {
+		this.nodes = nodes;
+	}
+
+	/** the associated relay server */
+	@ManyToOne(cascade = CascadeType.ALL, optional = false)
+	@NotNull
+	private RelayServer relayServer = null;
+
+	/**
+	 * @return the relayServer
+	 */
+	public final RelayServer getRelayServer() {
+		return relayServer;
+	}
+
+	/**
+	 * @param relayServer
+	 *          the relayServer to set
+	 */
+	public final void setRelayServer(RelayServer relayServer) {
+		this.relayServer = relayServer;
 	}
 
 	@Override
@@ -119,18 +145,21 @@ public class RelayServer implements Serializable {
 		builder.append(id);
 		builder.append(", ip=");
 		builder.append(ip.getHostAddress());
-		builder.append(", port=");
+		builder.append(":");
 		builder.append(port.intValue());
-		builder.append(", gateways=[");
+		builder.append(", nodes=[");
 		boolean comma = false;
-		for (Gateway gateway : gateways) {
+		for (Node node : nodes) {
 			if (comma) {
 				builder.append(", ");
 			}
-			builder.append(gateway.getId());
+			builder.append(node.getId());
 			comma = true;
 		}
-		builder.append("]]");
+		builder.append("]");
+		builder.append(", relayServer=");
+		builder.append(relayServer.getId());
+		builder.append("]");
 		return builder.toString();
 	}
 }

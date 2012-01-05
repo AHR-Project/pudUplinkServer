@@ -7,6 +7,7 @@
 		class="nl.mindef.c2sc.nbs.olsr.pud.uplink.server.logger.DatabaseLogger"
 		init-method="init" destroy-method="destroy">
 		<property name="databaseLogFile" value="${database.logger.filename}" />
+		<property name="gateways" ref="Gateways" />
 		<property name="nodes" ref="Nodes" />
 		<property name="positions" ref="Positions" />
 		<property name="relayServers" ref="RelayServers" />

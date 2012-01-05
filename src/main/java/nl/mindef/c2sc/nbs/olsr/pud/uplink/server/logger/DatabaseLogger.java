@@ -7,6 +7,7 @@ import java.nio.channels.FileChannel;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.Gateways;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.Nodes;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.Positions;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.RelayServers;
@@ -75,6 +76,17 @@ public class DatabaseLogger {
 		this.relayServers = relayServers;
 	}
 
+	private Gateways gateways;
+
+	/**
+	 * @param gateways
+	 *          the gateways to set
+	 */
+	@Required
+	public final void setGateways(Gateways gateways) {
+		this.gateways = gateways;
+	}
+
 	/*
 	 * Main
 	 */
@@ -106,6 +118,8 @@ public class DatabaseLogger {
 					positions.print(fos);
 					fos.write(eol);
 					relayServers.print(fos);
+					fos.write(eol);
+					gateways.print(fos);
 
 					channel.truncate(channel.position());
 					fos.flush();
@@ -141,6 +155,7 @@ public class DatabaseLogger {
 			nodes.log(logger, Level.DEBUG);
 			positions.log(logger, Level.DEBUG);
 			relayServers.log(logger, Level.DEBUG);
+			gateways.log(logger, Level.DEBUG);
 		}
 	}
 }

@@ -27,6 +27,18 @@ public class RelayServersImpl implements RelayServers {
 		this.sessionFactory = sessionFactory;
 	}
 
+	/** the UDP port to listen on for uplink messages */
+	private Integer uplinkUdpPort = null;
+
+	/**
+	 * @param uplinkUdpPort
+	 *            the uplinkUdpPort to set
+	 */
+	@Required
+	public final void setUplinkUdpPort(int uplinkUdpPort) {
+		this.uplinkUdpPort = uplinkUdpPort;
+	}
+
 	@Override
 	@Transactional
 	public List<RelayServer> getRelayServers() {
@@ -95,14 +107,14 @@ public class RelayServersImpl implements RelayServers {
 		return s.toString();
 	}
 
-	private static final RelayServer me = new RelayServer();
+	private RelayServer me = null;
 
 	@Override
 	public RelayServer getMe() {
 		return me;
 	}
 
-	static {
+	void init() {
 		try {
 			InetAddress ip;
 			try {
@@ -110,7 +122,7 @@ public class RelayServersImpl implements RelayServers {
 			} catch (UnknownHostException e) {
 				ip = InetAddress.getByName("localhost");
 			}
-			me.setIp(ip);
+			me = new RelayServer(ip, uplinkUdpPort);
 		} catch (Exception e) {
 			throw new ExceptionInInitializerError(e);
 		}
@@ -130,4 +142,6 @@ public class RelayServersImpl implements RelayServers {
 		String s = getRelayServersDump();
 		out.write(s.getBytes(), 0, s.length());
 	}
+	
+	//FIXME add remove expire
 }

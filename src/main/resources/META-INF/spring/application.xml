@@ -17,6 +17,7 @@
 
 	<import resource="classpath:META-INF/spring/hibernate.xml" />
 	<import resource="classpath:META-INF/spring/daoDataLock.xml" />
+	<import resource="classpath:META-INF/spring/gateways.xml" />
 	<import resource="classpath:META-INF/spring/nodes.xml" />
 	<import resource="classpath:META-INF/spring/positions.xml" />
 	<import resource="classpath:META-INF/spring/relayServers.xml" />
