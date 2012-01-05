@@ -4,11 +4,11 @@ import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.util.Enumeration;
+import java.util.HashSet;
 import java.util.Set;
-import java.util.TreeSet;
 
 public class MyIPAddresses {
-	private static final Set<InetAddress> myIpAddresses = new TreeSet<InetAddress>();
+	private static final Set<InetAddress> myIpAddresses = new HashSet<InetAddress>();
 
 	static {
 		try {
