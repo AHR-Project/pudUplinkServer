@@ -2,8 +2,8 @@ package nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.domainmodel;
 
 import java.io.Serializable;
 import java.net.InetAddress;
+import java.util.HashSet;
 import java.util.Set;
-import java.util.TreeSet;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -94,8 +94,8 @@ public class RelayServer implements Serializable {
 	}
 
 	/** the gateways associated with the relay server */
-	@OneToMany(cascade = CascadeType.ALL, mappedBy = "relayServer", orphanRemoval = true)
-	private Set<Gateway> gateways = new TreeSet<Gateway>();
+	@OneToMany(cascade = CascadeType.ALL, mappedBy = "relayServer")
+	private Set<Gateway> gateways = new HashSet<Gateway>();
 
 	/**
 	 * @return the gateways
@@ -118,9 +118,7 @@ public class RelayServer implements Serializable {
 		builder.append(this.getClass().getSimpleName() + " [id=");
 		builder.append(id);
 		builder.append(", ip=");
-		builder.append(ip.getHostAddress());
-		builder.append(", port=");
-		builder.append(port.intValue());
+		builder.append(ip.getHostAddress() + ":" + port.intValue());
 		builder.append(", gateways=[");
 		boolean comma = false;
 		for (Gateway gateway : gateways) {

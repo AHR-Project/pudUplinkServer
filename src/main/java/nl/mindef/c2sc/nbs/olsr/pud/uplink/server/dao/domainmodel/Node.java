@@ -2,8 +2,8 @@ package nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.domainmodel;
 
 import java.io.Serializable;
 import java.net.InetAddress;
+import java.util.HashSet;
 import java.util.Set;
-import java.util.TreeSet;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -18,6 +18,25 @@ import javax.validation.constraints.NotNull;
 @Entity
 public class Node implements Serializable {
 	private static final long serialVersionUID = 8997670429374427930L;
+
+	/**
+	 * Default constructor
+	 */
+	public Node() {
+		super();
+	}
+
+	/**
+	 * Constructor
+	 * 
+	 * @param mainIp
+	 * @param gateway
+	 */
+	public Node(InetAddress mainIp, Gateway gateway) {
+		super();
+		this.mainIp = mainIp;
+		this.gateway = gateway;
+	}
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
@@ -58,8 +77,7 @@ public class Node implements Serializable {
 	}
 
 	/** the associated gateway */
-	@ManyToOne(cascade = CascadeType.ALL, optional = false)
-	@NotNull
+	@ManyToOne(cascade = CascadeType.ALL)
 	private Gateway gateway = null;
 
 	/**
@@ -78,7 +96,7 @@ public class Node implements Serializable {
 	}
 
 	/** the associated position update message */
-	@OneToOne(cascade = CascadeType.ALL, optional = true, orphanRemoval = true)
+	@OneToOne(cascade = CascadeType.ALL, optional = true)
 	private PositionUpdateMsg positionUpdateMsg = null;
 
 	/**
@@ -97,7 +115,7 @@ public class Node implements Serializable {
 	}
 
 	/** the associated cluster leader message */
-	@OneToOne(cascade = CascadeType.ALL, optional = true, orphanRemoval = true)
+	@OneToOne(cascade = CascadeType.ALL, optional = true)
 	private ClusterLeaderMsg clusterLeaderMsg = null;
 
 	/**
@@ -117,7 +135,7 @@ public class Node implements Serializable {
 
 	/** the associated cluster nodes */
 	@OneToMany(cascade = CascadeType.ALL, mappedBy = "clusterLeader")
-	private Set<ClusterLeaderMsg> clusterNodes = new TreeSet<ClusterLeaderMsg>();
+	private Set<ClusterLeaderMsg> clusterNodes = new HashSet<ClusterLeaderMsg>();
 
 	/**
 	 * @return the clusterNodes
@@ -143,11 +161,7 @@ public class Node implements Serializable {
 		builder.append(mainIp.getHostAddress());
 		builder.append(", gateway=");
 		builder.append(gateway.getId());
-		builder.append(", positionUpdateMsg=");
-		builder.append((positionUpdateMsg == null) ? "-" : positionUpdateMsg.getId());
-		builder.append(", clusterLeaderMsg=");
-		builder.append((clusterLeaderMsg == null) ? "-" : clusterLeaderMsg.getId());
-		builder.append(", clusterNodes=");
+		builder.append(", clusterNodes=[");
 		boolean comma = false;
 		for (ClusterLeaderMsg clusterNode : clusterNodes) {
 			if (comma) {
@@ -156,7 +170,12 @@ public class Node implements Serializable {
 			builder.append(clusterNode.getNode().getId());
 			comma = true;
 		}
-		builder.append("]]");
+		builder.append("]");
+		builder.append(", positionUpdateMsg=");
+		builder.append((positionUpdateMsg == null) ? "" : positionUpdateMsg.getId());
+		builder.append(", clusterLeaderMsg=");
+		builder.append((clusterLeaderMsg == null) ? "" : clusterLeaderMsg.getId());
+		builder.append("]");
 		return builder.toString();
 	}
 }

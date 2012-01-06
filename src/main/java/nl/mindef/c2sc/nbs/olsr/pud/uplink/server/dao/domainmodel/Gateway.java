@@ -2,8 +2,8 @@ package nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.domainmodel;
 
 import java.io.Serializable;
 import java.net.InetAddress;
+import java.util.HashSet;
 import java.util.Set;
-import java.util.TreeSet;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -100,8 +100,8 @@ public class Gateway implements Serializable {
 	}
 
 	/** the associated nodes */
-	@OneToMany(cascade = CascadeType.ALL, mappedBy = "gateway", orphanRemoval = true)
-	private Set<Node> nodes = new TreeSet<Node>();
+	@OneToMany(cascade = CascadeType.ALL, mappedBy = "gateway")
+	private Set<Node> nodes = new HashSet<Node>();
 
 	/**
 	 * @return the nodes
@@ -144,9 +144,9 @@ public class Gateway implements Serializable {
 		builder.append(this.getClass().getSimpleName() + " [id=");
 		builder.append(id);
 		builder.append(", ip=");
-		builder.append(ip.getHostAddress());
-		builder.append(":");
-		builder.append(port.intValue());
+		builder.append(ip.getHostAddress() + ":" + port.intValue());
+		builder.append(", relayServer=");
+		builder.append((relayServer != null) ? relayServer.getId() : "");
 		builder.append(", nodes=[");
 		boolean comma = false;
 		for (Node node : nodes) {
@@ -156,10 +156,7 @@ public class Gateway implements Serializable {
 			builder.append(node.getId());
 			comma = true;
 		}
-		builder.append("]");
-		builder.append(", relayServer=");
-		builder.append(relayServer.getId());
-		builder.append("]");
+		builder.append("]]");
 		return builder.toString();
 	}
 }
