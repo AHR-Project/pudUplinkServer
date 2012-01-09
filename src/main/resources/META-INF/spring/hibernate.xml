@@ -38,12 +38,12 @@
 		</property>
 		<property name="hibernateProperties">
 			<props>
-				<prop key="dialect">org.hibernate.dialect.HSQLDialect</prop>
-				<prop key="format_sql">${hibernate.sql.format}</prop>
-				<prop key="hibernate.hbm2ddl.auto">create</prop>
-				<prop key="show_sql">${hibernate.sql.show}</prop>
-				<prop key="use_query_cache">${hibernate.use.query.cache}</prop>
-				<prop key="use_sql_comments">${hibernate.use.sql.comments}</prop>
+				<prop key="hibernate.dialect">org.hibernate.dialect.HSQLDialect</prop>
+				<prop key="hibernate.use_query_cache">${hibernate.use_query_cache}</prop>
+				<prop key="hibernate.hbm2ddl.auto">create-drop</prop>
+				<prop key="hibernate.show_sql">${hibernate.show_sql}</prop>
+				<prop key="hibernate.format_sql">${hibernate.format_sql}</prop>
+				<prop key="hibernate.use_sql_comments">${hibernate.use_sql_comments}</prop>
 			</props>
 		</property>
 	</bean>
