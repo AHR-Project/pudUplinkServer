@@ -33,14 +33,14 @@ public class PositionUpdateMsgsImpl implements PositionUpdateMsgs {
 
 	@Override
 	@Transactional
-	public PositionUpdateMsg getPosition(InetAddress mainIp) {
+	public PositionUpdateMsg getPositionUpdateMsg(InetAddress mainIp) {
 		if (mainIp == null) {
 			return null;
 		}
 
 		@SuppressWarnings("unchecked")
 		List<PositionUpdateMsg> result = sessionFactory.getCurrentSession()
-				.createQuery("select pos from PositionUpdateMsg pos where pos.node.mainIp = :ip").setParameter("ip", mainIp)
+				.createQuery("select pu from PositionUpdateMsg pu where pu.node.mainIp = :ip").setParameter("ip", mainIp)
 				.list();
 
 		if (result.size() == 0) {
@@ -54,7 +54,7 @@ public class PositionUpdateMsgsImpl implements PositionUpdateMsgs {
 
 	@Override
 	@Transactional
-	public List<PositionUpdateMsg> getPositionsForDistribution(long startTime, long endTime, Node clusterLeader) {
+	public List<PositionUpdateMsg> getPositionUpdateMsgForDistribution(long startTime, long endTime, Node clusterLeader) {
 		if (startTime >= endTime) {
 			return null;
 		}
@@ -63,14 +63,12 @@ public class PositionUpdateMsgsImpl implements PositionUpdateMsgs {
 		List<PositionUpdateMsg> result = sessionFactory
 				.getCurrentSession()
 				.createQuery(
-						"select pos from PositionUpdateMsg pos where"
-								+ " pos.receptionTime > :startTime and"
-								+ " pos.receptionTime <= :endTime"
-								+ ((clusterLeader == null) ? "" : " and pos.node is not null"
-										+ " and pos.node.clusterLeaderMsg is not null"
-										+ " and pos.node.clusterLeaderMsg.clusterLeader is not null"
-										+ " and pos.node.clusterLeaderMsg.clusterLeader.id != " + clusterLeader.getId()))
-				.setParameter("startTime", startTime).setParameter("endTime", endTime).list();
+						"select pos from PositionUpdateMsg pu where" + " pu.receptionTime > :startTime and"
+								+ " pu.receptionTime <= :endTime"
+								+ ((clusterLeader == null) ? "" : " and pu.node.clusterLeaderMsg is not null"
+								/* the cluster leader of the node is not the specified cluster leader */
+								+ " and pu.node.clusterLeaderMsg.clusterLeader.id != :clId")).setParameter("startTime", startTime)
+				.setParameter("endTime", endTime).setParameter("clId", clusterLeader.getId()).list();
 
 		if (result.size() == 0) {
 			return null;
@@ -81,23 +79,24 @@ public class PositionUpdateMsgsImpl implements PositionUpdateMsgs {
 
 	@Override
 	@Transactional
-	public void saveNodePosition(PositionUpdateMsg position, boolean newObject) {
+	public void savePositionUpdateMsg(PositionUpdateMsg positionUpdateMsg, boolean newObject) {
 		if (newObject) {
-			sessionFactory.getCurrentSession().saveOrUpdate(position);
+			sessionFactory.getCurrentSession().saveOrUpdate(positionUpdateMsg);
 		} else {
-			sessionFactory.getCurrentSession().merge(position);
+			sessionFactory.getCurrentSession().merge(positionUpdateMsg);
 		}
 	}
 
 	@Override
 	@Transactional
-	public boolean removeExpiredNodePosition(long utcTimestamp, double validityTimeMultiplier) {
+	public boolean removeExpiredPositionUpdateMsg(long utcTimestamp, double validityTimeMultiplier) {
 		@SuppressWarnings("unchecked")
 		List<PositionUpdateMsg> result = sessionFactory
 				.getCurrentSession()
 				.createQuery(
-						"select pu from PositionUpdateMsg pu where (receptionTime + (validityTime * " + validityTimeMultiplier
-								+ ")) < " + utcTimestamp).list();
+						"select pu from PositionUpdateMsg pu where (receptionTime + (validityTime * :validityTimeMultiplier)) <"
+								+ " :utcTimestamp").setParameter("validityTimeMultiplier", validityTimeMultiplier)
+				.setParameter("utcTimestamp", utcTimestamp).list();
 
 		if (result.size() == 0) {
 			return false;
@@ -110,7 +109,7 @@ public class PositionUpdateMsgsImpl implements PositionUpdateMsgs {
 		}
 
 		if (logger.isDebugEnabled()) {
-			logger.debug("  removed " + result.size() + " PositionUpdateMsg objects");
+			logger.debug("removed " + result.size() + " PositionUpdateMsg objects");
 		}
 
 		sessionFactory.getCurrentSession().flush();
@@ -119,8 +118,7 @@ public class PositionUpdateMsgsImpl implements PositionUpdateMsgs {
 
 	private String getPositionsDump() {
 		@SuppressWarnings("unchecked")
-		List<PositionUpdateMsg> result = sessionFactory.getCurrentSession().createQuery("from PositionUpdateMsg node")
-				.list();
+		List<PositionUpdateMsg> result = sessionFactory.getCurrentSession().createQuery("from PositionUpdateMsg pu").list();
 
 		StringBuilder s = new StringBuilder();
 		s.append("[PositionUpdateMsgs]\n");

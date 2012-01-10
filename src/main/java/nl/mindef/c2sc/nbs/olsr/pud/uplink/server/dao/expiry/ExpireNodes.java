@@ -53,7 +53,7 @@ public class ExpireNodes {
 				}
 
 				try {
-					positionUpdateMsgs.removeExpiredNodePosition(utcTimestamp, validityTimeMultiplier);
+					positionUpdateMsgs.removeExpiredPositionUpdateMsg(utcTimestamp, validityTimeMultiplier);
 				} catch (Throwable e) {
 					logger.error("Removal of expired position update messages failed", e);
 				}

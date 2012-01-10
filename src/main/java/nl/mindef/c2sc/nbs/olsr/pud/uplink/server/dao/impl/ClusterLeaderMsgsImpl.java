@@ -32,7 +32,7 @@ public class ClusterLeaderMsgsImpl implements ClusterLeaderMsgs {
 
 	@Override
 	@Transactional
-	public ClusterLeaderMsg getClusterLeader(InetAddress mainIp) {
+	public ClusterLeaderMsg getClusterLeaderMsg(InetAddress mainIp) {
 		if (mainIp == null) {
 			return null;
 		}

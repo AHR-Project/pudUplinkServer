@@ -77,7 +77,7 @@ public class PositionUpdateHandlerImpl implements PositionUpdateHandler {
 		if (storedPosition == null) {
 			/* new position update */
 			storedPosition = new PositionUpdateMsg(originatorNode, posUpMsg);
-			positionUpdateMsgs.saveNodePosition(storedPosition, true);
+			positionUpdateMsgs.savePositionUpdateMsg(storedPosition, true);
 			storedPositionIsNew = true;
 		}
 
@@ -108,7 +108,7 @@ public class PositionUpdateHandlerImpl implements PositionUpdateHandler {
 		originatorNode.setPositionUpdateMsg(storedPosition);
 
 		/* save the node and position. explicitly saving the originatorNode is not needed since that is cascaded */
-		positionUpdateMsgs.saveNodePosition(storedPosition, false);
+		positionUpdateMsgs.savePositionUpdateMsg(storedPosition, false);
 
 		return true;
 	}

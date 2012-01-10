@@ -11,16 +11,73 @@ import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.domainmodel.PositionUpdateM
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
+/**
+ * The PositionUpdateMsg DAO
+ */
 public interface PositionUpdateMsgs {
-	public PositionUpdateMsg getPosition(InetAddress mainIp);
+	/**
+	 * Retrieve the PositionUpdateMsg as sent by an OLSRd node
+	 * 
+	 * @param mainIp
+	 *          the main IP address of the OLSR stack of an OLSRd node
+	 * @return the PositionUpdateMsg, or null when the OLSRd node is not found
+	 */
+	public PositionUpdateMsg getPositionUpdateMsg(InetAddress mainIp);
 
-	public List<PositionUpdateMsg> getPositionsForDistribution(long startTime, long endTime, Node clusterLeader);
+	/**
+	 * Retrieve the PositionUpdateMsg objects that must be distributed to the given cluster leader. A PositionUpdateMsg
+	 * must be distributed if its reception time is between startTime and endTime.
+	 * 
+	 * @param startTime
+	 *          the startTime of the reception time window
+	 * @param endTime
+	 *          the endTime of the reception time window
+	 * @param clusterLeader
+	 *          the cluster leader for which the objects must be retrieved. When null, then just retrieve all objects that
+	 *          must be distributed
+	 * @return the list of objects that must be distributed, or null when none found
+	 */
+	public List<PositionUpdateMsg> getPositionUpdateMsgForDistribution(long startTime, long endTime, Node clusterLeader);
 
-	public void saveNodePosition(PositionUpdateMsg position, boolean newObject);
+	/**
+	 * Save a PositionUpdateMsg into the database
+	 * 
+	 * @param positionUpdateMsg
+	 *          the PositionUpdateMsg
+	 * @param newObject
+	 *          true when the object is newly created, false when it already exists in the database
+	 */
+	public void savePositionUpdateMsg(PositionUpdateMsg positionUpdateMsg, boolean newObject);
 
-	public boolean removeExpiredNodePosition(long utcTimestamp, double validityTimeMultiplier);
+	/**
+	 * Remove expired/out-of-date PositionUpdateMsg objects from the database
+	 * 
+	 * @param utcTimestamp
+	 *          the timestamp for which expiry must be evaluated
+	 * @param validityTimeMultiplier
+	 *          the multiplier that must be applied to the validity time of a PositionUpdateMsg before evaluating expiry
+	 * @return true when 1 or more PositionUpdateMsg objects were removed from the database
+	 */
+	public boolean removeExpiredPositionUpdateMsg(long utcTimestamp, double validityTimeMultiplier);
 
+	/**
+	 * Log the printout of the PositionUpdateMsg objects
+	 * 
+	 * @param logger
+	 *          the logger to which the printout is sent
+	 * @param level
+	 *          the level at which the printout must be logged. no logging is performed when the logger is not enabled for
+	 *          the specified level.
+	 */
 	public void log(Logger logger, Level level);
 
+	/**
+	 * Print the PositionUpdateMsg objects to an output stream
+	 * 
+	 * @param out
+	 *          the output stream to which the printout is sent
+	 * @throws IOException
+	 *           in case of an error
+	 */
 	public void print(OutputStream out) throws IOException;
 }

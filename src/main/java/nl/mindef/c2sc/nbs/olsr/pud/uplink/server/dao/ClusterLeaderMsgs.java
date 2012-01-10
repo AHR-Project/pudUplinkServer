@@ -20,7 +20,7 @@ public interface ClusterLeaderMsgs {
 	 *          the main IP address of the OLSR stack of an OLSRd node
 	 * @return the ClusterLeaderMsg, or null when the OLSRd node is not found
 	 */
-	public ClusterLeaderMsg getClusterLeader(InetAddress mainIp);
+	public ClusterLeaderMsg getClusterLeaderMsg(InetAddress mainIp);
 
 	/**
 	 * Save a ClusterLeaderMsg into the database
