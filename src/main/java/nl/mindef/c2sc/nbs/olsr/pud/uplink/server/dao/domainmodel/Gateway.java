@@ -119,7 +119,7 @@ public class Gateway implements Serializable {
 	}
 
 	/** the associated relay server */
-	@ManyToOne(cascade = CascadeType.ALL, optional = false)
+	@ManyToOne(cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH, CascadeType.DETACH }, optional = false)
 	@NotNull
 	private RelayServer relayServer = null;
 

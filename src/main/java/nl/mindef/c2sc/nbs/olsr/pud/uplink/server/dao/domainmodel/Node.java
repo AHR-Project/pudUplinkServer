@@ -77,7 +77,7 @@ public class Node implements Serializable {
 	}
 
 	/** the associated gateway */
-	@ManyToOne(cascade = CascadeType.ALL)
+	@ManyToOne(cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH, CascadeType.DETACH })
 	private Gateway gateway = null;
 
 	/**
@@ -134,7 +134,7 @@ public class Node implements Serializable {
 	}
 
 	/** the associated cluster nodes */
-	@OneToMany(cascade = CascadeType.ALL, mappedBy = "clusterLeader")
+	@OneToMany(cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH, CascadeType.DETACH }, mappedBy = "clusterLeader")
 	private Set<ClusterLeaderMsg> clusterNodes = new HashSet<ClusterLeaderMsg>();
 
 	/**

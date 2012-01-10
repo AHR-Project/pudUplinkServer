@@ -15,6 +15,25 @@ import javax.validation.constraints.NotNull;
 public class ClusterLeaderMsg implements Serializable {
 	private static final long serialVersionUID = -2705472710068034493L;
 
+	/**
+	 * Default constructor
+	 */
+	public ClusterLeaderMsg() {
+		super();
+	}
+
+	/**
+	 * Constructor
+	 * 
+	 * @param node
+	 * @param clusterLeader
+	 */
+	public ClusterLeaderMsg(Node node, Node clusterLeader) {
+		super();
+		this.node = node;
+		this.clusterLeader = clusterLeader;
+	}
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long id;
@@ -35,7 +54,7 @@ public class ClusterLeaderMsg implements Serializable {
 	}
 
 	/** the associated node */
-	@OneToOne(cascade = CascadeType.ALL, mappedBy = "clusterLeaderMsg", optional = false)
+	@OneToOne(cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH, CascadeType.DETACH }, mappedBy = "clusterLeaderMsg", optional = false)
 	@NotNull
 	private Node node = null;
 

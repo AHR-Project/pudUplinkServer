@@ -16,6 +16,25 @@ import org.olsr.plugin.pud.PositionUpdate;
 public class PositionUpdateMsg implements Serializable {
 	private static final long serialVersionUID = -1387490955979060516L;
 
+	/**
+	 * Default constructor
+	 */
+	public PositionUpdateMsg() {
+		super();
+	}
+
+	/**
+	 * Constructor
+	 * 
+	 * @param node
+	 * @param positionUpdateMsg
+	 */
+	public PositionUpdateMsg(Node node, PositionUpdate positionUpdateMsg) {
+		super();
+		this.node = node;
+		this.positionUpdateMsg = positionUpdateMsg;
+	}
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long id;
@@ -36,7 +55,7 @@ public class PositionUpdateMsg implements Serializable {
 	}
 
 	/** the associated node */
-	@OneToOne(cascade = CascadeType.ALL, mappedBy = "positionUpdateMsg", optional = false)
+	@OneToOne(cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH, CascadeType.DETACH }, mappedBy = "positionUpdateMsg", optional=false)
 	@NotNull
 	private Node node = null;
 
