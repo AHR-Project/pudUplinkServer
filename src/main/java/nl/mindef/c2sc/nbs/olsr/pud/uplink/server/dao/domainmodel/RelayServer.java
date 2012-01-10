@@ -110,8 +110,8 @@ public class RelayServer implements Serializable {
 	}
 
 	/**
-	 * @param gateways
-	 *          the gateways to set
+	 * @param nodes
+	 *          the nodes to set
 	 */
 	public final void setGateways(Set<Gateway> nodes) {
 		this.gateways = nodes;

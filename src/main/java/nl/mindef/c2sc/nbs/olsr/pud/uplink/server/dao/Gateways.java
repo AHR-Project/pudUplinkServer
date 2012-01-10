@@ -10,11 +10,14 @@ import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.domainmodel.Gateway;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
+/**
+ * The Gateway DAO
+ */
 public interface Gateways {
 	/**
 	 * Get a list of gateways.<br/>
 	 * <br/>
-	 * Only the gateways themselves are retrieved, no linked objects (non-eager fetching) <br/>
+	 * Only the gateways themselves are retrieved, no linked objects (non-eager fetching)<br/>
 	 * <br/>
 	 * 
 	 * @param ip
@@ -26,7 +29,7 @@ public interface Gateways {
 	/**
 	 * Get a gateway.<br/>
 	 * <br/>
-	 * Only the gateway itself is retrieved, no linked objects (non-eager fetching) <br/>
+	 * Only the gateway itself is retrieved, no linked objects (non-eager fetching)<br/>
 	 * <br/>
 	 * 
 	 * @param ip
@@ -38,21 +41,40 @@ public interface Gateways {
 	public Gateway getGateway(InetAddress ip, int port);
 
 	/**
-	 * Save a gateway.
+	 * Save a gateway into the database
 	 * 
 	 * @param gateway
 	 *          the gateway to save
 	 * @param newObject
-	 *          true when the gateway is new, false when already exists
+	 *          true when the object is newly created, false when it already exists in the database
 	 */
 	public void saveGateway(Gateway gateway, boolean newObject);
 
 	/**
-	 * Remove all empty gateways.<br/>
+	 * Remove expired/out-of-date Gateway objects from the database
+	 * 
+	 * @return true when 1 or more Gateway objects were removed from the database
 	 */
 	public boolean removeExpiredGateways();
 
+	/**
+	 * Log the printout of the Gateway objects
+	 * 
+	 * @param logger
+	 *          the logger to which the printout is sent
+	 * @param level
+	 *          the level at which the printout must be logged. no logging is performed when the logger is not enabled for
+	 *          the specified level.
+	 */
 	public void log(Logger logger, Level level);
 
+	/**
+	 * Print the Gateway objects to an output stream
+	 * 
+	 * @param out
+	 *          the output stream to which the printout is sent
+	 * @throws IOException
+	 *           in case of an error
+	 */
 	public void print(OutputStream out) throws IOException;
 }

@@ -94,8 +94,8 @@ public class ClusterLeaderMsg implements Serializable {
 	 * @param clusterLeaderNode
 	 *          the clusterLeaderNode to set
 	 */
-	public final void setClusterLeaderNode(Node clusterLeader) {
-		this.clusterLeaderNode = clusterLeader;
+	public final void setClusterLeaderNode(Node clusterLeaderNode) {
+		this.clusterLeaderNode = clusterLeaderNode;
 	}
 
 	/** the reception date (UTC, milliseconds since Epoch) */

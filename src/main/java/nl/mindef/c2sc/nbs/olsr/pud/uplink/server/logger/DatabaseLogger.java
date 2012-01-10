@@ -166,12 +166,10 @@ public class DatabaseLogger {
 	}
 
 	public void log(Logger logger, Level level) {
-		if (logger.isEnabledFor(level)) {
-			relayServers.log(logger, level);
-			gateways.log(logger, level);
-			nodes.log(logger, level);
-			positionUpdateMsgs.log(logger, level);
-			clusterLeaderMsgs.log(logger, level);
-		}
+		relayServers.log(logger, level);
+		gateways.log(logger, level);
+		nodes.log(logger, level);
+		positionUpdateMsgs.log(logger, level);
+		clusterLeaderMsgs.log(logger, level);
 	}
 }

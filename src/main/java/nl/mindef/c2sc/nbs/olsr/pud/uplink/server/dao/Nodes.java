@@ -10,6 +10,9 @@ import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.domainmodel.Node;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 
+/**
+ * The Node DAO
+ */
 public interface Nodes {
 	/**
 	 * Get a node.<br/>
@@ -18,23 +21,25 @@ public interface Nodes {
 	 * <br/>
 	 * 
 	 * @param mainIp
-	 *          the IP address of the node to fetch
-	 * @return a list of all cluster leader nodes
+	 *          the main IP address of the OLSR stack of the OLSRd node
+	 * @return a list of all nodes, or null when not found
 	 */
 	public Node getNode(InetAddress mainIp);
 
 	/**
-	 * Save a node.
+	 * Save a node into the database
 	 * 
 	 * @param node
 	 *          the node to save
 	 * @param newObject
-	 *          true when the node is new, false when already exists
+	 *          true when the object is newly created, false when it already exists in the database
 	 */
 	public void saveNode(Node node, boolean newObject);
 
 	/**
-	 * Remove all empty nodes.<br/>
+	 * Remove expired/out-of-date Node objects from the database
+	 * 
+	 * @return true when 1 or more Node objects were removed from the database
 	 */
 	public boolean removeExpiredNodes();
 
@@ -49,26 +54,51 @@ public interface Nodes {
 	 * <li>a node that points to itself as a cluster leader</li>
 	 * <li>a node that points to another node that does not point to itself as a cluster leader</li>
 	 * </ul>
+	 * When clusterLeadersIncludesTransitionalNodes is true, then a cluster leader also is:
+	 * <ul>
+	 * <li>a node of which the cluster leader does not point to itself</li>
+	 * </ul>
 	 * 
-	 * @return a list of all cluster leader nodes
+	 * 
+	 * @return a list of all cluster leader nodes, or null when not found
 	 */
 	public List<Node> getClusterLeaders();
 
 	/**
 	 * Get a substitute cluster leader for a given cluster leader.<br/>
 	 * <br/>
-	 * The substitute cluster leader is a Node that is in the same cluster as the cluster leader, but is not the cluster
-	 * leader itself. The substitute cluster leader also has a valid IP address and a valid downlink port.<br/>
 	 * Only the substitute cluster leader node is retrieved, no linked objects (non-eager fetching)<br/>
 	 * <br/>
+	 * The substitute cluster leader is:
+	 * <ul>
+	 * <li>a node that is in the same cluster as the cluster leader, but is not the cluster leader itself</li>
+	 * <li>a node that has a valid IP address and a valid downlink port</li>
+	 * </ul>
 	 * 
 	 * @param clusterLeader
 	 *          the cluster leader for which a substitute is sought
-	 * @return the substitute cluster leader
+	 * @return the substitute cluster leader, or null when not found
 	 */
 	public Node getSubstituteClusterLeader(Node clusterLeader);
 
+	/**
+	 * Log the printout of the Node objects
+	 * 
+	 * @param logger
+	 *          the logger to which the printout is sent
+	 * @param level
+	 *          the level at which the printout must be logged. no logging is performed when the logger is not enabled for
+	 *          the specified level.
+	 */
 	public void log(Logger logger, Level level);
 
+	/**
+	 * Print the Node objects to an output stream
+	 * 
+	 * @param out
+	 *          the output stream to which the printout is sent
+	 * @throws IOException
+	 *           in case of an error
+	 */
 	public void print(OutputStream out) throws IOException;
 }

@@ -52,14 +52,15 @@ public class ClusterLeaderMsgsImpl implements ClusterLeaderMsgs {
 
 	@Override
 	@Transactional
-	public void saveClusterLeaderMsg(ClusterLeaderMsg position, boolean newObject) {
+	public void saveClusterLeaderMsg(ClusterLeaderMsg clusterLeaderMsg, boolean newObject) {
 		if (newObject) {
-			sessionFactory.getCurrentSession().saveOrUpdate(position);
+			sessionFactory.getCurrentSession().saveOrUpdate(clusterLeaderMsg);
 		} else {
-			sessionFactory.getCurrentSession().merge(position);
+			sessionFactory.getCurrentSession().merge(clusterLeaderMsg);
 		}
 	}
 
+	// FIXME set readonly attributes on relevant queries
 	@Override
 	@Transactional
 	public boolean removeExpiredClusterLeaderMsg(long utcTimestamp, double validityTimeMultiplier) {
@@ -67,8 +68,9 @@ public class ClusterLeaderMsgsImpl implements ClusterLeaderMsgs {
 		List<ClusterLeaderMsg> result = sessionFactory
 				.getCurrentSession()
 				.createQuery(
-						"select cl from ClusterLeaderMsg cl where (receptionTime + (validityTime * " + validityTimeMultiplier
-								+ ")) < " + utcTimestamp).list();
+						"select cl from ClusterLeaderMsg cl where (receptionTime + (validityTime * :validityTimeMultiplier)) <"
+								+ " :utcTimestamp").setParameter("validityTimeMultiplier", validityTimeMultiplier)
+				.setParameter("utcTimestamp", utcTimestamp).list();
 
 		if (result.size() == 0) {
 			return false;
@@ -82,21 +84,22 @@ public class ClusterLeaderMsgsImpl implements ClusterLeaderMsgs {
 		}
 
 		if (logger.isDebugEnabled()) {
-			logger.debug("  removed " + result.size() + " clusterLeaderMsg objects");
+			logger.debug("removed " + result.size() + " clusterLeaderMsg objects");
 		}
 
 		sessionFactory.getCurrentSession().flush();
 		return true;
 	}
 
-	private String getPositionsDump() {
+	private String getClusterLeaderMsgsDump() {
 		@SuppressWarnings("unchecked")
-		List<ClusterLeaderMsg> result = sessionFactory.getCurrentSession().createQuery("from ClusterLeaderMsg node").list();
+		List<ClusterLeaderMsg> result = sessionFactory.getCurrentSession()
+				.createQuery("from ClusterLeaderMsg clusterLeaderMsg").list();
 
 		StringBuilder s = new StringBuilder();
 		s.append("[ClusterLeaderMsgs]\n");
-		for (ClusterLeaderMsg node : result) {
-			s.append(node.toString() + "\n");
+		for (ClusterLeaderMsg clusterLeaderMsg : result) {
+			s.append(clusterLeaderMsg.toString() + "\n");
 		}
 
 		return s.toString();
@@ -106,14 +109,14 @@ public class ClusterLeaderMsgsImpl implements ClusterLeaderMsgs {
 	@Transactional
 	public void log(Logger logger, Level level) {
 		if (logger.isEnabledFor(level)) {
-			logger.log(level, getPositionsDump());
+			logger.log(level, getClusterLeaderMsgsDump());
 		}
 	}
 
 	@Override
 	@Transactional
 	public void print(OutputStream out) throws IOException {
-		String s = getPositionsDump();
+		String s = getClusterLeaderMsgsDump();
 		out.write(s.getBytes(), 0, s.length());
 	}
 }

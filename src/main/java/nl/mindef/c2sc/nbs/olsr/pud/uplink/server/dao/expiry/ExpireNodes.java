@@ -12,9 +12,15 @@ import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.PositionUpdateMsgs;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Required;
 
+/**
+ * Expire out-of-date PositionUpdate and ClusterLeader messages, and then remove empty Nodes and Gateways. Do NOT remove
+ * empty RelayServers since these are statically configured
+ */
 public class ExpireNodes {
 	private Logger logger = Logger.getLogger(this.getClass().getName());
 
+	// FIXME remove the data lock
+	/** the data lock used to serialize access to the database */
 	private ReentrantLock dataLock;
 
 	/**
@@ -26,6 +32,9 @@ public class ExpireNodes {
 		this.dataLock = dataLock;
 	}
 
+	/**
+	 * Timer task that does the actual expiry of out-of-date and empty objects
+	 */
 	protected class ExpiryTimerTask extends TimerTask {
 		@Override
 		public void run() {
@@ -40,7 +49,7 @@ public class ExpireNodes {
 				try {
 					clusterLeaderMsgs.removeExpiredClusterLeaderMsg(utcTimestamp, validityTimeMultiplier);
 				} catch (Throwable e) {
-					logger.error("Removal of expired position update messages failed", e);
+					logger.error("Removal of expired cluster leader messages failed", e);
 				}
 
 				try {
@@ -85,11 +94,8 @@ public class ExpireNodes {
 		this.interval = interval;
 	}
 
-	/** the default multiplier for the validity time */
-	public static final double validityTimeMultiplier_default = 3.0;
-
 	/** the multiplier for the validity time */
-	private double validityTimeMultiplier = validityTimeMultiplier_default;
+	private double validityTimeMultiplier = 3.0;
 
 	/**
 	 * @param validityTimeMultiplier
@@ -99,6 +105,7 @@ public class ExpireNodes {
 		this.validityTimeMultiplier = validityTimeMultiplier;
 	}
 
+	/** the Node DAO */
 	private Nodes nodes;
 
 	/**
@@ -110,7 +117,7 @@ public class ExpireNodes {
 		this.nodes = nodes;
 	}
 
-	/** the PositionUpdateMsgs handler */
+	/** the PositionUpdateMsg DAO */
 	private PositionUpdateMsgs positionUpdateMsgs;
 
 	/**
@@ -122,7 +129,7 @@ public class ExpireNodes {
 		this.positionUpdateMsgs = positionUpdateMsgs;
 	}
 
-	/** the ClusterLeaderMsgs handler */
+	/** the ClusterLeaderMsg DAO */
 	private ClusterLeaderMsgs clusterLeaderMsgs;
 
 	/**
@@ -134,7 +141,7 @@ public class ExpireNodes {
 		this.clusterLeaderMsgs = clusterLeaderMsgs;
 	}
 
-	/** the Gateways handler */
+	/** the Gateway DAO */
 	private Gateways gateways;
 
 	/**
@@ -146,6 +153,7 @@ public class ExpireNodes {
 		this.gateways = gateways;
 	}
 
+	/** the timer from which the expiry task runs */
 	private Timer timer;
 
 	public void init() {

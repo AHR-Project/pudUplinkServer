@@ -93,7 +93,7 @@ public class GatewaysImpl implements Gateways {
 
 		if (cnt != 0) {
 			if (logger.isDebugEnabled()) {
-				logger.debug("  removed " + cnt + " Gateway objects");
+				logger.debug("removed " + cnt + " Gateway objects");
 			}
 		}
 
