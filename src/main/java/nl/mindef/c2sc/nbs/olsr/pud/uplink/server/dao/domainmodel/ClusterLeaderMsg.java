@@ -11,9 +11,12 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import javax.validation.constraints.NotNull;
 
+/**
+ * Represents a ClusterLeader message as sent by the OLSRd PUD plugin
+ */
 @Entity
 public class ClusterLeaderMsg implements Serializable {
-	private static final long serialVersionUID = -2705472710068034493L;
+	private static final long serialVersionUID = 6855352041095506686L;
 
 	/**
 	 * Default constructor
@@ -26,12 +29,14 @@ public class ClusterLeaderMsg implements Serializable {
 	 * Constructor
 	 * 
 	 * @param node
-	 * @param clusterLeader
+	 *          the node to which the ClusterLeader message belongs
+	 * @param clusterLeaderNode
+	 *          the cluster leader of the node
 	 */
-	public ClusterLeaderMsg(Node node, Node clusterLeader) {
+	public ClusterLeaderMsg(Node node, Node clusterLeaderNode) {
 		super();
 		this.node = node;
-		this.clusterLeader = clusterLeader;
+		this.clusterLeaderNode = clusterLeaderNode;
 	}
 
 	@Id
@@ -53,7 +58,7 @@ public class ClusterLeaderMsg implements Serializable {
 		this.id = id;
 	}
 
-	/** the associated node */
+	/** the node to which the ClusterLeader message belongs */
 	@OneToOne(cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH, CascadeType.DETACH }, mappedBy = "clusterLeaderMsg", optional = false)
 	@NotNull
 	private Node node = null;
@@ -73,24 +78,24 @@ public class ClusterLeaderMsg implements Serializable {
 		this.node = node;
 	}
 
-	/** the associated cluster leader node */
-	@ManyToOne(cascade = CascadeType.ALL, optional = false)
+	/** the cluster leader of the node */
+	@ManyToOne(cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH, CascadeType.DETACH }, optional = false)
 	@NotNull
-	private Node clusterLeader = null;
+	private Node clusterLeaderNode = null;
 
 	/**
-	 * @return the clusterLeader
+	 * @return the clusterLeaderNode
 	 */
-	public final Node getClusterLeader() {
-		return clusterLeader;
+	public final Node getClusterLeaderNode() {
+		return clusterLeaderNode;
 	}
 
 	/**
-	 * @param clusterLeader
-	 *          the clusterLeader to set
+	 * @param clusterLeaderNode
+	 *          the clusterLeaderNode to set
 	 */
-	public final void setClusterLeader(Node clusterLeader) {
-		this.clusterLeader = clusterLeader;
+	public final void setClusterLeaderNode(Node clusterLeader) {
+		this.clusterLeaderNode = clusterLeader;
 	}
 
 	/** the reception date (UTC, milliseconds since Epoch) */
@@ -136,8 +141,8 @@ public class ClusterLeaderMsg implements Serializable {
 		builder.append(id);
 		builder.append(", node=");
 		builder.append(node.getId());
-		builder.append(", clusterLeader=");
-		builder.append(clusterLeader.getId());
+		builder.append(", clusterLeaderNode=");
+		builder.append(clusterLeaderNode.getId());
 		builder.append(", receptionTime=");
 		builder.append(receptionTime);
 		builder.append(", validityTime=");

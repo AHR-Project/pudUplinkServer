@@ -14,9 +14,13 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.validation.constraints.NotNull;
 
+/**
+ * Represents a gateway node that sends PositionUpdate and ClusterLeader messages (from an OLSRd node) to the
+ * RelayServer
+ */
 @Entity
 public class Gateway implements Serializable {
-	private static final long serialVersionUID = -7276838498590984721L;
+	private static final long serialVersionUID = 5149981674264087644L;
 
 	/**
 	 * Default constructor
@@ -33,7 +37,7 @@ public class Gateway implements Serializable {
 	 * @param port
 	 *          the port of the gateway
 	 * @param relayServer
-	 *          the relay server that received from the gateway
+	 *          the relay server that belongs to the gateway
 	 */
 	public Gateway(InetAddress ip, Integer port, RelayServer relayServer) {
 		super();
@@ -61,7 +65,7 @@ public class Gateway implements Serializable {
 		this.id = id;
 	}
 
-	/** the destination IP of the node */
+	/** the IP address of the gateway */
 	@NotNull
 	private InetAddress ip = null;
 
@@ -80,7 +84,7 @@ public class Gateway implements Serializable {
 		this.ip = ip;
 	}
 
-	/** the UDP port for the node */
+	/** the port of the gateway */
 	@NotNull
 	private Integer port = null;
 
@@ -118,7 +122,7 @@ public class Gateway implements Serializable {
 		this.nodes = nodes;
 	}
 
-	/** the associated relay server */
+	/** the relay server that belongs to the gateway */
 	@ManyToOne(cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH, CascadeType.DETACH }, optional = false)
 	@NotNull
 	private RelayServer relayServer = null;

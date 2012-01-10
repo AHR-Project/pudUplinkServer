@@ -15,9 +15,12 @@ import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.validation.constraints.NotNull;
 
+/**
+ * Represents an OLSRd node that sends PositionUpdate and ClusterLeader messages to a gateway node
+ */
 @Entity
 public class Node implements Serializable {
-	private static final long serialVersionUID = 8997670429374427930L;
+	private static final long serialVersionUID = -1275132193159715216L;
 
 	/**
 	 * Default constructor
@@ -30,7 +33,9 @@ public class Node implements Serializable {
 	 * Constructor
 	 * 
 	 * @param mainIp
+	 *          the main IP address of the OLSR stack of the OLSRd node
 	 * @param gateway
+	 *          the gateway to which the node belongs
 	 */
 	public Node(InetAddress mainIp, Gateway gateway) {
 		super();
@@ -57,7 +62,7 @@ public class Node implements Serializable {
 		this.id = id;
 	}
 
-	/** the main IP of the node */
+	/** the main IP address of the OLSR stack of the OLSRd node */
 	@NotNull
 	private InetAddress mainIp = null;
 
@@ -76,7 +81,10 @@ public class Node implements Serializable {
 		this.mainIp = mainIp;
 	}
 
-	/** the associated gateway */
+	/**
+	 * the gateway to which the node belongs; can be null when an OLSRd node sends a ClusterLeader message that points at
+	 * a cluster leader node that has not been seen yet by the RelayServer
+	 */
 	@ManyToOne(cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH, CascadeType.DETACH })
 	private Gateway gateway = null;
 
@@ -96,7 +104,7 @@ public class Node implements Serializable {
 	}
 
 	/** the associated position update message */
-	@OneToOne(cascade = CascadeType.ALL, optional = true)
+	@OneToOne(cascade = CascadeType.ALL)
 	private PositionUpdateMsg positionUpdateMsg = null;
 
 	/**
@@ -115,7 +123,7 @@ public class Node implements Serializable {
 	}
 
 	/** the associated cluster leader message */
-	@OneToOne(cascade = CascadeType.ALL, optional = true)
+	@OneToOne(cascade = CascadeType.ALL)
 	private ClusterLeaderMsg clusterLeaderMsg = null;
 
 	/**
@@ -163,11 +171,11 @@ public class Node implements Serializable {
 		builder.append(gateway.getId());
 		builder.append(", clusterNodes=[");
 		boolean comma = false;
-		for (ClusterLeaderMsg clusterNode : clusterNodes) {
+		for (ClusterLeaderMsg clusterLeaderMsg : clusterNodes) {
 			if (comma) {
 				builder.append(", ");
 			}
-			builder.append(clusterNode.getNode().getId());
+			builder.append(clusterLeaderMsg.getNode().getId());
 			comma = true;
 		}
 		builder.append("]");

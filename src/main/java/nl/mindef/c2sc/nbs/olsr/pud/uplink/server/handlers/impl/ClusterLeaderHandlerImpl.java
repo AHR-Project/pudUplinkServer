@@ -95,7 +95,7 @@ public class ClusterLeaderHandlerImpl implements ClusterLeaderHandler {
 		originatorNode.setClusterLeaderMsg(storedClusterLeader);
 
 		/* link the clust leader update to the cluster leader's clusterNodes */
-		storedClusterLeader.setClusterLeader(clusterLeaderNode);
+		storedClusterLeader.setClusterLeaderNode(clusterLeaderNode);
 
 		/* save the nodes and cluster leader update. explicitly saving the nodes is not needed since these are cascaded */
 		clusterLeaderMsgs.saveClusterLeaderMsg(storedClusterLeader, false);

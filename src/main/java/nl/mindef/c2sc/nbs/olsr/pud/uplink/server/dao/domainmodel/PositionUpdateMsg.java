@@ -12,9 +12,12 @@ import javax.validation.constraints.NotNull;
 
 import org.olsr.plugin.pud.PositionUpdate;
 
+/**
+ * Represents a PositionUpdate message as sent by the OLSRd PUD plugin
+ */
 @Entity
 public class PositionUpdateMsg implements Serializable {
-	private static final long serialVersionUID = -1387490955979060516L;
+	private static final long serialVersionUID = -7725058655152809466L;
 
 	/**
 	 * Default constructor
@@ -27,7 +30,9 @@ public class PositionUpdateMsg implements Serializable {
 	 * Constructor
 	 * 
 	 * @param node
+	 *          the node to which the PositionUpdate message belongs
 	 * @param positionUpdateMsg
+	 *          the PositionUpdate message
 	 */
 	public PositionUpdateMsg(Node node, PositionUpdate positionUpdateMsg) {
 		super();
@@ -54,8 +59,8 @@ public class PositionUpdateMsg implements Serializable {
 		this.id = id;
 	}
 
-	/** the associated node */
-	@OneToOne(cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH, CascadeType.DETACH }, mappedBy = "positionUpdateMsg", optional=false)
+	/** the node to which the PositionUpdate message belongs */
+	@OneToOne(cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH, CascadeType.DETACH }, mappedBy = "positionUpdateMsg", optional = false)
 	@NotNull
 	private Node node = null;
 
@@ -74,7 +79,7 @@ public class PositionUpdateMsg implements Serializable {
 		this.node = node;
 	}
 
-	/** the position update uplink message */
+	/** the PositionUpdate message */
 	@NotNull
 	private PositionUpdate positionUpdateMsg = null;
 

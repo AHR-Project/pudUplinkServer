@@ -13,9 +13,12 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.validation.constraints.NotNull;
 
+/**
+ * Represents a RelayServer that receives and distributes PositionUpdate and ClusterLeader messages
+ */
 @Entity
 public class RelayServer implements Serializable {
-	private static final long serialVersionUID = 3573019703164508653L;
+	private static final long serialVersionUID = -5770906949985852253L;
 
 	/**
 	 * Default constructor
@@ -28,7 +31,9 @@ public class RelayServer implements Serializable {
 	 * Constructor
 	 * 
 	 * @param ip
+	 *          the IP address of the relay server
 	 * @param port
+	 *          the port of the relay server
 	 */
 	public RelayServer(InetAddress ip, Integer port) {
 		super();
@@ -55,7 +60,7 @@ public class RelayServer implements Serializable {
 		this.id = id;
 	}
 
-	/** the IP address of the server */
+	/** the IP address of the relay server */
 	@NotNull
 	private InetAddress ip = null;
 
@@ -74,7 +79,7 @@ public class RelayServer implements Serializable {
 		this.ip = ip;
 	}
 
-	/** the port of the server */
+	/** port the port of the relay server */
 	@NotNull
 	private Integer port = null;
 
