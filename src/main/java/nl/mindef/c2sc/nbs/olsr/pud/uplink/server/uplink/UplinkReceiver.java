@@ -5,7 +5,6 @@ import java.net.DatagramSocket;
 import java.net.SocketException;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.distributor.Distributor;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.handlers.PacketHandler;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.logger.DatabaseLogger;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.signals.StopHandlerConsumer;
@@ -42,16 +41,16 @@ public class UplinkReceiver extends Thread implements StopHandlerConsumer {
 		this.packetHandler = packetHandler;
 	}
 
-	private Distributor distributor;
-
-	/**
-	 * @param distributor
-	 *          the distributor to set
-	 */
-	@Required
-	public final void setDistributor(Distributor distributor) {
-		this.distributor = distributor;
-	}
+	// private Distributor distributor;
+	//
+	// /**
+	// * @param distributor
+	// * the distributor to set
+	// */
+	// @Required
+	// public final void setDistributor(Distributor distributor) {
+	// this.distributor = distributor;
+	// }
 
 	private DatabaseLogger databaseLogger;
 
@@ -105,12 +104,13 @@ public class UplinkReceiver extends Thread implements StopHandlerConsumer {
 		while (run.get()) {
 			try {
 				sock.receive(packet);
-				if (packetHandler.processPacket(packet)) {
-					if (logger.isDebugEnabled()) {
+				try {
+					if (packetHandler.processPacket(packet)) {
 						databaseLogger.log(logger, Level.DEBUG);
+						// FIXME distributor.signalUpdate();
 					}
-
-					distributor.signalUpdate();
+				} catch (Throwable e) {
+					logger.error(e);
 				}
 			} catch (Exception e) {
 				if (!SocketException.class.equals(e.getClass())) {

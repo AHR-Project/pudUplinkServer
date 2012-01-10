@@ -8,7 +8,9 @@
 		class="org.springframework.beans.factory.annotation.RequiredAnnotationBeanPostProcessor" />
 
 	<!-- Debug Beans -->
+	<!--
 	<import resource="classpath:META-INF/spring/faker.xml" />
+	 -->
 
 	<!-- Beans -->
 	<import resource="classpath:META-INF/spring/jmx.xml" />
@@ -19,7 +21,8 @@
 	<import resource="classpath:META-INF/spring/daoDataLock.xml" />
 	<import resource="classpath:META-INF/spring/gateways.xml" />
 	<import resource="classpath:META-INF/spring/nodes.xml" />
-	<import resource="classpath:META-INF/spring/positions.xml" />
+	<import resource="classpath:META-INF/spring/positionUpdateMsgs.xml" />
+	<import resource="classpath:META-INF/spring/clusterLeaderMsgs.xml" />
 	<import resource="classpath:META-INF/spring/relayServers.xml" />
 	<import resource="classpath:META-INF/spring/expiry.xml" />
 	<import resource="classpath:META-INF/spring/databaseLogger.xml" />
@@ -28,7 +31,9 @@
 	<import resource="classpath:META-INF/spring/positionUpdateHandler.xml" />
 	<import resource="classpath:META-INF/spring/packetHandler.xml" />
 
+	<!--
 	<import resource="classpath:META-INF/spring/distributor.xml" />
+	 -->
 
 	<import resource="classpath:META-INF/spring/uplinkReceiver.xml" />
 

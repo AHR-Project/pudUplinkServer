@@ -4,16 +4,14 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.locks.ReentrantLock;
 
+import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.ClusterLeaderMsgs;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.Gateways;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.Nodes;
-import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.Positions;
+import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.PositionUpdateMsgs;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Required;
-import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
 
-@Repository
 public class ExpireNodes {
 	private Logger logger = Logger.getLogger(this.getClass().getName());
 
@@ -28,39 +26,39 @@ public class ExpireNodes {
 		this.dataLock = dataLock;
 	}
 
-	@Transactional
 	protected class ExpiryTimerTask extends TimerTask {
 		@Override
 		public void run() {
 			dataLock.lock();
-
-			if (logger.isDebugEnabled()) {
-				logger.debug("************************** expiry");
-			}
-
 			try {
+				if (logger.isDebugEnabled()) {
+					logger.debug("************************** expiry");
+				}
+
+				long utcTimestamp = System.currentTimeMillis();
+
 				try {
-					nodes.removeExpiredNodes(validityTimeMultiplier);
+					clusterLeaderMsgs.removeExpiredClusterLeaderMsg(utcTimestamp, validityTimeMultiplier);
 				} catch (Throwable e) {
-					/* swallow */
-					e.printStackTrace();
+					logger.error("Removal of expired position update messages failed", e);
 				}
 
 				try {
-					positions.removeExpiredNodePosition(validityTimeMultiplier);
+					positionUpdateMsgs.removeExpiredNodePosition(utcTimestamp, validityTimeMultiplier);
 				} catch (Throwable e) {
-					/* swallow */
-					e.printStackTrace();
+					logger.error("Removal of expired position update messages failed", e);
 				}
 
-				// remove empty Nodes
+				try {
+					nodes.removeExpiredNodes();
+				} catch (Throwable e) {
+					logger.error("Removal of empty nodes failed", e);
+				}
 
-				// remove empty Gateways
 				try {
 					gateways.removeExpiredGateways();
 				} catch (Throwable e) {
-					/* swallow */
-					e.printStackTrace();
+					logger.error("Removal of empty gateways failed", e);
 				}
 			} finally {
 				dataLock.unlock();
@@ -104,13 +102,6 @@ public class ExpireNodes {
 	private Nodes nodes;
 
 	/**
-	 * @return the nodes
-	 */
-	public Nodes getNodes() {
-		return nodes;
-	}
-
-	/**
 	 * @param nodes
 	 *          the nodes to set
 	 */
@@ -119,23 +110,36 @@ public class ExpireNodes {
 		this.nodes = nodes;
 	}
 
-	/** the Positions handler */
-	private Positions positions;
+	/** the PositionUpdateMsgs handler */
+	private PositionUpdateMsgs positionUpdateMsgs;
 
 	/**
-	 * @param positions
-	 *          the positions to set
+	 * @param positionUpdateMsgs
+	 *          the positionUpdateMsgs to set
 	 */
 	@Required
-	public void setPositions(Positions positions) {
-		this.positions = positions;
+	public void setPositions(PositionUpdateMsgs positionUpdateMsgs) {
+		this.positionUpdateMsgs = positionUpdateMsgs;
+	}
+
+	/** the ClusterLeaderMsgs handler */
+	private ClusterLeaderMsgs clusterLeaderMsgs;
+
+	/**
+	 * @param clusterLeaderMsgs
+	 *          the clusterLeaderMsgs to set
+	 */
+	@Required
+	public void setClusterLeaderMsgs(ClusterLeaderMsgs clusterLeaderMsgs) {
+		this.clusterLeaderMsgs = clusterLeaderMsgs;
 	}
 
 	/** the Gateways handler */
 	private Gateways gateways;
 
 	/**
-	 * @param gateways the gateways to set
+	 * @param gateways
+	 *          the gateways to set
 	 */
 	@Required
 	public void setGateways(Gateways gateways) {

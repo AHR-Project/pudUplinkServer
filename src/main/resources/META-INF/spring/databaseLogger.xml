@@ -6,10 +6,11 @@
 	<bean id="DatabaseLogger"
 		class="nl.mindef.c2sc.nbs.olsr.pud.uplink.server.logger.DatabaseLogger"
 		init-method="init" destroy-method="destroy">
+		<property name="clusterLeaderMsgs" ref="ClusterLeaderMsgs" />
 		<property name="databaseLogFile" value="${database.logger.filename}" />
 		<property name="gateways" ref="Gateways" />
 		<property name="nodes" ref="Nodes" />
-		<property name="positions" ref="Positions" />
+		<property name="positions" ref="PositionUpdateMsgs" />
 		<property name="relayServers" ref="RelayServers" />
 		<property name="updateIntervalMs" value="${database.logger.updateintervalms}" />
 	</bean>

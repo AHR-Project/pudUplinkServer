@@ -5,9 +5,9 @@ import java.io.OutputStream;
 import java.net.InetAddress;
 import java.util.List;
 
-import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.Positions;
+import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.PositionUpdateMsgs;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.domainmodel.Node;
-import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.domainmodel.NodePosition;
+import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.domainmodel.PositionUpdateMsg;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -17,14 +17,14 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 @Repository
-public class PositionsImpl implements Positions {
+public class PositionUpdateMsgsImpl implements PositionUpdateMsgs {
 	private Logger logger = Logger.getLogger(this.getClass().getName());
 
 	private SessionFactory sessionFactory;
 
 	/**
 	 * @param sessionFactory
-	 *            the sessionFactory to set
+	 *          the sessionFactory to set
 	 */
 	@Required
 	public final void setSessionFactory(SessionFactory sessionFactory) {
@@ -33,17 +33,15 @@ public class PositionsImpl implements Positions {
 
 	@Override
 	@Transactional
-	public NodePosition getPosition(InetAddress mainIp) {
+	public PositionUpdateMsg getPosition(InetAddress mainIp) {
 		if (mainIp == null) {
 			return null;
 		}
 
 		@SuppressWarnings("unchecked")
-		List<NodePosition> result = sessionFactory
-				.getCurrentSession()
-				.createQuery(
-						"select node from NodePosition node where node.mainIp = :par1")
-				.setParameter("par1", mainIp).list();
+		List<PositionUpdateMsg> result = sessionFactory.getCurrentSession()
+				.createQuery("select pos from PositionUpdateMsg pos where pos.node.mainIp = :ip").setParameter("ip", mainIp)
+				.list();
 
 		if (result.size() == 0) {
 			return null;
@@ -56,26 +54,23 @@ public class PositionsImpl implements Positions {
 
 	@Override
 	@Transactional
-	public List<NodePosition> getPositionsForDistribution(long startTime,
-			long endTime, Node clusterLeader) {
+	public List<PositionUpdateMsg> getPositionsForDistribution(long startTime, long endTime, Node clusterLeader) {
 		if (startTime >= endTime) {
 			return null;
 		}
 
 		@SuppressWarnings("unchecked")
-		List<NodePosition> result = sessionFactory
+		List<PositionUpdateMsg> result = sessionFactory
 				.getCurrentSession()
 				.createQuery(
-						"select pos from NodePosition pos where"
+						"select pos from PositionUpdateMsg pos where"
 								+ " pos.receptionTime > :startTime and"
 								+ " pos.receptionTime <= :endTime"
-								+ ((clusterLeader == null) ? ""
-										: " and pos.node != null"
-												+ " and pos.node.clusterLeader != null"
-												+ " and pos.node.clusterLeader.id != "
-												+ clusterLeader.getId()))
-				.setParameter("startTime", startTime)
-				.setParameter("endTime", endTime).list();
+								+ ((clusterLeader == null) ? "" : " and pos.node is not null"
+										+ " and pos.node.clusterLeaderMsg is not null"
+										+ " and pos.node.clusterLeaderMsg.clusterLeader is not null"
+										+ " and pos.node.clusterLeaderMsg.clusterLeader.id != " + clusterLeader.getId()))
+				.setParameter("startTime", startTime).setParameter("endTime", endTime).list();
 
 		if (result.size() == 0) {
 			return null;
@@ -86,7 +81,7 @@ public class PositionsImpl implements Positions {
 
 	@Override
 	@Transactional
-	public void saveNodePosition(NodePosition position, boolean newObject) {
+	public void saveNodePosition(PositionUpdateMsg position, boolean newObject) {
 		if (newObject) {
 			sessionFactory.getCurrentSession().saveOrUpdate(position);
 		} else {
@@ -96,32 +91,40 @@ public class PositionsImpl implements Positions {
 
 	@Override
 	@Transactional
-	public void removeExpiredNodePosition(double validityTimeMultiplier) {
-		long utcTimestamp = System.currentTimeMillis();
-
-		int cnt = sessionFactory
+	public boolean removeExpiredNodePosition(long utcTimestamp, double validityTimeMultiplier) {
+		@SuppressWarnings("unchecked")
+		List<PositionUpdateMsg> result = sessionFactory
 				.getCurrentSession()
 				.createQuery(
-						"delete NodePosition position where"
-								+ " (receptionTime + (validityTime * "
-								+ validityTimeMultiplier + ")) < "
-								+ utcTimestamp).executeUpdate();
-		if (cnt != 0) {
-			if (logger.isDebugEnabled()) {
-				logger.debug("  removed " + cnt + " positions");
-			}
+						"select pu from PositionUpdateMsg pu where (receptionTime + (validityTime * " + validityTimeMultiplier
+								+ ")) < " + utcTimestamp).list();
+
+		if (result.size() == 0) {
+			return false;
 		}
-		return;
+
+		for (PositionUpdateMsg pu : result) {
+			pu.getNode().setPositionUpdateMsg(null);
+			sessionFactory.getCurrentSession().merge(pu.getNode());
+			sessionFactory.getCurrentSession().delete(pu);
+		}
+
+		if (logger.isDebugEnabled()) {
+			logger.debug("  removed " + result.size() + " PositionUpdateMsg objects");
+		}
+
+		sessionFactory.getCurrentSession().flush();
+		return true;
 	}
 
 	private String getPositionsDump() {
 		@SuppressWarnings("unchecked")
-		List<NodePosition> result = sessionFactory.getCurrentSession()
-				.createQuery("from NodePosition node").list();
+		List<PositionUpdateMsg> result = sessionFactory.getCurrentSession().createQuery("from PositionUpdateMsg node")
+				.list();
 
 		StringBuilder s = new StringBuilder();
-		s.append("[Positions]\n");
-		for (NodePosition node : result) {
+		s.append("[PositionUpdateMsgs]\n");
+		for (PositionUpdateMsg node : result) {
 			s.append(node.toString() + "\n");
 		}
 

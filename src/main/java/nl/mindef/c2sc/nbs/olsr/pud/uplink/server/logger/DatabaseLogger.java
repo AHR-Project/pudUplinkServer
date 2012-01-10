@@ -7,9 +7,10 @@ import java.nio.channels.FileChannel;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.ClusterLeaderMsgs;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.Gateways;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.Nodes;
-import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.Positions;
+import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.PositionUpdateMsgs;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.RelayServers;
 
 import org.apache.log4j.Level;
@@ -53,16 +54,28 @@ public class DatabaseLogger {
 		this.nodes = nodes;
 	}
 
-	/** the Positions handler */
-	private Positions positions;
+	/** the PositionUpdateMsgs handler */
+	private PositionUpdateMsgs positionUpdateMsgs;
 
 	/**
-	 * @param positions
-	 *          the positions to set
+	 * @param positionUpdateMsgs
+	 *          the positionUpdateMsgs to set
 	 */
 	@Required
-	public final void setPositions(Positions positions) {
-		this.positions = positions;
+	public final void setPositions(PositionUpdateMsgs positionUpdateMsgs) {
+		this.positionUpdateMsgs = positionUpdateMsgs;
+	}
+
+	/** the ClusterLeaderMsgs handler */
+	private ClusterLeaderMsgs clusterLeaderMsgs;
+
+	/**
+	 * @param clusterLeaderMsgs
+	 *          the clusterLeaderMsgs to set
+	 */
+	@Required
+	public final void setClusterLeaderMsgs(ClusterLeaderMsgs clusterLeaderMsgs) {
+		this.clusterLeaderMsgs = clusterLeaderMsgs;
 	}
 
 	private RelayServers relayServers;
@@ -113,13 +126,15 @@ public class DatabaseLogger {
 
 					logger.debug("Writing database logfile");
 
-					nodes.print(fos);
-					fos.write(eol);
-					positions.print(fos);
-					fos.write(eol);
 					relayServers.print(fos);
 					fos.write(eol);
 					gateways.print(fos);
+					fos.write(eol);
+					nodes.print(fos);
+					fos.write(eol);
+					positionUpdateMsgs.print(fos);
+					fos.write(eol);
+					clusterLeaderMsgs.print(fos);
 
 					channel.truncate(channel.position());
 					fos.flush();
@@ -152,10 +167,11 @@ public class DatabaseLogger {
 
 	public void log(Logger logger, Level level) {
 		if (logger.isEnabledFor(level)) {
-			nodes.log(logger, Level.DEBUG);
-			positions.log(logger, Level.DEBUG);
-			relayServers.log(logger, Level.DEBUG);
-			gateways.log(logger, Level.DEBUG);
+			relayServers.log(logger, level);
+			gateways.log(logger, level);
+			nodes.log(logger, level);
+			positionUpdateMsgs.log(logger, level);
+			clusterLeaderMsgs.log(logger, level);
 		}
 	}
 }

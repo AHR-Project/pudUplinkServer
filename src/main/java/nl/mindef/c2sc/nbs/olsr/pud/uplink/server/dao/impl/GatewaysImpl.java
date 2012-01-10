@@ -83,26 +83,27 @@ public class GatewaysImpl implements Gateways {
 		} else {
 			sessionFactory.getCurrentSession().merge(gateway);
 		}
+		sessionFactory.getCurrentSession().flush();
 	}
 
 	@Override
 	@Transactional
-	public void removeExpiredGateways() {
-		int cnt = sessionFactory.getCurrentSession().createQuery("delete Gateway gw where size(nodes) = 0")
-				.executeUpdate();
-		
+	public boolean removeExpiredGateways() {
+		int cnt = sessionFactory.getCurrentSession().createQuery("delete Gateway gw where size(nodes) = 0").executeUpdate();
+
 		if (cnt != 0) {
 			if (logger.isDebugEnabled()) {
-				logger.debug("  removed " + cnt + " gateways");
+				logger.debug("  removed " + cnt + " Gateway objects");
 			}
 		}
-		return;
+
+		sessionFactory.getCurrentSession().flush();
+		return (cnt != 0);
 	}
 
 	private String getGatewaysDump() {
 		@SuppressWarnings("unchecked")
-		List<Gateway> result = sessionFactory.getCurrentSession()
-				.createQuery("from Gateway gw").list();
+		List<Gateway> result = sessionFactory.getCurrentSession().createQuery("from Gateway gw").list();
 
 		StringBuilder s = new StringBuilder();
 		s.append("[Gateways]\n");
@@ -112,7 +113,7 @@ public class GatewaysImpl implements Gateways {
 
 		return s.toString();
 	}
-	
+
 	@Override
 	@Transactional
 	public void log(Logger logger, Level level) {

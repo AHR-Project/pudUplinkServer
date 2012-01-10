@@ -50,7 +50,7 @@ public interface Gateways {
 	/**
 	 * Remove all empty gateways.<br/>
 	 */
-	public void removeExpiredGateways();
+	public boolean removeExpiredGateways();
 
 	public void log(Logger logger, Level level);
 

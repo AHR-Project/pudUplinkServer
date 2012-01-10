@@ -12,7 +12,7 @@ import org.apache.log4j.Logger;
 public interface RelayServers {
 	public List<RelayServer> getRelayServers();
 
-	public void addRelayServer(RelayServer relayServer);
+	public void addRelayServer(RelayServer relayServer, boolean newObject);
 
 	public List<RelayServer> getOtherRelayServers();
 

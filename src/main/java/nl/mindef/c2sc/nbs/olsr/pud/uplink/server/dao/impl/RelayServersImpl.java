@@ -3,7 +3,6 @@ package nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.impl;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.util.List;
 
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.RelayServers;
@@ -13,8 +12,10 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Required;
+import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+@Repository
 public class RelayServersImpl implements RelayServers {
 	private SessionFactory sessionFactory;
 
@@ -32,7 +33,7 @@ public class RelayServersImpl implements RelayServers {
 
 	/**
 	 * @param uplinkUdpPort
-	 *            the uplinkUdpPort to set
+	 *          the uplinkUdpPort to set
 	 */
 	@Required
 	public final void setUplinkUdpPort(int uplinkUdpPort) {
@@ -78,20 +79,16 @@ public class RelayServersImpl implements RelayServers {
 		return result;
 	}
 
+	@Override
 	@Transactional
-	private void saveRelayServer(RelayServer relayServer, boolean newObject) {
+	public void addRelayServer(RelayServer relayServer, boolean newObject) {
+		assert (getRelayServer(relayServer) == null);
 		if (newObject) {
 			sessionFactory.getCurrentSession().saveOrUpdate(relayServer);
 		} else {
 			sessionFactory.getCurrentSession().merge(relayServer);
 		}
-	}
-
-	@Override
-	@Transactional
-	public void addRelayServer(RelayServer relayServer) {
-		assert (getRelayServer(relayServer) == null);
-		saveRelayServer(relayServer, true);
+		sessionFactory.getCurrentSession().flush();
 	}
 
 	private String getRelayServersDump() {
@@ -110,19 +107,30 @@ public class RelayServersImpl implements RelayServers {
 	private RelayServer me = null;
 
 	@Override
+	@Transactional
 	public RelayServer getMe() {
-		return me;
+		@SuppressWarnings("unchecked")
+		List<RelayServer> result = sessionFactory.getCurrentSession()
+				.createQuery("select rs from RelayServer rs where rs.ip = :ip" + " and rs.port = :port")
+				.setParameter("ip", myIp).setParameter("port", uplinkUdpPort).list();
+
+		if (result.size() == 0) {
+			RelayServer me = new RelayServer(myIp, uplinkUdpPort);
+			addRelayServer(me, true);
+			this.me = me;
+			return me;
+		}
+
+		assert (result.size() == 1);
+
+		return result.get(0);
 	}
 
-	void init() {
+	private static InetAddress myIp = null;
+
+	static {
 		try {
-			InetAddress ip;
-			try {
-				ip = InetAddress.getLocalHost();
-			} catch (UnknownHostException e) {
-				ip = InetAddress.getByName("localhost");
-			}
-			me = new RelayServer(ip, uplinkUdpPort);
+			myIp = InetAddress.getByName("localhost");
 		} catch (Exception e) {
 			throw new ExceptionInInitializerError(e);
 		}
@@ -142,6 +150,4 @@ public class RelayServersImpl implements RelayServers {
 		String s = getRelayServersDump();
 		out.write(s.getBytes(), 0, s.length());
 	}
-	
-	//FIXME add remove expire
 }

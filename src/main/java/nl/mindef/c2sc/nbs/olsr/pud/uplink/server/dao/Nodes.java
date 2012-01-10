@@ -34,28 +34,20 @@ public interface Nodes {
 	public void saveNode(Node node, boolean newObject);
 
 	/**
-	 * Remove all expired nodes.<br/>
-	 * <br/>
-	 * An expired node is a node the has a reception time that is at least
-	 * 'validityTime*validityTimeMultiplier' seconds in the past.
-	 * 
-	 * @param validityTimeMultiplier
-	 *          the validity time multiplier
+	 * Remove all empty nodes.<br/>
 	 */
-	public void removeExpiredNodes(double validityTimeMultiplier);
+	public boolean removeExpiredNodes();
 
 	/**
 	 * Get a list of all cluster leaders.<br/>
 	 * <br/>
-	 * Only the cluster leader nodes themselves are retrieved, no linked objects
-	 * (non-eager fetching) <br/>
+	 * Only the cluster leader nodes themselves are retrieved, no linked objects (non-eager fetching) <br/>
 	 * <br/>
 	 * 
 	 * A cluster leader is:
 	 * <ul>
 	 * <li>a node that points to itself as a cluster leader</li>
-	 * <li>a node that points to another node that does not point to itself as a
-	 * cluster leader</li>
+	 * <li>a node that points to another node that does not point to itself as a cluster leader</li>
 	 * </ul>
 	 * 
 	 * @return a list of all cluster leader nodes
@@ -65,11 +57,9 @@ public interface Nodes {
 	/**
 	 * Get a substitute cluster leader for a given cluster leader.<br/>
 	 * <br/>
-	 * The substitute cluster leader is a Node that is in the same cluster as the
-	 * cluster leader, but is not the cluster leader itself. The substitute
-	 * cluster leader also has a valid IP address and a valid downlink port.<br/>
-	 * Only the substitute cluster leader node is retrieved, no linked objects
-	 * (non-eager fetching)<br/>
+	 * The substitute cluster leader is a Node that is in the same cluster as the cluster leader, but is not the cluster
+	 * leader itself. The substitute cluster leader also has a valid IP address and a valid downlink port.<br/>
+	 * Only the substitute cluster leader node is retrieved, no linked objects (non-eager fetching)<br/>
 	 * <br/>
 	 * 
 	 * @param clusterLeader

@@ -3,10 +3,10 @@ package nl.mindef.c2sc.nbs.olsr.pud.uplink.server.handlers.impl;
 import java.net.InetAddress;
 
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.Nodes;
-import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.Positions;
+import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.PositionUpdateMsgs;
+import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.domainmodel.Gateway;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.domainmodel.Node;
-import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.domainmodel.NodePosition;
-import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.domainmodel.RelayServer;
+import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.domainmodel.PositionUpdateMsg;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.handlers.PositionUpdateHandler;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.util.TimeZoneUtil;
 
@@ -21,16 +21,16 @@ import org.springframework.transaction.annotation.Transactional;
 public class PositionUpdateHandlerImpl implements PositionUpdateHandler {
 	private Logger logger = Logger.getLogger(this.getClass().getName());
 
-	/** the Positions handler */
-	private Positions positions;
+	/** the PositionUpdateMsgs handler */
+	private PositionUpdateMsgs positionUpdateMsgs;
 
 	/**
-	 * @param positions
-	 *            the positions to set
+	 * @param positionUpdateMsgs
+	 *          the positionUpdateMsgs to set
 	 */
 	@Required
-	public final void setPositions(Positions positions) {
-		this.positions = positions;
+	public final void setPositions(PositionUpdateMsgs positionUpdateMsgs) {
+		this.positionUpdateMsgs = positionUpdateMsgs;
 	}
 
 	/** the Node handler */
@@ -38,7 +38,7 @@ public class PositionUpdateHandlerImpl implements PositionUpdateHandler {
 
 	/**
 	 * @param nodes
-	 *            the nodes to set
+	 *          the nodes to set
 	 */
 	@Required
 	public final void setNodes(Nodes nodes) {
@@ -47,17 +47,16 @@ public class PositionUpdateHandlerImpl implements PositionUpdateHandler {
 
 	@Override
 	@Transactional
-	public boolean handlePositionMessage(InetAddress srcIp, long utcTimestamp,
-			PositionUpdate posUpMsg, RelayServer relayServer) {
-		assert (relayServer != null);
+	public boolean handlePositionMessage(Gateway gateway, long utcTimestamp, PositionUpdate posUpMsg) {
+		assert (posUpMsg != null);
 
 		if (posUpMsg.getPositionUpdateVersion() != WireFormatConstants.VERSION) {
-			logger.warn("Received wrong version of position update"
-					+ " message, expected version "
-					+ WireFormatConstants.VERSION + ", received version "
-					+ posUpMsg.getPositionUpdateVersion() + ": ignored");
+			logger.warn("Received wrong version of position update message, expected version " + WireFormatConstants.VERSION
+					+ ", received version " + posUpMsg.getPositionUpdateVersion() + ": ignored");
 			return false;
 		}
+
+		assert (gateway != null);
 
 		InetAddress originator = posUpMsg.getOlsrMessageOriginator();
 
@@ -65,61 +64,51 @@ public class PositionUpdateHandlerImpl implements PositionUpdateHandler {
 		Node originatorNode = nodes.getNode(originator);
 		if (originatorNode == null) {
 			/* new node */
-			originatorNode = new Node();
-			originatorNode.setIp(srcIp);
-			originatorNode.setMainIp(originator);
-			originatorNode.setReceptionTime(utcTimestamp);
-			originatorNode.setValidityTime(posUpMsg
-					.getPositionUpdateValidityTime() * 1000);
-			originatorNode.setRelayServer(relayServer);
+			originatorNode = new Node(originator, gateway);
 			nodes.saveNode(originatorNode, true);
 		}
 
-		/* get the position that we stored */
-		NodePosition storedPosition = originatorNode.getPosition();
+		/* link the node to the gateway from which it was received */
+		originatorNode.setGateway(gateway);
+
+		/* get the position update of the node */
+		PositionUpdateMsg storedPosition = originatorNode.getPositionUpdateMsg();
 		boolean storedPositionIsNew = false;
 		if (storedPosition == null) {
-			/* new position */
-			storedPosition = new NodePosition();
+			/* new position update */
+			storedPosition = new PositionUpdateMsg(originatorNode, posUpMsg);
+			positionUpdateMsgs.saveNodePosition(storedPosition, true);
 			storedPositionIsNew = true;
 		}
 
-		/* get the stored timestamp */
-		long storedTimestamp = 0;
-		if (storedPosition.getPositionUpdate() != null) {
-			storedTimestamp = storedPosition.getPositionUpdate()
-					.getPositionUpdateTime(utcTimestamp,
-							TimeZoneUtil.getTimezoneOffset());
-		}
-
-		/* get the received timestamp */
-		long receivedTimeStamp = posUpMsg.getPositionUpdateTime(utcTimestamp,
-				TimeZoneUtil.getTimezoneOffset());
-
 		/* check that received timestamp is later than stored timestamp */
-		if (receivedTimeStamp <= storedTimestamp) {
-			/*
-			 * we have stored a position with a more recent timestamp already,
-			 * so skip this one
-			 */
-			return false;
+		if (!storedPositionIsNew) {
+			/* get the stored timestamp */
+			long storedTimestamp = 0;
+			if (storedPosition.getPositionUpdateMsg() != null) {
+				storedTimestamp = storedPosition.getPositionUpdateMsg().getPositionUpdateTime(utcTimestamp,
+						TimeZoneUtil.getTimezoneOffset());
+			}
+
+			/* get the received timestamp */
+			long receivedTimeStamp = posUpMsg.getPositionUpdateTime(utcTimestamp, TimeZoneUtil.getTimezoneOffset());
+
+			if (receivedTimeStamp <= storedTimestamp) {
+				/* we have stored a position with a more recent timestamp already, so skip this one */
+				return false;
+			}
 		}
 
-		/* fill in the stored position with the received position */
-		storedPosition.setMainIp(originator);
+		/* fill in the position update */
+		storedPosition.setPositionUpdateMsg(posUpMsg);
 		storedPosition.setReceptionTime(utcTimestamp);
-		storedPosition
-				.setValidityTime(posUpMsg.getPositionUpdateValidityTime() * 1000);
-		storedPosition.setPositionUpdate(posUpMsg);
+		storedPosition.setValidityTime(posUpMsg.getPositionUpdateValidityTime() * 1000);
 
-		/* use the owning side of the relation */
-		originatorNode.setPosition(storedPosition);
+		/* link the position update to the node */
+		originatorNode.setPositionUpdateMsg(storedPosition);
 
-		/*
-		 * save the node and position. explicitly saving the originatorNode is
-		 * not needed since that is cascaded
-		 */
-		positions.saveNodePosition(storedPosition, storedPositionIsNew);
+		/* save the node and position. explicitly saving the originatorNode is not needed since that is cascaded */
+		positionUpdateMsgs.saveNodePosition(storedPosition, false);
 
 		return true;
 	}
