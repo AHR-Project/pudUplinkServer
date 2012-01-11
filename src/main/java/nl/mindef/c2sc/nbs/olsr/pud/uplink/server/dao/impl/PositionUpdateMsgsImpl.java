@@ -63,12 +63,13 @@ public class PositionUpdateMsgsImpl implements PositionUpdateMsgs {
 		List<PositionUpdateMsg> result = sessionFactory
 				.getCurrentSession()
 				.createQuery(
-						"select pos from PositionUpdateMsg pu where" + " pu.receptionTime > :startTime and"
-								+ " pu.receptionTime <= :endTime"
-								+ ((clusterLeader == null) ? "" : " and pu.node.clusterLeaderMsg is not null"
+						"select pos from PositionUpdateMsg pu where pu.receptionTime > "
+								+ startTime
+								+ " and pu.receptionTime <= "
+								+ endTime
 								/* the cluster leader of the node is not the specified cluster leader */
-								+ " and pu.node.clusterLeaderMsg.clusterLeader.id != :clId")).setParameter("startTime", startTime)
-				.setParameter("endTime", endTime).setParameter("clId", clusterLeader.getId()).list();
+								+ ((clusterLeader == null) ? "" : " and pu.node.clusterLeaderMsg is not null"
+										+ " and pu.node.clusterLeaderMsg.clusterLeader.id != " + clusterLeader.getId())).list();
 
 		if (result.size() == 0) {
 			return null;
@@ -95,7 +96,7 @@ public class PositionUpdateMsgsImpl implements PositionUpdateMsgs {
 				.getCurrentSession()
 				.createQuery(
 						"select pu from PositionUpdateMsg pu where (receptionTime + (validityTime * " + validityTimeMultiplier
-								+ ")) < :utcTimestamp").setParameter("utcTimestamp", utcTimestamp).list();
+								+ ")) < " + utcTimestamp).list();
 
 		if (result.size() == 0) {
 			return false;

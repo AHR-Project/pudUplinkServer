@@ -62,8 +62,7 @@ public class GatewaysImpl implements Gateways {
 
 		@SuppressWarnings("unchecked")
 		List<Gateway> result = sessionFactory.getCurrentSession()
-				.createQuery("select gw from Gateway gw where gw.ip = :ip and gw.port = :port").setParameter("ip", ip)
-				.setParameter("port", port).list();
+				.createQuery("select gw from Gateway gw where gw.ip = :ip and gw.port = " + port).setParameter("ip", ip).list();
 
 		if (result.size() == 0) {
 			return null;

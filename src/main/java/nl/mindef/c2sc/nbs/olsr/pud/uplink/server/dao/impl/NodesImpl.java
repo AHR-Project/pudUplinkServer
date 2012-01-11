@@ -94,11 +94,11 @@ public class NodesImpl implements Nodes {
 		@SuppressWarnings("unchecked")
 		List<Node> result = sessionFactory.getCurrentSession().createQuery("select node from Node node where"
 		/* node is not the cluster leader itself and node points to cluster leader */
-		+ " id != :clId and clusterLeaderMsg is not null and clusterLeaderMsg.clusterLeader.id = :clId"
+		+ " id != " + clId + " and clusterLeaderMsg is not null and clusterLeaderMsg.clusterLeader.id = " + clId
 		/* node has a valid gateway (a gateway always has a valid IP address and a valid downlink port) */
 		+ " and gateway is not null"
 		/* keep the node with the most recently received cluster leader message on top of the list */
-		+ " order by clusterLeaderMsg.receptionTime desc").setParameter("clId", clId).list();
+		+ " order by clusterLeaderMsg.receptionTime desc").list();
 
 		if (result.size() == 0) {
 			return null;

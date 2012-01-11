@@ -69,7 +69,7 @@ public class ClusterLeaderMsgsImpl implements ClusterLeaderMsgs {
 				.getCurrentSession()
 				.createQuery(
 						"select cl from ClusterLeaderMsg cl where (receptionTime + (validityTime * " + validityTimeMultiplier
-								+ ")) < :utcTimestamp").setParameter("utcTimestamp", utcTimestamp).list();
+								+ ")) < " + utcTimestamp).list();
 
 		if (result.size() == 0) {
 			return false;

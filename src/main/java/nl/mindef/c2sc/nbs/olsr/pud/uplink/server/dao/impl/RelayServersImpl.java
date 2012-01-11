@@ -68,8 +68,8 @@ public class RelayServersImpl implements RelayServers {
 
 		@SuppressWarnings("unchecked")
 		List<RelayServer> result = sessionFactory.getCurrentSession()
-				.createQuery("select rs from RelayServer rs where rs.ip = :ip and rs.port = :port")
-				.setParameter("ip", relayServer.getIp()).setParameter("port", relayServer.getPort()).list();
+				.createQuery("select rs from RelayServer rs where rs.ip = :ip and rs.port = " + relayServer.getPort())
+				.setParameter("ip", relayServer.getIp()).list();
 
 		if (result.size() == 0) {
 			return null;
@@ -85,8 +85,7 @@ public class RelayServersImpl implements RelayServers {
 	public List<RelayServer> getOtherRelayServers() {
 		@SuppressWarnings("unchecked")
 		List<RelayServer> result = sessionFactory.getCurrentSession()
-				.createQuery("select rs from RelayServer rs" + " where rs.id != :meId").setParameter("meId", getMe().getId())
-				.list();
+				.createQuery("select rs from RelayServer rs where rs.id != " + getMe().getId()).list();
 
 		if (result.size() == 0) {
 			return null;
@@ -125,8 +124,8 @@ public class RelayServersImpl implements RelayServers {
 	public RelayServer getMe() {
 		@SuppressWarnings("unchecked")
 		List<RelayServer> result = sessionFactory.getCurrentSession()
-				.createQuery("select rs from RelayServer rs where rs.ip = :ip and rs.port = :port").setParameter("ip", myIp)
-				.setParameter("port", uplinkUdpPort).list();
+				.createQuery("select rs from RelayServer rs where rs.ip = :ip and rs.port = " + uplinkUdpPort)
+				.setParameter("ip", myIp).list();
 
 		if (result.size() == 0) {
 			RelayServer me = new RelayServer(myIp, uplinkUdpPort);
