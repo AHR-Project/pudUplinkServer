@@ -68,11 +68,11 @@ public class UplinkReceiver extends Thread implements StopHandlerConsumer {
 	 */
 
 	private DatagramSocket sock = null;
-
 	private AtomicBoolean run = new AtomicBoolean(true);
 
-	public void init() {
+	public void init() throws SocketException {
 		this.setName(this.getClass().getSimpleName());
+		sock = new DatagramSocket(uplinkUdpPort);
 		this.start();
 	}
 
@@ -91,13 +91,6 @@ public class UplinkReceiver extends Thread implements StopHandlerConsumer {
 	 */
 	@Override
 	public void run() {
-		try {
-			sock = new DatagramSocket(uplinkUdpPort);
-		} catch (SocketException e1) {
-			System.err.println("Can't bind to uplink UDP port " + uplinkUdpPort + ": " + e1.getMessage());
-			return;
-		}
-
 		byte[] receiveBuffer = new byte[BUFFERSIZE];
 		DatagramPacket packet = new DatagramPacket(receiveBuffer, receiveBuffer.length);
 

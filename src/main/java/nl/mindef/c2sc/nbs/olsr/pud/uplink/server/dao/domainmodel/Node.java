@@ -142,7 +142,7 @@ public class Node implements Serializable {
 	}
 
 	/** the associated cluster nodes */
-	@OneToMany(cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH, CascadeType.DETACH }, mappedBy = "clusterLeader")
+	@OneToMany(cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH, CascadeType.DETACH }, mappedBy = "clusterLeaderNode")
 	private Set<ClusterLeaderMsg> clusterNodes = new HashSet<ClusterLeaderMsg>();
 
 	/**
