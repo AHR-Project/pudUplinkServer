@@ -12,6 +12,7 @@ import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.domainmodel.RelayServer;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.handlers.ClusterLeaderHandler;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.handlers.PacketHandler;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.handlers.PositionUpdateHandler;
+import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.handlers.impl.debug.Faker;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.util.DumpUtil;
 
 import org.apache.log4j.Level;
@@ -75,26 +76,26 @@ public class PacketHandlerImpl implements PacketHandler {
 	 * Fake data
 	 */
 
-	// private boolean useFaker = false;
-	//
-	// /**
-	// * @param useFaker
-	// * the useFaker to set
-	// */
-	// public final void setUseFaker(boolean useFaker) {
-	// this.useFaker = useFaker;
-	// }
-	//
-	// private Faker faker = null;
-	//
-	// /**
-	// * @param faker
-	// * the faker to set
-	// */
-	// @Required
-	// public final void setFaker(Faker faker) {
-	// this.faker = faker;
-	// }
+	private boolean useFaker = false;
+
+	/**
+	 * @param useFaker
+	 *          the useFaker to set
+	 */
+	public final void setUseFaker(boolean useFaker) {
+		this.useFaker = useFaker;
+	}
+
+	private Faker faker = null;
+
+	/**
+	 * @param faker
+	 *          the faker to set
+	 */
+	@Required
+	public final void setFaker(Faker faker) {
+		this.faker = faker;
+	}
 
 	/*
 	 * end fake
@@ -156,15 +157,15 @@ public class PacketHandlerImpl implements PacketHandler {
 				if (messageType == UplinkMessage.getUplinkMessageTypePosition()) {
 					PositionUpdate pu = new PositionUpdate(messageData, messageLength);
 					updated = positionUpdateHandler.handlePositionMessage(gateway, utcTimestamp, pu) || updated;
-					// if (useFaker) {
-					// faker.fakeit(Faker.MSGTYPE.PU, utcTimestamp, pu, relayServer);
-					// }
+					if (useFaker) {
+						faker.fakeit(gateway, utcTimestamp, Faker.MSGTYPE.PU, pu);
+					}
 				} else if (messageType == PositionUpdate.getUplinkMessageTypeClusterLeader()) {
 					ClusterLeader cl = new ClusterLeader(messageData, messageLength);
 					updated = clusterLeaderHandler.handleClusterLeaderMessage(gateway, utcTimestamp, cl) || updated;
-					// if (useFaker) {
-					// faker.fakeit(Faker.MSGTYPE.CL, utcTimestamp, cl, relayServer);
-					// }
+					if (useFaker) {
+						faker.fakeit(gateway, utcTimestamp, Faker.MSGTYPE.CL, cl);
+					}
 				} else {
 					logger.warn("Uplink message type " + messageType + " not supported: ignored");
 				}
@@ -175,9 +176,9 @@ public class PacketHandlerImpl implements PacketHandler {
 			return updated;
 		} finally {
 			dataLock.unlock();
-			// if (useFaker) {
-			// faker.setFirstFake(false);
-			// }
+			if (useFaker) {
+				faker.setFirstFake(false);
+			}
 		}
 	}
 }

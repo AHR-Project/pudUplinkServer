@@ -8,9 +8,7 @@
 		class="org.springframework.beans.factory.annotation.RequiredAnnotationBeanPostProcessor" />
 
 	<!-- Debug Beans -->
-	<!--
 	<import resource="classpath:META-INF/spring/faker.xml" />
-	 -->
 
 	<!-- Beans -->
 	<import resource="classpath:META-INF/spring/jmx.xml" />
