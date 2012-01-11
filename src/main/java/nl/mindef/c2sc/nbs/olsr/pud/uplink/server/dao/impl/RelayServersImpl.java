@@ -46,9 +46,20 @@ public class RelayServersImpl implements RelayServers {
 		@SuppressWarnings("unchecked")
 		List<RelayServer> result = sessionFactory.getCurrentSession().createQuery("select rs from RelayServer rs").list();
 
+		if (result.size() == 0) {
+			return null;
+		}
+
 		return result;
 	}
 
+	/**
+	 * Retrieve a RelayServer object from the database from an unsaved RelayServer object
+	 * 
+	 * @param relayServer
+	 *          the unsaved RelayServer object
+	 * @return the RelayServer object from the database, or null when not found
+	 */
 	@Transactional
 	private RelayServer getRelayServer(RelayServer relayServer) {
 		if (relayServer == null) {
@@ -57,8 +68,8 @@ public class RelayServersImpl implements RelayServers {
 
 		@SuppressWarnings("unchecked")
 		List<RelayServer> result = sessionFactory.getCurrentSession()
-				.createQuery("select rs from RelayServer rs where rs.ip = :par1" + " and rs.port = :par2")
-				.setParameter("par1", relayServer.getIp()).setParameter("par2", relayServer.getPort()).list();
+				.createQuery("select rs from RelayServer rs where rs.ip = :ip and rs.port = :port")
+				.setParameter("ip", relayServer.getIp()).setParameter("port", relayServer.getPort()).list();
 
 		if (result.size() == 0) {
 			return null;
@@ -74,7 +85,12 @@ public class RelayServersImpl implements RelayServers {
 	public List<RelayServer> getOtherRelayServers() {
 		@SuppressWarnings("unchecked")
 		List<RelayServer> result = sessionFactory.getCurrentSession()
-				.createQuery("select rs from RelayServer rs" + " where rs.id != " + me.getId()).list();
+				.createQuery("select rs from RelayServer rs" + " where rs.id != :meId").setParameter("meId", getMe().getId())
+				.list();
+
+		if (result.size() == 0) {
+			return null;
+		}
 
 		return result;
 	}
@@ -88,7 +104,7 @@ public class RelayServersImpl implements RelayServers {
 		} else {
 			sessionFactory.getCurrentSession().merge(relayServer);
 		}
-		sessionFactory.getCurrentSession().flush();
+		// FIXME remove all session flushes
 	}
 
 	private String getRelayServersDump() {
@@ -104,20 +120,17 @@ public class RelayServersImpl implements RelayServers {
 		return s.toString();
 	}
 
-	private RelayServer me = null;
-
 	@Override
 	@Transactional
 	public RelayServer getMe() {
 		@SuppressWarnings("unchecked")
 		List<RelayServer> result = sessionFactory.getCurrentSession()
-				.createQuery("select rs from RelayServer rs where rs.ip = :ip" + " and rs.port = :port")
-				.setParameter("ip", myIp).setParameter("port", uplinkUdpPort).list();
+				.createQuery("select rs from RelayServer rs where rs.ip = :ip and rs.port = :port").setParameter("ip", myIp)
+				.setParameter("port", uplinkUdpPort).list();
 
 		if (result.size() == 0) {
 			RelayServer me = new RelayServer(myIp, uplinkUdpPort);
 			addRelayServer(me, true);
-			this.me = me;
 			return me;
 		}
 

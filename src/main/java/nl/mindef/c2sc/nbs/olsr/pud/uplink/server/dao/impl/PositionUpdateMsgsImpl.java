@@ -94,9 +94,10 @@ public class PositionUpdateMsgsImpl implements PositionUpdateMsgs {
 		List<PositionUpdateMsg> result = sessionFactory
 				.getCurrentSession()
 				.createQuery(
-						"select pu from PositionUpdateMsg pu where (receptionTime + (validityTime * :validityTimeMultiplier)) <"
-								+ " :utcTimestamp").setParameter("validityTimeMultiplier", validityTimeMultiplier)
-				.setParameter("utcTimestamp", utcTimestamp).list();
+						"select pu from PositionUpdateMsg pu where"
+								+ " (receptionTime + (validityTime * :validityTimeMultiplier)) < :utcTimestamp")
+				.setParameter("validityTimeMultiplier", validityTimeMultiplier).setParameter("utcTimestamp", utcTimestamp)
+				.list();
 
 		if (result.size() == 0) {
 			return false;
