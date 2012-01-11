@@ -152,7 +152,7 @@ public class PacketHandlerImpl implements PacketHandler {
 						+ UplinkMessage.getUplinkMessageLength(packetData, messageOffset);
 
 				byte[] messageData = Arrays.copyOfRange(packetData, messageOffset, messageOffset + messageLength);
-				DumpUtil.dumpUplinkMessage(logger, Level.DEBUG, messageData, packet, messageType, utcTimestamp);
+				DumpUtil.dumpUplinkMessage(logger, Level.DEBUG, messageData, srcIp, srcPort, messageType, utcTimestamp, "  ");
 				if (messageType == UplinkMessage.getUplinkMessageTypePosition()) {
 					PositionUpdate pu = new PositionUpdate(messageData, messageLength);
 					updated = positionUpdateHandler.handlePositionMessage(gateway, utcTimestamp, pu) || updated;
