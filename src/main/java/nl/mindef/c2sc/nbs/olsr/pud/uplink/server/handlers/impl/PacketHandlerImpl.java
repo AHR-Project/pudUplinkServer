@@ -100,6 +100,7 @@ public class PacketHandlerImpl implements PacketHandler {
 	 * end fake
 	 */
 
+	// FIXME remove datalock
 	private ReentrantLock dataLock;
 
 	/**
@@ -118,57 +119,57 @@ public class PacketHandlerImpl implements PacketHandler {
 		boolean updated = false;
 
 		if (logger.isDebugEnabled()) {
-			logger.debug("Received " + packet.getLength() + " bytes on timestamp " + utcTimestamp + " from "
+			logger.debug("[" + utcTimestamp + "] Received " + packet.getLength() + " bytes from "
 					+ packet.getAddress().getHostAddress() + ":" + packet.getPort());
 		}
 
 		dataLock.lock();
 		try {
 			InetAddress srcIp = packet.getAddress();
-			int port = packet.getPort();
+			int srcPort = packet.getPort();
 
-			RelayServer relayServer = relayServers.getMe();
+			RelayServer me = relayServers.getMe();
 
 			/* get gateway node or create */
-			Gateway gw = gateways.getGateway(srcIp, port);
-			if (gw == null) {
-				gw = new Gateway(srcIp, port, relayServer);
-				gateways.saveGateway(gw, true);
+			Gateway gateway = gateways.getGateway(srcIp, srcPort);
+			if (gateway == null) {
+				gateway = new Gateway(srcIp, srcPort, me);
+				gateways.saveGateway(gateway, true);
 			}
 
 			/* make sure the gateway is linked to this relayServer */
-			gw.setRelayServer(relayServer);
-			gateways.saveGateway(gw, false);
+			gateway.setRelayServer(me);
 
-			/* get packet information */
+			/* get packet data */
 			byte[] packetData = packet.getData();
 			int packetLength = packet.getLength();
 
-			int from = 0;
-			while (from < packetLength) {
-				int type = UplinkMessage.getUplinkMessageType(packetData, from);
-				int length = UplinkMessage.getUplinkMessageHeaderLength()
-						+ UplinkMessage.getUplinkMessageLength(packetData, from);
+			/* parse the uplink packet for messages */
+			int messageOffset = 0;
+			while (messageOffset < packetLength) {
+				int messageType = UplinkMessage.getUplinkMessageType(packetData, messageOffset);
+				int messageLength = UplinkMessage.getUplinkMessageHeaderLength()
+						+ UplinkMessage.getUplinkMessageLength(packetData, messageOffset);
 
-				byte[] data1 = Arrays.copyOfRange(packetData, from, from + length);
-				DumpUtil.dumpUplinkMessage(logger, Level.DEBUG, data1, packet, type, utcTimestamp);
-				if (type == UplinkMessage.getUplinkMessageTypePosition()) {
-					PositionUpdate pu = new PositionUpdate(data1, length);
-					updated = positionUpdateHandler.handlePositionMessage(gw, utcTimestamp, pu) || updated;
+				byte[] messageData = Arrays.copyOfRange(packetData, messageOffset, messageOffset + messageLength);
+				DumpUtil.dumpUplinkMessage(logger, Level.DEBUG, messageData, packet, messageType, utcTimestamp);
+				if (messageType == UplinkMessage.getUplinkMessageTypePosition()) {
+					PositionUpdate pu = new PositionUpdate(messageData, messageLength);
+					updated = positionUpdateHandler.handlePositionMessage(gateway, utcTimestamp, pu) || updated;
 					// if (useFaker) {
 					// faker.fakeit(Faker.MSGTYPE.PU, utcTimestamp, pu, relayServer);
 					// }
-				} else if (type == PositionUpdate.getUplinkMessageTypeClusterLeader()) {
-					ClusterLeader cl = new ClusterLeader(data1, length);
-					updated = clusterLeaderHandler.handleClusterLeaderMessage(gw, utcTimestamp, cl) || updated;
+				} else if (messageType == PositionUpdate.getUplinkMessageTypeClusterLeader()) {
+					ClusterLeader cl = new ClusterLeader(messageData, messageLength);
+					updated = clusterLeaderHandler.handleClusterLeaderMessage(gateway, utcTimestamp, cl) || updated;
 					// if (useFaker) {
 					// faker.fakeit(Faker.MSGTYPE.CL, utcTimestamp, cl, relayServer);
 					// }
 				} else {
-					logger.warn("Uplink message type " + type + " not supported");
+					logger.warn("Uplink message type " + messageType + " not supported: ignored");
 				}
 
-				from += length;
+				messageOffset += messageLength;
 			}
 
 			return updated;

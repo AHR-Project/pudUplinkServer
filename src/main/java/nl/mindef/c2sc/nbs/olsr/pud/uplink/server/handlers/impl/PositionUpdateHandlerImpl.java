@@ -47,18 +47,19 @@ public class PositionUpdateHandlerImpl implements PositionUpdateHandler {
 
 	@Override
 	@Transactional
-	public boolean handlePositionMessage(Gateway gateway, long utcTimestamp, PositionUpdate posUpMsg) {
-		assert (posUpMsg != null);
+	public boolean handlePositionMessage(Gateway gateway, long utcTimestamp, PositionUpdate puMsg) {
+		assert (puMsg != null);
 
-		if (posUpMsg.getPositionUpdateVersion() != WireFormatConstants.VERSION) {
-			logger.warn("Received wrong version of position update message, expected version " + WireFormatConstants.VERSION
-					+ ", received version " + posUpMsg.getPositionUpdateVersion() + ": ignored");
+		if (puMsg.getPositionUpdateVersion() != WireFormatConstants.VERSION) {
+			logger.error("Received wrong version of position update message from " + gateway.getIp().getHostAddress() + ":"
+					+ gateway.getPort() + ", expected version " + WireFormatConstants.VERSION + ", received version "
+					+ puMsg.getPositionUpdateVersion() + ": ignored");
 			return false;
 		}
 
 		assert (gateway != null);
 
-		InetAddress originator = posUpMsg.getOlsrMessageOriginator();
+		InetAddress originator = puMsg.getOlsrMessageOriginator();
 
 		/* retrieve the node that sent the position update */
 		Node originatorNode = nodes.getNode(originator);
@@ -72,43 +73,37 @@ public class PositionUpdateHandlerImpl implements PositionUpdateHandler {
 		originatorNode.setGateway(gateway);
 
 		/* get the position update of the node */
-		PositionUpdateMsg storedPosition = originatorNode.getPositionUpdateMsg();
-		boolean storedPositionIsNew = false;
-		if (storedPosition == null) {
+		PositionUpdateMsg storedPositionUpdate = originatorNode.getPositionUpdateMsg();
+		if (storedPositionUpdate == null) {
 			/* new position update */
-			storedPosition = new PositionUpdateMsg(originatorNode, posUpMsg);
-			positionUpdateMsgs.savePositionUpdateMsg(storedPosition, true);
-			storedPositionIsNew = true;
-		}
-
-		/* check that received timestamp is later than stored timestamp */
-		if (!storedPositionIsNew) {
-			/* get the stored timestamp */
-			long storedTimestamp = 0;
-			if (storedPosition.getPositionUpdateMsg() != null) {
-				storedTimestamp = storedPosition.getPositionUpdateMsg().getPositionUpdateTime(utcTimestamp,
+			storedPositionUpdate = new PositionUpdateMsg(originatorNode, puMsg);
+			positionUpdateMsgs.savePositionUpdateMsg(storedPositionUpdate, true);
+		} else {
+			/* check that received timestamp is later than the stored timestamp */
+			if (storedPositionUpdate.getPositionUpdateMsg() != null) {
+				long storedTimestamp = storedPositionUpdate.getPositionUpdateMsg().getPositionUpdateTime(utcTimestamp,
 						TimeZoneUtil.getTimezoneOffset());
-			}
 
-			/* get the received timestamp */
-			long receivedTimeStamp = posUpMsg.getPositionUpdateTime(utcTimestamp, TimeZoneUtil.getTimezoneOffset());
+				/* get the received timestamp */
+				long receivedTimeStamp = puMsg.getPositionUpdateTime(utcTimestamp, TimeZoneUtil.getTimezoneOffset());
 
-			if (receivedTimeStamp <= storedTimestamp) {
-				/* we have stored a position with a more recent timestamp already, so skip this one */
-				return false;
+				if (receivedTimeStamp <= storedTimestamp) {
+					/* we have stored a position with a more recent timestamp already, so skip this one */
+					return false;
+				}
 			}
 		}
 
 		/* fill in the position update */
-		storedPosition.setPositionUpdateMsg(posUpMsg);
-		storedPosition.setReceptionTime(utcTimestamp);
-		storedPosition.setValidityTime(posUpMsg.getPositionUpdateValidityTime() * 1000);
+		storedPositionUpdate.setPositionUpdateMsg(puMsg);
+		storedPositionUpdate.setReceptionTime(utcTimestamp);
+		storedPositionUpdate.setValidityTime(puMsg.getPositionUpdateValidityTime() * 1000);
 
 		/* link the position update to the node */
-		originatorNode.setPositionUpdateMsg(storedPosition);
+		originatorNode.setPositionUpdateMsg(storedPositionUpdate);
 
 		/* save the node and position. explicitly saving the originatorNode is not needed since that is cascaded */
-		positionUpdateMsgs.savePositionUpdateMsg(storedPosition, false);
+		positionUpdateMsgs.savePositionUpdateMsg(storedPositionUpdate, false);
 
 		return true;
 	}

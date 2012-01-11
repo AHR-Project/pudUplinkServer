@@ -46,19 +46,20 @@ public class ClusterLeaderHandlerImpl implements ClusterLeaderHandler {
 
 	@Override
 	@Transactional
-	public boolean handleClusterLeaderMessage(Gateway gateway, long utcTimestamp, ClusterLeader clUpMsg) {
-		assert (clUpMsg != null);
+	public boolean handleClusterLeaderMessage(Gateway gateway, long utcTimestamp, ClusterLeader clMsg) {
+		assert (clMsg != null);
 
-		if (clUpMsg.getClusterLeaderVersion() != WireFormatConstants.VERSION) {
-			logger.warn("Received wrong version of cluster leader" + " message, expected version "
-					+ WireFormatConstants.VERSION + ", received version " + clUpMsg.getClusterLeaderVersion() + ": ignored");
+		if (clMsg.getClusterLeaderVersion() != WireFormatConstants.VERSION) {
+			logger.error("Received wrong version of cluster leader message from " + gateway.getIp().getHostAddress() + ":"
+					+ gateway.getPort() + ", expected version " + WireFormatConstants.VERSION + ", received version "
+					+ clMsg.getClusterLeaderVersion() + ": ignored");
 			return false;
 		}
 
 		assert (gateway != null);
 
-		InetAddress originator = clUpMsg.getClusterLeaderOriginator();
-		InetAddress clusterLeader = clUpMsg.getClusterLeaderClusterLeader();
+		InetAddress originator = clMsg.getClusterLeaderOriginator();
+		InetAddress clusterLeader = clMsg.getClusterLeaderClusterLeader();
 
 		/* retrieve the node that sent the cluster leader update */
 		Node originatorNode = nodes.getNode(originator);
@@ -89,12 +90,12 @@ public class ClusterLeaderHandlerImpl implements ClusterLeaderHandler {
 
 		/* fill in the cluster leader update */
 		storedClusterLeader.setReceptionTime(utcTimestamp);
-		storedClusterLeader.setValidityTime(clUpMsg.getClusterLeaderValidityTime() * 1000);
+		storedClusterLeader.setValidityTime(clMsg.getClusterLeaderValidityTime() * 1000);
 
 		/* link the cluster leader update to the node */
 		originatorNode.setClusterLeaderMsg(storedClusterLeader);
 
-		/* link the clust leader update to the cluster leader's clusterNodes */
+		/* link the cluster leader update to the cluster leader's clusterNodes */
 		storedClusterLeader.setClusterLeaderNode(clusterLeaderNode);
 
 		/* save the nodes and cluster leader update. explicitly saving the nodes is not needed since these are cascaded */

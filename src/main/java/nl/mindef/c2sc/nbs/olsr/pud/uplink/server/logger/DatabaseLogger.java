@@ -105,9 +105,8 @@ public class DatabaseLogger {
 	 */
 
 	private Timer timer = new Timer(this.getClass().getName());
-
-	private FileOutputStream fos = null;
 	private TimerTask task = null;
+	private FileOutputStream fos = null;
 	private static final byte[] eol = "\n".getBytes();
 
 	public void init() throws FileNotFoundException {
@@ -139,8 +138,7 @@ public class DatabaseLogger {
 					channel.truncate(channel.position());
 					fos.flush();
 				} catch (Throwable t) {
-					/* ignore */
-					t.printStackTrace();
+					logger.error("Error while logging database", t);
 				}
 			}
 		};

@@ -73,7 +73,6 @@ public class DumpUtil {
 			s.append("      *** UplinkClusterLeader ***\n");
 			s.append(String.format("      version       = %d\n", cl.getClusterLeaderVersion()));
 			s.append(String.format("      validity      = %d sec\n", cl.getClusterLeaderValidityTime()));
-			s.append(String.format("      downlinkPort  = %d\n", cl.getClusterLeaderDownlinkPort()));
 			s.append(String.format("      originator    = %s\n", cl.getClusterLeaderOriginator().getHostAddress()));
 			s.append(String.format("      clusterLeader = %s\n", cl.getClusterLeaderClusterLeader().getHostAddress()));
 		}
