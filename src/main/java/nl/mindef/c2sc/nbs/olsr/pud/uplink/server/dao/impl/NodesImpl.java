@@ -70,16 +70,18 @@ public class NodesImpl implements Nodes {
 				.createQuery(
 						"select node from Node node"
 								/* do an eager fetch of the gateway */
-								+ " left join node.gateway where"
-								/* node points to itself as a cluster leader */
-								+ " node.clusterLeaderMsg is not null and (node.clusterLeaderMsg.clusterLeaderNode.id = node.id"
+								+ " left join node.gateway"
+								/* node has cluster nodes AND node is not a cluster leader that doesn't point to itself */
+								+ " where (node.clusterNodes is not empty and node not in (select cl.clusterLeaderNode from ClusterLeaderMsg cl where cl.clusterLeaderNode.id != cl.clusterLeaderNode.clusterLeaderMsg.clusterLeaderNode.id))"
+
 								/*
-								 * (when clusterLeadersIncludesTransitionalNodes is set): or cluster leader of the node does not point
-								 * to itself
+								 * (when clusterLeadersIncludesTransitionalNodes is set): or node is a node that points to a cluster
+								 * leader that doesn't point to itself
 								 */
-								+ (clusterLeadersIncludesTransitionalNodes ? " or (node.clusterLeaderMsg.clusterLeaderNode.clusterLeaderMsg is not null"
-										+ " and node.clusterLeaderMsg.clusterLeaderNode.clusterLeaderMsg.clusterLeaderNode.id != node.clusterLeaderMsg.clusterLeaderNode.id))"
-										: ")")).list();
+								+ (!clusterLeadersIncludesTransitionalNodes ? ""
+										: " or (node in (select cl.node from ClusterLeaderMsg cl where cl.clusterLeaderNode.id != cl.clusterLeaderNode.clusterLeaderMsg.clusterLeaderNode.id))")
+
+								+ " order by node.mainIp").list();
 		if (result.size() == 0) {
 			return null;
 		}
@@ -103,7 +105,7 @@ public class NodesImpl implements Nodes {
 						/* node is not the cluster leader itself and node points to cluster leader */
 						+ " node.id != " + clId
 								+ " and node.clusterLeaderMsg is not null and node.clusterLeaderMsg.clusterLeaderNode.id = " + clId
-								/* node has a valid gateway (a gateway always has a valid IP address and a valid downlink port) */
+								/* node has a valid gateway (a gateway always has a valid IP address and a valid port) */
 								+ " and node.gateway is not null"
 								/* keep the node with the most recently received cluster leader message on top of the list */
 								+ " order by node.clusterLeaderMsg.receptionTime desc").list();
