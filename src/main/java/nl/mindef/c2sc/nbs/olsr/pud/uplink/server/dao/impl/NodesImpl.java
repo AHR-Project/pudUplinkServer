@@ -68,15 +68,17 @@ public class NodesImpl implements Nodes {
 		List<Node> result = sessionFactory
 				.getCurrentSession()
 				.createQuery(
-						"select node from Node node where"
+						"select node from Node node"
+								/* do an eager fetch of the gateway */
+								+ " left join node.gateway where"
 								/* node points to itself as a cluster leader */
-								+ " clusterLeaderMsg is not null and (clusterLeaderMsg.clusterLeader.id = id"
+								+ " node.clusterLeaderMsg is not null and (node.clusterLeaderMsg.clusterLeaderNode.id = node.id"
 								/*
 								 * (when clusterLeadersIncludesTransitionalNodes is set): or cluster leader of the node does not point
 								 * to itself
 								 */
-								+ (clusterLeadersIncludesTransitionalNodes ? " or (clusterLeaderMsg.clusterLeader.clusterLeaderMsg is not null"
-										+ " and clusterLeaderMsg.clusterLeader.clusterLeaderMsg.clusterLeader.id != clusterLeaderMsg.clusterLeader.id))"
+								+ (clusterLeadersIncludesTransitionalNodes ? " or (node.clusterLeaderMsg.clusterLeaderNode.clusterLeaderMsg is not null"
+										+ " and node.clusterLeaderMsg.clusterLeaderNode.clusterLeaderMsg.clusterLeaderNode.id != node.clusterLeaderMsg.clusterLeaderNode.id))"
 										: ")")).list();
 		if (result.size() == 0) {
 			return null;
@@ -92,13 +94,19 @@ public class NodesImpl implements Nodes {
 		Long clId = clusterLeader.getId();
 
 		@SuppressWarnings("unchecked")
-		List<Node> result = sessionFactory.getCurrentSession().createQuery("select node from Node node where"
-		/* node is not the cluster leader itself and node points to cluster leader */
-		+ " id != " + clId + " and clusterLeaderMsg is not null and clusterLeaderMsg.clusterLeader.id = " + clId
-		/* node has a valid gateway (a gateway always has a valid IP address and a valid downlink port) */
-		+ " and gateway is not null"
-		/* keep the node with the most recently received cluster leader message on top of the list */
-		+ " order by clusterLeaderMsg.receptionTime desc").list();
+		List<Node> result = sessionFactory
+				.getCurrentSession()
+				.createQuery(
+						"select node from Node node"
+						/* do an eager fetch of the gateway */
+						+ " left join node.gateway where"
+						/* node is not the cluster leader itself and node points to cluster leader */
+						+ " node.id != " + clId
+								+ " and node.clusterLeaderMsg is not null and node.clusterLeaderMsg.clusterLeaderNode.id = " + clId
+								/* node has a valid gateway (a gateway always has a valid IP address and a valid downlink port) */
+								+ " and node.gateway is not null"
+								/* keep the node with the most recently received cluster leader message on top of the list */
+								+ " order by node.clusterLeaderMsg.receptionTime desc").list();
 
 		if (result.size() == 0) {
 			return null;
@@ -110,6 +118,7 @@ public class NodesImpl implements Nodes {
 	@Override
 	@Transactional
 	public void saveNode(Node node, boolean newObject) {
+		// FIXME try with only the saveOrUpdate method
 		if (newObject) {
 			sessionFactory.getCurrentSession().saveOrUpdate(node);
 		} else {

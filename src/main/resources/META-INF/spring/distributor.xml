@@ -12,7 +12,7 @@
 		<property name="distributionDelay" value="${distribution.delay}" />
 		<property name="nodes" ref="Nodes" />
 		<property name="packetMaxSize" value="${distribution.packet.max.size}" />
-		<property name="positions" ref="Positions" />
+		<property name="positions" ref="PositionUpdateMsgs" />
 		<property name="relayServers" ref="RelayServers" />
 		<property name="uplinkUdpPort" value="${uplink.listener.udp.port}" />
 	</bean>

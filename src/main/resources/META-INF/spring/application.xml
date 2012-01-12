@@ -29,9 +29,7 @@
 	<import resource="classpath:META-INF/spring/positionUpdateHandler.xml" />
 	<import resource="classpath:META-INF/spring/packetHandler.xml" />
 
-	<!--
 	<import resource="classpath:META-INF/spring/distributor.xml" />
-	 -->
 
 	<import resource="classpath:META-INF/spring/uplinkReceiver.xml" />
 

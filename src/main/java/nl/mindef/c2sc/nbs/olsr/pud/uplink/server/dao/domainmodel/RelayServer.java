@@ -82,12 +82,12 @@ public class RelayServer implements Serializable {
 
 	/** port the port of the relay server */
 	@NotNull
-	private Integer port = null;
+	private int port = 2242;
 
 	/**
 	 * @return the port
 	 */
-	public final Integer getPort() {
+	public final int getPort() {
 		return port;
 	}
 
@@ -95,7 +95,7 @@ public class RelayServer implements Serializable {
 	 * @param port
 	 *          the port to set
 	 */
-	public final void setPort(Integer port) {
+	public final void setPort(int port) {
 		this.port = port;
 	}
 
@@ -124,7 +124,7 @@ public class RelayServer implements Serializable {
 		builder.append(this.getClass().getSimpleName() + " [id=");
 		builder.append(id);
 		builder.append(", ip=");
-		builder.append(ip.getHostAddress() + ":" + port.intValue());
+		builder.append(ip.getHostAddress() + ":" + port);
 		builder.append(", gateways=[");
 		boolean comma = false;
 		Set<Long> ids = new TreeSet<Long>();

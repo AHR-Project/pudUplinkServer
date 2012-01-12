@@ -53,33 +53,6 @@ public class RelayServersImpl implements RelayServers {
 		return result;
 	}
 
-	/**
-	 * Retrieve a RelayServer object from the database from an unsaved RelayServer object
-	 * 
-	 * @param relayServer
-	 *          the unsaved RelayServer object
-	 * @return the RelayServer object from the database, or null when not found
-	 */
-	@Transactional
-	private RelayServer getRelayServer(RelayServer relayServer) {
-		if (relayServer == null) {
-			return null;
-		}
-
-		@SuppressWarnings("unchecked")
-		List<RelayServer> result = sessionFactory.getCurrentSession()
-				.createQuery("select rs from RelayServer rs where rs.ip = :ip and rs.port = " + relayServer.getPort())
-				.setParameter("ip", relayServer.getIp()).list();
-
-		if (result.size() == 0) {
-			return null;
-		}
-
-		assert (result.size() == 1);
-
-		return result.get(0);
-	}
-
 	@Override
 	@Transactional
 	public List<RelayServer> getOtherRelayServers() {
@@ -97,7 +70,6 @@ public class RelayServersImpl implements RelayServers {
 	@Override
 	@Transactional
 	public void addRelayServer(RelayServer relayServer, boolean newObject) {
-		assert (getRelayServer(relayServer) == null);
 		if (newObject) {
 			sessionFactory.getCurrentSession().saveOrUpdate(relayServer);
 		} else {

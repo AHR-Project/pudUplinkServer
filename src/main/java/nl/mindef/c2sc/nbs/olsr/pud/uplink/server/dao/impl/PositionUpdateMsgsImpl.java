@@ -63,13 +63,13 @@ public class PositionUpdateMsgsImpl implements PositionUpdateMsgs {
 		List<PositionUpdateMsg> result = sessionFactory
 				.getCurrentSession()
 				.createQuery(
-						"select pos from PositionUpdateMsg pu where pu.receptionTime > "
+						"select pu from PositionUpdateMsg pu where pu.receptionTime > "
 								+ startTime
 								+ " and pu.receptionTime <= "
 								+ endTime
 								/* the cluster leader of the node is not the specified cluster leader */
 								+ ((clusterLeader == null) ? "" : " and pu.node.clusterLeaderMsg is not null"
-										+ " and pu.node.clusterLeaderMsg.clusterLeader.id != " + clusterLeader.getId())).list();
+										+ " and pu.node.clusterLeaderMsg.clusterLeaderNode.id != " + clusterLeader.getId())).list();
 
 		if (result.size() == 0) {
 			return null;
