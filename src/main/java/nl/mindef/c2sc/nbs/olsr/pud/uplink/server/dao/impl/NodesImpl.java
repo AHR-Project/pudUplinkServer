@@ -121,8 +121,11 @@ public class NodesImpl implements Nodes {
 	@Transactional
 	public boolean removeExpiredNodes() {
 		@SuppressWarnings("unchecked")
-		List<Node> result = sessionFactory.getCurrentSession()
-				.createQuery("select node from Node node where positionUpdateMsg is null and clusterLeaderMsg is null").list();
+		List<Node> result = sessionFactory
+				.getCurrentSession()
+				.createQuery(
+						"select node from Node node where positionUpdateMsg is null and clusterLeaderMsg is null"
+								+ " and size(clusterNodes) = 0").list();
 
 		if (result.size() == 0) {
 			return false;
