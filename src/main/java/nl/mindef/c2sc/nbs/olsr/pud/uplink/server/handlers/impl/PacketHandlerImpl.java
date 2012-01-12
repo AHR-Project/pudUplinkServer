@@ -101,7 +101,6 @@ public class PacketHandlerImpl implements PacketHandler {
 	 * end fake
 	 */
 
-	// FIXME remove datalock
 	private ReentrantLock dataLock;
 
 	/**

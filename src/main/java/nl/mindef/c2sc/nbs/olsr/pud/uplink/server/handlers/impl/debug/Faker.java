@@ -101,7 +101,7 @@ public class Faker {
 						 */
 						if (type == MSGTYPE.PU) {
 							byte[] pumsgClone = pumsg.clone();
-							// olsr originator
+							/* olsr originator */
 							pumsgClone[UplinkMessage_v4_clusterLeader_originator_network] = (byte) network;
 							pumsgClone[UplinkMessage_v4_clusterLeader_originator_node] = (byte) node;
 
@@ -114,11 +114,11 @@ public class Faker {
 						 */
 						else /* if (type == MSGTYPE.CL) */{
 							byte[] clmsgClone = clmsg.clone();
-							// originator
+							/* originator */
 							clmsgClone[UplinkMessage_v4_clusterLeader_originator_network] = (byte) network;
 							clmsgClone[UplinkMessage_v4_clusterLeader_originator_node] = (byte) node;
 
-							// clusterLeader
+							/* clusterLeader */
 							clmsgClone[UplinkMessage_v4_clusterLeader_clusterLeader_network] = (byte) network;
 							clmsgClone[UplinkMessage_v4_clusterLeader_clusterLeader_node] = (byte) clusterLeaderNode;
 
