@@ -161,7 +161,7 @@ public class ExpireNodes {
 			return;
 		}
 
-		timer = new Timer(this.getClass().getSimpleName());
+		timer = new Timer(this.getClass().getSimpleName() + "-Timer");
 		timer.scheduleAtFixedRate(new ExpiryTimerTask(), interval, interval);
 	}
 
