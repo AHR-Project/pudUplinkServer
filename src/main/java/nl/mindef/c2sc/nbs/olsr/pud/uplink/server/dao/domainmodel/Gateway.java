@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.net.InetAddress;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.TreeSet;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -153,11 +154,15 @@ public class Gateway implements Serializable {
 		builder.append((relayServer != null) ? relayServer.getId() : "");
 		builder.append(", nodes=[");
 		boolean comma = false;
+		Set<Long> ids = new TreeSet<Long>();
 		for (Node node : nodes) {
+			ids.add(node.getId());
+		}
+		for (Long id : ids) {
 			if (comma) {
 				builder.append(", ");
 			}
-			builder.append(node.getId());
+			builder.append(id);
 			comma = true;
 		}
 		builder.append("]]");

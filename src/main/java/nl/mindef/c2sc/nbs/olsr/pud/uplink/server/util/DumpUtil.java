@@ -27,12 +27,15 @@ public class DumpUtil {
 
 		StringBuilder s = new StringBuilder();
 
+		s.append("\n");
 		s.append(indent + "*** UplinkMessage ***\n");
-		s.append(indent + "data   = ");
+		s.append(indent + "data   =");
 		for (int index = 0; index < data.length; index++) {
 			if ((index % 8) == 0) {
 				if ((index % 16) == 0) {
-					s.append("\n" + indent + "         ");
+					if (index != 0) {
+						s.append("\n" + indent + "        ");
+					}
 				} else {
 					s.append("  ");
 				}

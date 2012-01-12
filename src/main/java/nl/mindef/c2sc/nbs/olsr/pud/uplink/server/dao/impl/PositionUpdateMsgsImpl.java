@@ -112,7 +112,6 @@ public class PositionUpdateMsgsImpl implements PositionUpdateMsgs {
 			logger.debug("removed " + result.size() + " PositionUpdateMsg objects");
 		}
 
-		sessionFactory.getCurrentSession().flush();
 		return true;
 	}
 

@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.net.InetAddress;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.TreeSet;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -168,14 +169,18 @@ public class Node implements Serializable {
 		builder.append(", mainIp=");
 		builder.append(mainIp.getHostAddress());
 		builder.append(", gateway=");
-		builder.append(gateway.getId());
+		builder.append((gateway == null) ? "" : gateway.getId());
 		builder.append(", clusterNodes=[");
 		boolean comma = false;
-		for (ClusterLeaderMsg clusterLeaderMsg : clusterNodes) {
+		Set<Long> ids = new TreeSet<Long>();
+		for (ClusterLeaderMsg clusterNode : clusterNodes) {
+			ids.add(clusterNode.getId());
+		}
+		for (Long id : ids) {
 			if (comma) {
 				builder.append(", ");
 			}
-			builder.append(clusterLeaderMsg.getNode().getId());
+			builder.append(id);
 			comma = true;
 		}
 		builder.append("]");

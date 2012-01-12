@@ -83,10 +83,9 @@ public class ClusterLeaderMsgsImpl implements ClusterLeaderMsgs {
 		}
 
 		if (logger.isDebugEnabled()) {
-			logger.debug("removed " + result.size() + " clusterLeaderMsg objects");
+			logger.debug("removed " + result.size() + " ClusterLeaderMsg objects");
 		}
 
-		sessionFactory.getCurrentSession().flush();
 		return true;
 	}
 

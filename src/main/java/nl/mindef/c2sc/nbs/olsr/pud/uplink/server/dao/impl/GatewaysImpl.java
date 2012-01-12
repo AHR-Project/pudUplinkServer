@@ -82,7 +82,6 @@ public class GatewaysImpl implements Gateways {
 		} else {
 			sessionFactory.getCurrentSession().merge(gateway);
 		}
-		sessionFactory.getCurrentSession().flush();
 	}
 
 	@Override

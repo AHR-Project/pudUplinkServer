@@ -115,7 +115,6 @@ public class NodesImpl implements Nodes {
 		} else {
 			sessionFactory.getCurrentSession().merge(node);
 		}
-		sessionFactory.getCurrentSession().flush();
 	}
 
 	@Override

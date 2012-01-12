@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.net.InetAddress;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.TreeSet;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -126,11 +127,15 @@ public class RelayServer implements Serializable {
 		builder.append(ip.getHostAddress() + ":" + port.intValue());
 		builder.append(", gateways=[");
 		boolean comma = false;
+		Set<Long> ids = new TreeSet<Long>();
 		for (Gateway gateway : gateways) {
+			ids.add(gateway.getId());
+		}
+		for (Long id : ids) {
 			if (comma) {
 				builder.append(", ");
 			}
-			builder.append(gateway.getId());
+			builder.append(id);
 			comma = true;
 		}
 		builder.append("]]");

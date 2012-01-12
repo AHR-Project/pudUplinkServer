@@ -103,7 +103,6 @@ public class RelayServersImpl implements RelayServers {
 		} else {
 			sessionFactory.getCurrentSession().merge(relayServer);
 		}
-		// FIXME remove all session flushes
 	}
 
 	private String getRelayServersDump() {
