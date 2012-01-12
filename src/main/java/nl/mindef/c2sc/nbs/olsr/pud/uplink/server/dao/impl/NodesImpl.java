@@ -120,17 +120,24 @@ public class NodesImpl implements Nodes {
 	@Override
 	@Transactional
 	public boolean removeExpiredNodes() {
-		int cnt = sessionFactory.getCurrentSession()
-				.createQuery("delete Node node where positionUpdateMsg is null and clusterLeaderMsg is null").executeUpdate();
+		@SuppressWarnings("unchecked")
+		List<Node> result = sessionFactory.getCurrentSession()
+				.createQuery("select node from Node node where positionUpdateMsg is null and clusterLeaderMsg is null").list();
 
-		if (cnt != 0) {
-			if (logger.isDebugEnabled()) {
-				logger.debug("  removed " + cnt + " Node objects");
-			}
+		if (result.size() == 0) {
+			return false;
 		}
 
-		sessionFactory.getCurrentSession().flush();
-		return (cnt != 0);
+		for (Node node : result) {
+			node.setGateway(null);
+			sessionFactory.getCurrentSession().delete(node);
+		}
+
+		if (logger.isDebugEnabled()) {
+			logger.debug("removed " + result.size() + " Node objects");
+		}
+
+		return true;
 	}
 
 	private String getNodesDump() {

@@ -87,16 +87,24 @@ public class GatewaysImpl implements Gateways {
 	@Override
 	@Transactional
 	public boolean removeExpiredGateways() {
-		int cnt = sessionFactory.getCurrentSession().createQuery("delete Gateway gw where size(nodes) = 0").executeUpdate();
+		@SuppressWarnings("unchecked")
+		List<Gateway> result = sessionFactory.getCurrentSession()
+				.createQuery("select gw from Gateway gw where size(nodes) = 0").list();
 
-		if (cnt != 0) {
-			if (logger.isDebugEnabled()) {
-				logger.debug("removed " + cnt + " Gateway objects");
-			}
+		if (result.size() == 0) {
+			return false;
 		}
 
-		sessionFactory.getCurrentSession().flush();
-		return (cnt != 0);
+		for (Gateway gw : result) {
+			gw.setRelayServer(null);
+			sessionFactory.getCurrentSession().delete(gw);
+		}
+
+		if (logger.isDebugEnabled()) {
+			logger.debug("removed " + result.size() + " Gateway objects");
+		}
+
+		return true;
 	}
 
 	private String getGatewaysDump() {
