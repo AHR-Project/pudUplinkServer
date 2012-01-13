@@ -4,7 +4,7 @@
 
 	<groupId>nl.mindef.c2sc.nbs</groupId>
 	<artifactId>olsr.pud.uplink.server</artifactId>
-	<version>1.0.0</version>
+	<version>1.1.0</version>
 	<packaging>jar</packaging>
 
 	<name>olsr.pud.uplink.server</name>
