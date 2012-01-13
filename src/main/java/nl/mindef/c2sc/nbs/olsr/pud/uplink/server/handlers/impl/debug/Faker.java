@@ -55,10 +55,12 @@ public class Faker {
 	}
 
 	/* locations in byte array */
-	static private final int UplinkMessage_v4_clusterLeader_originator_network = 10;
-	static private final int UplinkMessage_v4_clusterLeader_originator_node = 11;
-	static private final int UplinkMessage_v4_clusterLeader_clusterLeader_network = 14;
-	static private final int UplinkMessage_v4_clusterLeader_clusterLeader_node = 15;
+	static private final int UplinkMessage_v4_olsrMessage_v4_originator_network = 10;
+	static private final int UplinkMessage_v4_olsrMessage_v4_originator_node = 11;
+	static private final int UplinkMessage_v4_clusterLeader_originator_network = 8;
+	static private final int UplinkMessage_v4_clusterLeader_originator_node = 9;
+	static private final int UplinkMessage_v4_clusterLeader_clusterLeader_network = 12;
+	static private final int UplinkMessage_v4_clusterLeader_clusterLeader_node = 13;
 
 	public void fakeit(Gateway gateway, long utcTimestamp, MSGTYPE type, Object msg) {
 		if (!firstFake) {
@@ -73,8 +75,8 @@ public class Faker {
 		byte initialNode = 1;
 		if (type == MSGTYPE.PU) {
 			pumsg = ((PositionUpdate) msg).getData();
-			initialNetwork = pumsg[UplinkMessage_v4_clusterLeader_originator_network];
-			initialNode = pumsg[UplinkMessage_v4_clusterLeader_originator_node];
+			initialNetwork = pumsg[UplinkMessage_v4_olsrMessage_v4_originator_network];
+			initialNode = pumsg[UplinkMessage_v4_olsrMessage_v4_originator_node];
 		} else /* if (type == MSGTYPE.CL) */{
 			clmsg = ((ClusterLeader) msg).getData();
 			initialNetwork = clmsg[UplinkMessage_v4_clusterLeader_originator_network];
@@ -102,8 +104,8 @@ public class Faker {
 						if (type == MSGTYPE.PU) {
 							byte[] pumsgClone = pumsg.clone();
 							/* olsr originator */
-							pumsgClone[UplinkMessage_v4_clusterLeader_originator_network] = (byte) network;
-							pumsgClone[UplinkMessage_v4_clusterLeader_originator_node] = (byte) node;
+							pumsgClone[UplinkMessage_v4_olsrMessage_v4_originator_network] = (byte) network;
+							pumsgClone[UplinkMessage_v4_olsrMessage_v4_originator_node] = (byte) node;
 
 							PositionUpdate pu = new PositionUpdate(pumsgClone, pumsgClone.length);
 							positionUpdateHandler.handlePositionMessage(gateway, utcTimestamp + random.nextInt(randomRange), pu);
@@ -146,8 +148,8 @@ public class Faker {
 		if (type == MSGTYPE.PU) {
 			byte[] pumsgClone = pumsg.clone();
 			// olsr originator
-			pumsgClone[UplinkMessage_v4_clusterLeader_originator_network] = (byte) network;
-			pumsgClone[UplinkMessage_v4_clusterLeader_originator_node] = (byte) node;
+			pumsgClone[UplinkMessage_v4_olsrMessage_v4_originator_network] = (byte) network;
+			pumsgClone[UplinkMessage_v4_olsrMessage_v4_originator_node] = (byte) node;
 
 			PositionUpdate pu = new PositionUpdate(pumsgClone, pumsgClone.length);
 			positionUpdateHandler.handlePositionMessage(gateway, utcTimestamp + random.nextInt(randomRange), pu);
