@@ -154,7 +154,7 @@ public class ExpireNodes {
 	}
 
 	/** the timer from which the expiry task runs */
-	private Timer timer;
+	private Timer timer = null;
 
 	public void init() {
 		if (interval <= 0) {

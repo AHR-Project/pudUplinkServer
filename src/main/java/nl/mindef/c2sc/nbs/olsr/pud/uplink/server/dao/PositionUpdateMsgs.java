@@ -26,7 +26,7 @@ public interface PositionUpdateMsgs {
 
 	/**
 	 * Retrieve the PositionUpdateMsg objects that must be distributed to the given cluster leader. A PositionUpdateMsg
-	 * must be distributed if its reception time is between startTime and endTime.
+	 * must be distributed if its reception time is later than startTime and at latest endTime.
 	 * 
 	 * @param startTime
 	 *          the startTime of the reception time window

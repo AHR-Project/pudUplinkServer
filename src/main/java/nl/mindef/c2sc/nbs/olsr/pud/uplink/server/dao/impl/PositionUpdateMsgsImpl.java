@@ -63,7 +63,9 @@ public class PositionUpdateMsgsImpl implements PositionUpdateMsgs {
 		List<PositionUpdateMsg> result = sessionFactory
 				.getCurrentSession()
 				.createQuery(
-						"select pu from PositionUpdateMsg pu where pu.receptionTime > "
+						"select pu from PositionUpdateMsg pu where"
+								/* receptionTime in <startTime, endTime] */
+								+ " pu.receptionTime > "
 								+ startTime
 								+ " and pu.receptionTime <= "
 								+ endTime

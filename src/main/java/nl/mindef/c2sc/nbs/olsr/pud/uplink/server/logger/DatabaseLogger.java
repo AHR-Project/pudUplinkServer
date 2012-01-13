@@ -104,7 +104,7 @@ public class DatabaseLogger {
 	 * Main
 	 */
 
-	private Timer timer = new Timer(this.getClass().getName() + "-Timer");
+	private Timer timer = null;
 	private TimerTask task = null;
 	private FileOutputStream fos = null;
 	private static final byte[] eol = "\n".getBytes();
@@ -116,6 +116,7 @@ public class DatabaseLogger {
 
 		fos = new FileOutputStream(databaseLogFile, false);
 
+		timer = new Timer(this.getClass().getName() + "-Timer");
 		task = new TimerTask() {
 			@Override
 			public void run() {
