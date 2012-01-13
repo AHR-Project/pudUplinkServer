@@ -16,9 +16,10 @@
 	<import resource="classpath:META-INF/spring/stopHandler.xml" />
 
 	<import resource="classpath:META-INF/spring/hibernate.xml" />
-	<import resource="classpath:META-INF/spring/daoDataLock.xml" />
+	<import resource="classpath:META-INF/spring/gateways.xml" />
 	<import resource="classpath:META-INF/spring/nodes.xml" />
-	<import resource="classpath:META-INF/spring/positions.xml" />
+	<import resource="classpath:META-INF/spring/positionUpdateMsgs.xml" />
+	<import resource="classpath:META-INF/spring/clusterLeaderMsgs.xml" />
 	<import resource="classpath:META-INF/spring/relayServers.xml" />
 	<import resource="classpath:META-INF/spring/expiry.xml" />
 	<import resource="classpath:META-INF/spring/databaseLogger.xml" />

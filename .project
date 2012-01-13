@@ -3,6 +3,7 @@
 	<name>pudUplinkServer</name>
 	<comment></comment>
 	<projects>
+		<project>olsrdPudWireFormat</project>
 		<project>olsrdPudWireFormatJava</project>
 	</projects>
 	<buildSpec>

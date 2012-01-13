@@ -5,8 +5,8 @@
 
 	<bean id="RelayServers"
 		class="nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.impl.RelayServersImpl">
-		<property name="relayCluster" ref="Distributor" />
 		<property name="sessionFactory" ref="sessionFactory" />
+		<property name="uplinkUdpPort" value="${uplink.listener.udp.port}" />
 	</bean>
 
 </beans>

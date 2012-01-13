@@ -14,13 +14,11 @@ public class Main {
 			ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext(
 					"classpath:META-INF/spring/application-context.xml");
 
-			context.start();
-
 			logger.info("RelayServer started");
 
-			UplinkReceiver uplinkReceiver = (UplinkReceiver) context
-					.getBean("UplinkReceiver");
+			context.start();
 
+			UplinkReceiver uplinkReceiver = (UplinkReceiver) context.getBean("UplinkReceiver");
 			uplinkReceiver.join();
 
 			logger.info("RelayServer stopped");

@@ -7,12 +7,10 @@
 		class="nl.mindef.c2sc.nbs.olsr.pud.uplink.server.distributor.impl.DistributorImpl"
 		init-method="init" destroy-method="destroy">
 		<property name="myIPAddresses" ref="RelayServerConfiguration" />
-		<property name="configuredRelayServers" value="${relaycluster.servers}" />
-		<property name="dataLock" ref="DaoDataLock" />
 		<property name="distributionDelay" value="${distribution.delay}" />
 		<property name="nodes" ref="Nodes" />
 		<property name="packetMaxSize" value="${distribution.packet.max.size}" />
-		<property name="positions" ref="Positions" />
+		<property name="positions" ref="PositionUpdateMsgs" />
 		<property name="relayServers" ref="RelayServers" />
 		<property name="uplinkUdpPort" value="${uplink.listener.udp.port}" />
 	</bean>

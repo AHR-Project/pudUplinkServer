@@ -23,7 +23,7 @@ public class NodesImpl implements Nodes {
 
 	/**
 	 * @param sessionFactory
-	 *            the sessionFactory to set
+	 *          the sessionFactory to set
 	 */
 	@Required
 	public final void setSessionFactory(SessionFactory sessionFactory) {
@@ -34,27 +34,23 @@ public class NodesImpl implements Nodes {
 
 	/**
 	 * @param clusterLeadersIncludesTransitionalNodes
-	 *            the clusterLeadersIncludesTransitionalNodes to set
+	 *          the clusterLeadersIncludesTransitionalNodes to set
 	 */
 	@Required
-	public final void setClusterLeadersIncludesTransitionalNodes(
-			boolean clusterLeadersIncludesTransitionalNodes) {
+	public final void setClusterLeadersIncludesTransitionalNodes(boolean clusterLeadersIncludesTransitionalNodes) {
 		this.clusterLeadersIncludesTransitionalNodes = clusterLeadersIncludesTransitionalNodes;
 	}
 
 	@Override
-	@Transactional
+	@Transactional(readOnly = true)
 	public Node getNode(InetAddress mainIp) {
 		if (mainIp == null) {
 			return null;
 		}
 
 		@SuppressWarnings("unchecked")
-		List<Node> result = sessionFactory
-				.getCurrentSession()
-				.createQuery(
-						"select node from Node node where node.mainIp = :par1")
-				.setParameter("par1", mainIp).list();
+		List<Node> result = sessionFactory.getCurrentSession()
+				.createQuery("select node from Node node where node.mainIp = :ip").setParameter("ip", mainIp).list();
 
 		if (result.size() == 0) {
 			return null;
@@ -66,36 +62,53 @@ public class NodesImpl implements Nodes {
 	}
 
 	@Override
-	@Transactional
+	@Transactional(readOnly = true)
 	public List<Node> getClusterLeaders() {
 		@SuppressWarnings("unchecked")
 		List<Node> result = sessionFactory
 				.getCurrentSession()
 				.createQuery(
-						"select node from Node node "
-								+ "where clusterLeader.id = id"
-								+ (clusterLeadersIncludesTransitionalNodes ? " or clusterLeader.clusterLeader.id != clusterLeader.id"
-										: "")).list();
+						"select node from Node node"
+								/* do an eager fetch of the gateway */
+								+ " left join node.gateway"
+								/* node has cluster nodes AND node is not a cluster leader that doesn't point to itself */
+								+ " where (node.clusterNodes is not empty and node not in (select cl.clusterLeaderNode from ClusterLeaderMsg cl where cl.clusterLeaderNode.id != cl.clusterLeaderNode.clusterLeaderMsg.clusterLeaderNode.id))"
+
+								/*
+								 * (when clusterLeadersIncludesTransitionalNodes is set): or node is a node that points to a cluster
+								 * leader that doesn't point to itself
+								 */
+								+ (!clusterLeadersIncludesTransitionalNodes ? ""
+										: " or (node in (select cl.node from ClusterLeaderMsg cl where cl.clusterLeaderNode.id != cl.clusterLeaderNode.clusterLeaderMsg.clusterLeaderNode.id))")
+
+								+ " order by node.mainIp").list();
+		if (result.size() == 0) {
+			return null;
+		}
 
 		return result;
 	}
 
 	@Override
-	@Transactional
+	@Transactional(readOnly = true)
 	public Node getSubstituteClusterLeader(Node clusterLeader) {
+		assert (clusterLeader != null);
+		Long clId = clusterLeader.getId();
+
 		@SuppressWarnings("unchecked")
-		List<Node> result = sessionFactory.getCurrentSession()
-				.createQuery("select node from Node node where "
-				/* it is not the cluster leader itself */
-				+ "id != " + clusterLeader.getId() + " and "
-				/* it points to cluster leader */
-				+ "clusterLeader.id = " + clusterLeader.getId() + " and "
-				/* it has a valid IP address */
-				+ "ip != null" + " and " +
-				/* it has a valid downlink port */
-				"downlinkPort != " + Node.DOWNLINK_PORT_INVALID
-				/* keep the most recent one on top of the list */
-				+ " order by receptionTime desc").list();
+		List<Node> result = sessionFactory
+				.getCurrentSession()
+				.createQuery(
+						"select node from Node node"
+						/* do an eager fetch of the gateway */
+						+ " left join node.gateway where"
+						/* node is not the cluster leader itself and node points to cluster leader */
+						+ " node.id != " + clId
+								+ " and node.clusterLeaderMsg is not null and node.clusterLeaderMsg.clusterLeaderNode.id = " + clId
+								/* node has a valid gateway (a gateway always has a valid IP address and a valid port) */
+								+ " and node.gateway is not null"
+								/* keep the node with the most recently received cluster leader message on top of the list */
+								+ " order by node.clusterLeaderMsg.receptionTime desc").list();
 
 		if (result.size() == 0) {
 			return null;
@@ -106,38 +119,39 @@ public class NodesImpl implements Nodes {
 
 	@Override
 	@Transactional
-	public void saveNode(Node node, boolean newObject) {
-		if (newObject) {
-			sessionFactory.getCurrentSession().saveOrUpdate(node);
-		} else {
-			sessionFactory.getCurrentSession().merge(node);
-		}
+	public void saveNode(Node node) {
+		sessionFactory.getCurrentSession().saveOrUpdate(node);
 	}
 
 	@Override
 	@Transactional
-	public void removeExpiredNodes(double validityTimeMultiplier) {
-		long utcTimestamp = System.currentTimeMillis();
-
-		int cnt = sessionFactory
+	public boolean removeExpiredNodes() {
+		@SuppressWarnings("unchecked")
+		List<Node> result = sessionFactory
 				.getCurrentSession()
 				.createQuery(
-						"delete Node node"
-								+ " where (receptionTime + (validityTime * "
-								+ validityTimeMultiplier + ")) < "
-								+ utcTimestamp).executeUpdate();
-		if (cnt != 0) {
-			if (logger.isDebugEnabled()) {
-				logger.debug("  removed " + cnt + " nodes");
-			}
+						"select node from Node node where positionUpdateMsg is null and clusterLeaderMsg is null"
+								+ " and size(clusterNodes) = 0").list();
+
+		if (result.size() == 0) {
+			return false;
 		}
-		return;
+
+		for (Node node : result) {
+			node.setGateway(null);
+			sessionFactory.getCurrentSession().delete(node);
+		}
+
+		if (logger.isDebugEnabled()) {
+			logger.debug("removed " + result.size() + " Node objects");
+		}
+
+		return true;
 	}
 
 	private String getNodesDump() {
 		@SuppressWarnings("unchecked")
-		List<Node> result = sessionFactory.getCurrentSession()
-				.createQuery("from Node node").list();
+		List<Node> result = sessionFactory.getCurrentSession().createQuery("from Node node").list();
 
 		StringBuilder s = new StringBuilder();
 		s.append("[Nodes]\n");
@@ -149,7 +163,7 @@ public class NodesImpl implements Nodes {
 	}
 
 	@Override
-	@Transactional
+	@Transactional(readOnly = true)
 	public void log(Logger logger, Level level) {
 		if (logger.isEnabledFor(level)) {
 			logger.log(level, getNodesDump());
@@ -157,7 +171,7 @@ public class NodesImpl implements Nodes {
 	}
 
 	@Override
-	@Transactional
+	@Transactional(readOnly = true)
 	public void print(OutputStream out) throws IOException {
 		String s = getNodesDump();
 		out.write(s.getBytes(), 0, s.length());

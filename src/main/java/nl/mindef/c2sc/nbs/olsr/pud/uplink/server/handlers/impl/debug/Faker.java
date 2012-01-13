@@ -2,24 +2,23 @@ package nl.mindef.c2sc.nbs.olsr.pud.uplink.server.handlers.impl.debug;
 
 import java.util.Random;
 
+import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.domainmodel.Gateway;
+import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.handlers.ClusterLeaderHandler;
+import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.handlers.PositionUpdateHandler;
+
 import org.olsr.plugin.pud.ClusterLeader;
 import org.olsr.plugin.pud.PositionUpdate;
 import org.springframework.beans.factory.annotation.Required;
-
-import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.domainmodel.RelayServer;
-import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.handlers.ClusterLeaderHandler;
-import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.handlers.PositionUpdateHandler;
 
 public class Faker {
 	private ClusterLeaderHandler clusterLeaderHandler;
 
 	/**
 	 * @param clusterLeaderHandler
-	 *            the clusterLeaderHandler to set
+	 *          the clusterLeaderHandler to set
 	 */
 	@Required
-	public final void setClusterLeaderHandler(
-			ClusterLeaderHandler clusterLeaderHandler) {
+	public final void setClusterLeaderHandler(ClusterLeaderHandler clusterLeaderHandler) {
 		this.clusterLeaderHandler = clusterLeaderHandler;
 	}
 
@@ -27,11 +26,10 @@ public class Faker {
 
 	/**
 	 * @param positionUpdateHandler
-	 *            the positionUpdateHandler to set
+	 *          the positionUpdateHandler to set
 	 */
 	@Required
-	public final void setPositionUpdateHandler(
-			PositionUpdateHandler positionUpdateHandler) {
+	public final void setPositionUpdateHandler(PositionUpdateHandler positionUpdateHandler) {
 		this.positionUpdateHandler = positionUpdateHandler;
 	}
 
@@ -50,14 +48,21 @@ public class Faker {
 
 	/**
 	 * @param firstFake
-	 *            the firstFake to set
+	 *          the firstFake to set
 	 */
 	public final void setFirstFake(boolean firstFake) {
 		this.firstFake = firstFake;
 	}
 
-	public void fakeit(MSGTYPE type, long utcTimestamp, Object msg,
-			RelayServer relayServer) {
+	/* locations in byte array */
+	static private final int UplinkMessage_v4_olsrMessage_v4_originator_network = 10;
+	static private final int UplinkMessage_v4_olsrMessage_v4_originator_node = 11;
+	static private final int UplinkMessage_v4_clusterLeader_originator_network = 8;
+	static private final int UplinkMessage_v4_clusterLeader_originator_node = 9;
+	static private final int UplinkMessage_v4_clusterLeader_clusterLeader_network = 12;
+	static private final int UplinkMessage_v4_clusterLeader_clusterLeader_node = 13;
+
+	public void fakeit(Gateway gateway, long utcTimestamp, MSGTYPE type, Object msg) {
 		if (!firstFake) {
 			return;
 		}
@@ -70,14 +75,12 @@ public class Faker {
 		byte initialNode = 1;
 		if (type == MSGTYPE.PU) {
 			pumsg = ((PositionUpdate) msg).getData();
-			initialNetwork = pumsg[10];
-			initialNode = pumsg[11];
-		} else if (type == MSGTYPE.CL) {
+			initialNetwork = pumsg[UplinkMessage_v4_olsrMessage_v4_originator_network];
+			initialNode = pumsg[UplinkMessage_v4_olsrMessage_v4_originator_node];
+		} else /* if (type == MSGTYPE.CL) */{
 			clmsg = ((ClusterLeader) msg).getData();
-			initialNetwork = clmsg[10];
-			initialNode = clmsg[11];
-		} else {
-			throw new IllegalArgumentException("Illegal msg type");
+			initialNetwork = clmsg[UplinkMessage_v4_clusterLeader_originator_network];
+			initialNode = clmsg[UplinkMessage_v4_clusterLeader_originator_node];
 		}
 
 		boolean firstNode = true;
@@ -100,37 +103,29 @@ public class Faker {
 						 */
 						if (type == MSGTYPE.PU) {
 							byte[] pumsgClone = pumsg.clone();
-							// olsr originator
-							pumsgClone[10] = (byte) network;
-							pumsgClone[11] = (byte) node;
+							/* olsr originator */
+							pumsgClone[UplinkMessage_v4_olsrMessage_v4_originator_network] = (byte) network;
+							pumsgClone[UplinkMessage_v4_olsrMessage_v4_originator_node] = (byte) node;
 
-							PositionUpdate pu = new PositionUpdate(pumsgClone,
-									pumsgClone.length);
-							positionUpdateHandler.handlePositionMessage(
-									pu.getOlsrMessageOriginator(), utcTimestamp
-											+ random.nextInt(randomRange), pu,
-									relayServer);
+							PositionUpdate pu = new PositionUpdate(pumsgClone, pumsgClone.length);
+							positionUpdateHandler.handlePositionMessage(gateway, utcTimestamp + random.nextInt(randomRange), pu);
 						}
 
 						/*
 						 * Cluster Leader Message
 						 */
-						if (type == MSGTYPE.CL) {
+						else /* if (type == MSGTYPE.CL) */{
 							byte[] clmsgClone = clmsg.clone();
-							// originator
-							clmsgClone[10] = (byte) network;
-							clmsgClone[11] = (byte) node;
+							/* originator */
+							clmsgClone[UplinkMessage_v4_clusterLeader_originator_network] = (byte) network;
+							clmsgClone[UplinkMessage_v4_clusterLeader_originator_node] = (byte) node;
 
-							// clusterLeader
-							clmsgClone[14] = (byte) network;
-							clmsgClone[15] = (byte) clusterLeaderNode;
+							/* clusterLeader */
+							clmsgClone[UplinkMessage_v4_clusterLeader_clusterLeader_network] = (byte) network;
+							clmsgClone[UplinkMessage_v4_clusterLeader_clusterLeader_node] = (byte) clusterLeaderNode;
 
-							ClusterLeader cl = new ClusterLeader(clmsgClone,
-									clmsgClone.length);
-							clusterLeaderHandler.handleClusterLeaderMessage(
-									cl.getClusterLeaderOriginator(),
-									utcTimestamp + random.nextInt(randomRange),
-									cl, relayServer);
+							ClusterLeader cl = new ClusterLeader(clmsgClone, clmsgClone.length);
+							clusterLeaderHandler.handleClusterLeaderMessage(gateway, utcTimestamp + random.nextInt(randomRange), cl);
 						}
 					}
 				} else {
@@ -153,33 +148,28 @@ public class Faker {
 		if (type == MSGTYPE.PU) {
 			byte[] pumsgClone = pumsg.clone();
 			// olsr originator
-			pumsgClone[10] = (byte) network;
-			pumsgClone[11] = (byte) node;
+			pumsgClone[UplinkMessage_v4_olsrMessage_v4_originator_network] = (byte) network;
+			pumsgClone[UplinkMessage_v4_olsrMessage_v4_originator_node] = (byte) node;
 
-			PositionUpdate pu = new PositionUpdate(pumsgClone,
-					pumsgClone.length);
-			positionUpdateHandler.handlePositionMessage(
-					pu.getOlsrMessageOriginator(), utcTimestamp, pu,
-					relayServer);
+			PositionUpdate pu = new PositionUpdate(pumsgClone, pumsgClone.length);
+			positionUpdateHandler.handlePositionMessage(gateway, utcTimestamp + random.nextInt(randomRange), pu);
 		}
 
 		/*
 		 * Cluster Leader Message
 		 */
-		if (type == MSGTYPE.CL) {
+		else /* if (type == MSGTYPE.CL) */{
 			byte[] clmsgClone = clmsg.clone();
 			// originator
-			clmsgClone[10] = (byte) network;
-			clmsgClone[11] = (byte) node;
+			clmsgClone[UplinkMessage_v4_clusterLeader_originator_network] = (byte) network;
+			clmsgClone[UplinkMessage_v4_clusterLeader_originator_node] = (byte) node;
 
 			// clusterLeader
-			clmsgClone[14] = (byte) (network - 1);
-			clmsgClone[15] = (byte) (clusterLeaderNode + nodeCountMax - 1);
+			clmsgClone[UplinkMessage_v4_clusterLeader_clusterLeader_network] = (byte) (network - 1);
+			clmsgClone[UplinkMessage_v4_clusterLeader_clusterLeader_node] = (byte) (clusterLeaderNode + nodeCountMax - 1);
 
 			ClusterLeader cl = new ClusterLeader(clmsgClone, clmsgClone.length);
-			clusterLeaderHandler.handleClusterLeaderMessage(
-					cl.getClusterLeaderOriginator(), utcTimestamp, cl,
-					relayServer);
+			clusterLeaderHandler.handleClusterLeaderMessage(gateway, utcTimestamp + random.nextInt(randomRange), cl);
 		}
 	}
 }

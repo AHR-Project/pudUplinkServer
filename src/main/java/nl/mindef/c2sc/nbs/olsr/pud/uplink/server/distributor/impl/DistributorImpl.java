@@ -6,20 +6,18 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
-import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.locks.ReentrantLock;
 
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.Nodes;
-import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.Positions;
+import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.PositionUpdateMsgs;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.RelayServers;
+import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.domainmodel.Gateway;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.domainmodel.Node;
-import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.domainmodel.NodePosition;
+import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.domainmodel.PositionUpdateMsg;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.domainmodel.RelayServer;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.distributor.Distributor;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.util.MyIPAddresses;
@@ -30,47 +28,35 @@ import org.springframework.beans.factory.annotation.Required;
 public class DistributorImpl extends Thread implements Distributor {
 	private Logger logger = Logger.getLogger(this.getClass().getName());
 
-	public static final int packetMaxSizeDefault = 1500;
-
-	private int packetMaxSize = packetMaxSizeDefault;
+	private int packetMaxSize = 1450;
 
 	/**
 	 * @param packetMaxSize
-	 *            the packetMaxSize to set
+	 *          the packetMaxSize to set
 	 */
 	public final void setPacketMaxSize(int packetMaxSize) {
 		this.packetMaxSize = packetMaxSize;
-	}
-
-	private ReentrantLock dataLock;
-
-	/**
-	 * @param dataLock
-	 *            the dataLock to set
-	 */
-	@Required
-	public final void setDataLock(ReentrantLock dataLock) {
-		this.dataLock = dataLock;
 	}
 
 	private MyIPAddresses myIPAddresses;
 
 	/**
 	 * @param myIPAddresses
-	 *            the myIPAddresses to set
+	 *          the myIPAddresses to set
 	 */
 	@Required
-	public final void setMyIPAddresses(MyIPAddresses config) {
-		this.myIPAddresses = config;
+	public final void setMyIPAddresses(MyIPAddresses myIPAddresses) {
+		this.myIPAddresses = myIPAddresses;
 	}
 
 	/** the UDP port to listen on for uplink messages */
-	private int uplinkUdpPort = RelayServer.PORT_DEFAULT;
+	private Integer uplinkUdpPort = null;
 
 	/**
 	 * @param uplinkUdpPort
-	 *            the uplinkUdpPort to set
+	 *          the uplinkUdpPort to set
 	 */
+	@Required
 	public final void setUplinkUdpPort(int uplinkUdpPort) {
 		this.uplinkUdpPort = uplinkUdpPort;
 	}
@@ -80,22 +66,22 @@ public class DistributorImpl extends Thread implements Distributor {
 
 	/**
 	 * @param nodes
-	 *            the nodes to set
+	 *          the nodes to set
 	 */
 	@Required
 	public final void setNodes(Nodes nodes) {
 		this.nodes = nodes;
 	}
 
-	/** the Positions handler */
-	private Positions positions;
+	/** the PositionUpdateMsgs handler */
+	private PositionUpdateMsgs positions;
 
 	/**
 	 * @param positions
-	 *            the positions to set
+	 *          the positions to set
 	 */
 	@Required
-	public final void setPositions(Positions positions) {
+	public final void setPositions(PositionUpdateMsgs positions) {
 		this.positions = positions;
 	}
 
@@ -103,106 +89,27 @@ public class DistributorImpl extends Thread implements Distributor {
 
 	/**
 	 * @param relayServers
-	 *            the relayServers to set
+	 *          the relayServers to set
 	 */
 	@Required
 	public final void setRelayServers(RelayServers relayServers) {
 		this.relayServers = relayServers;
 	}
 
-	public static final long DISTRIBUTION_DELAY_DEFAULT = 1000;
-	private long distributionDelay = DISTRIBUTION_DELAY_DEFAULT;
+	private long distributionDelay = 1000;
 
 	/**
 	 * @param distributionDelay
-	 *            the distributionDelay to set
+	 *          the distributionDelay to set
 	 */
 	public final void setDistributionDelay(long distributionDelay) {
 		this.distributionDelay = distributionDelay;
 	}
 
-	private final RelayServer me = new RelayServer();
-
-	/**
-	 * @return the me
-	 */
-	public RelayServer getMe() {
-		return me;
-	}
-
-	private Set<RelayServer> configuredRelayServers = new HashSet<RelayServer>();
-
-	private static final String ipMatcher = "(\\d{1,3}\\.){0,3}\\d{1,3}";
-	private static final String portMatcher = "\\d{1,5}";
-	private static final String entryMatcher = "\\s*" + ipMatcher + "(:"
-			+ portMatcher + ")?\\s*";
-	private static final String matcher = "^\\s*" + entryMatcher + "(,"
-			+ entryMatcher + ")*\\s*$";
-
-	/**
-	 * @param relayServers
-	 *            the relayServers to set
-	 * @throws UnknownHostException
-	 *             upon error converting an IP address or host name to an
-	 *             INetAddress
-	 */
-	@Required
-	public final void setConfiguredRelayServers(String relayServers)
-			throws UnknownHostException {
-		if ((relayServers == null) || relayServers.trim().isEmpty()) {
-			configuredRelayServers.clear();
-			return;
-		}
-
-		if (!relayServers.matches(matcher)) {
-			throw new IllegalArgumentException(
-					"Configured relayServers string does not comply to"
-							+ " regular expression \"" + matcher + "\"");
-		}
-
-		String[] splits = relayServers.split("\\s*,\\s*");
-		for (String split : splits) {
-			String[] fields = split.split(":", 2);
-
-			InetAddress ip = InetAddress.getByName(fields[0].trim());
-
-			RelayServer relayServer = new RelayServer();
-			relayServer.setIp(ip);
-
-			if (fields.length == 2) {
-				Integer port = Integer.valueOf(fields[1].trim());
-				if ((port <= 0) || (port > 65535)) {
-					throw new IllegalArgumentException("Configured port "
-							+ port + " for IP address " + ip.getHostAddress()
-							+ " is outside valid range of [1, 65535]");
-				}
-				relayServer.setPort(port.intValue());
-			}
-
-			this.configuredRelayServers.add(relayServer);
-		}
-	}
-
 	public void init() throws SocketException, UnknownHostException {
 		this.setName(this.getClass().getSimpleName());
-		InetAddress ip;
-		try {
-			ip = InetAddress.getLocalHost();
-		} catch (UnknownHostException e) {
-			ip = InetAddress.getByName("localhost");
-		}
-		me.setIp(ip);
-		this.configuredRelayServers.add(me);
-
-		/* save into database */
-		for (RelayServer relayServer : configuredRelayServers) {
-			relayServers.addRelayServer(relayServer);
-		}
-
 		timer = new Timer(this.getClass().getSimpleName() + "-Timer");
-
 		sock = new DatagramSocket();
-
 		this.start();
 	}
 
@@ -231,11 +138,10 @@ public class DistributorImpl extends Thread implements Distributor {
 				}
 			}
 			if (distribute.getAndSet(false)) {
-				dataLock.lock();
 				try {
 					distribute();
-				} finally {
-					dataLock.unlock();
+				} catch (Throwable e) {
+					logger.error("error during distribution", e);
 				}
 			}
 		}
@@ -246,13 +152,13 @@ public class DistributorImpl extends Thread implements Distributor {
 	 */
 
 	private Timer timer = null;
-	private AtomicInteger signaledUpdates = new AtomicInteger(0);
+	private AtomicBoolean signaledUpdates = new AtomicBoolean(false);
 
-	private long lastDistributionTime = 0;
+	private long lastDistributionTime = -1;
 
 	public void signalUpdate() {
-		int previousSignaledUpdates = signaledUpdates.getAndIncrement();
-		if (previousSignaledUpdates == 0) {
+		boolean previousSignaledUpdates = signaledUpdates.getAndSet(true);
+		if (!previousSignaledUpdates) {
 			timer.schedule(new TimerTask() {
 				@Override
 				public void run() {
@@ -267,105 +173,91 @@ public class DistributorImpl extends Thread implements Distributor {
 
 	private DatagramSocket sock;
 
-	private DatagramPacket toPacket(Set<NodePosition> packetPositions,
-			int packetPositionsByteCount) {
-		assert (packetPositions != null);
-		assert (packetPositions.size() > 0);
-		assert (packetPositionsByteCount > 0);
-		assert (packetPositionsByteCount <= packetMaxSize);
+	private DatagramPacket toPacket(List<PositionUpdateMsg> positionUpdateMsgs, int positionUpdateMsgsByteCount) {
+		assert (positionUpdateMsgs != null);
+		assert (positionUpdateMsgs.size() > 0);
+		assert (positionUpdateMsgsByteCount > 0);
+		assert (positionUpdateMsgsByteCount <= packetMaxSize);
 
-		DatagramPacket packet = new DatagramPacket(
-				new byte[packetPositionsByteCount], packetPositionsByteCount);
-		byte[] data = packet.getData();
-		int dataPos = 0;
-		for (NodePosition packetPosition : packetPositions) {
-			byte[] src = packetPosition.getPositionUpdate().getData();
-			int srcLength = src.length;
-			System.arraycopy(src, 0, data, dataPos, srcLength);
-			dataPos += srcLength;
+		DatagramPacket packet = new DatagramPacket(new byte[positionUpdateMsgsByteCount], positionUpdateMsgsByteCount);
+		byte[] packetData = packet.getData();
+		int packetDataIndex = 0;
+		for (PositionUpdateMsg positionUpdateMsg : positionUpdateMsgs) {
+			byte[] positionUpdateMsgData = positionUpdateMsg.getPositionUpdateMsg().getData();
+			int positionUpdateMsgDataLength = positionUpdateMsgData.length;
+			System.arraycopy(positionUpdateMsgData, 0, packetData, packetDataIndex, positionUpdateMsgDataLength);
+			packetDataIndex += positionUpdateMsgDataLength;
 		}
 
 		return packet;
 	}
 
-	private Set<DatagramPacket> positionsToPackets(
-			List<NodePosition> positionsToDistribute) {
-		if ((positionsToDistribute == null)
-				|| (positionsToDistribute.size() == 0)) {
+	private List<DatagramPacket> positionUpdateMsgsToPackets(List<PositionUpdateMsg> positionUpdateMsgsToDistribute) {
+		if ((positionUpdateMsgsToDistribute == null) || (positionUpdateMsgsToDistribute.size() == 0)) {
 			return null;
 		}
 
-		Set<DatagramPacket> result = new HashSet<DatagramPacket>();
+		List<DatagramPacket> result = new LinkedList<DatagramPacket>();
 
-		Set<NodePosition> packetPositions = new HashSet<NodePosition>();
-		int packetPositionsByteCount = 0;
-		for (NodePosition positionToDistribute : positionsToDistribute) {
-			int msgLength = positionToDistribute.getPositionUpdate().getData().length;
-			if ((packetPositionsByteCount + msgLength) > packetMaxSize) {
-				result.add(toPacket(packetPositions, packetPositionsByteCount));
-				packetPositions.clear();
-				packetPositionsByteCount = 0;
+		List<PositionUpdateMsg> packetPositionUpdateMsgs = new LinkedList<PositionUpdateMsg>();
+		int packetPositionUpdateMsgsByteCount = 0;
+		for (PositionUpdateMsg positionUpdateMsgToDistribute : positionUpdateMsgsToDistribute) {
+			int positionUpdateMsgLength = positionUpdateMsgToDistribute.getPositionUpdateMsg().getData().length;
+			if ((packetPositionUpdateMsgsByteCount + positionUpdateMsgLength) > packetMaxSize) {
+				result.add(toPacket(packetPositionUpdateMsgs, packetPositionUpdateMsgsByteCount));
+				packetPositionUpdateMsgs.clear();
+				packetPositionUpdateMsgsByteCount = 0;
 			}
 
-			packetPositions.add(positionToDistribute);
-			packetPositionsByteCount += msgLength;
+			packetPositionUpdateMsgs.add(positionUpdateMsgToDistribute);
+			packetPositionUpdateMsgsByteCount += positionUpdateMsgLength;
 		}
-		if (packetPositions.size() != 0) {
-			result.add(toPacket(packetPositions, packetPositionsByteCount));
+		if (packetPositionUpdateMsgs.size() != 0) {
+			result.add(toPacket(packetPositionUpdateMsgs, packetPositionUpdateMsgsByteCount));
 		}
 
 		return result;
 	}
 
 	private void distribute() {
-		while (signaledUpdates.get() > 0) {
-			signaledUpdates.decrementAndGet();
-
+		while (signaledUpdates.getAndSet(false)) {
 			long currentTime = System.currentTimeMillis();
 
-			StringBuilder s = new StringBuilder();
-
 			if (logger.isDebugEnabled()) {
-				logger.debug("Have to distribute [" + lastDistributionTime
-						+ ", " + currentTime + "]");
+				logger.debug("*** Have to distribute <" + lastDistributionTime + ", " + currentTime + "]");
 			}
 
 			/*
-			 * Relay Servers
+			 * Distribute to other relay servers
 			 */
 
 			if (logger.isDebugEnabled()) {
-				logger.debug("  *** relay servers");
+				logger.debug("*** relay servers");
 			}
 
-			List<RelayServer> otherRelayServers = relayServers
-					.getOtherRelayServers();
-
+			List<RelayServer> otherRelayServers = relayServers.getOtherRelayServers();
 			if ((otherRelayServers != null) && (otherRelayServers.size() > 0)) {
-				List<NodePosition> p4ds = positions
-						.getPositionsForDistribution(lastDistributionTime,
-								currentTime, null);
+				List<PositionUpdateMsg> p4ds = positions.getPositionUpdateMsgForDistribution(lastDistributionTime, currentTime,
+						null);
 				if (logger.isDebugEnabled()) {
-					s.setLength(0);
-					s.append("  p4ds(" + p4ds.size() + ")=");
-					for (NodePosition p4d : p4ds) {
+					StringBuilder s = new StringBuilder();
+					s.append("p4ds(" + p4ds.size() + ")=");
+					for (PositionUpdateMsg p4d : p4ds) {
 						s.append(" " + p4d.getId());
 					}
 					logger.debug(s.toString());
 				}
 
-				Set<DatagramPacket> packets = positionsToPackets(p4ds);
+				List<DatagramPacket> packets = positionUpdateMsgsToPackets(p4ds);
 				if ((packets != null) && (packets.size() > 0)) {
+					StringBuilder s = new StringBuilder();
 					for (RelayServer otherRelayServer : otherRelayServers) {
-						InetAddress otherRelayServerIp = otherRelayServer
-								.getIp();
+						InetAddress otherRelayServerIp = otherRelayServer.getIp();
 						int otherRelayServerPort = otherRelayServer.getPort();
 
-						s.setLength(0);
 						if (logger.isDebugEnabled()) {
-							s.append("  tx " + packets.size()
-									+ " packet(s) to "
-									+ otherRelayServerIp.getHostAddress() + ":"
+							s.setLength(0);
+							s.append("tx " + packets.size() + " packet(s) to " + otherRelayServerIp.getHostAddress() + ":"
 									+ otherRelayServerPort + ", sizes=");
 						}
 						for (DatagramPacket packet : packets) {
@@ -378,14 +270,10 @@ public class DistributorImpl extends Thread implements Distributor {
 								sock.send(packet);
 							} catch (IOException e) {
 								if (logger.isDebugEnabled()) {
-									s.append(" ERROR:"
-											+ e.getLocalizedMessage());
-									logger.debug(s.toString());
-									s.setLength(0);
+									s.append(" ERROR: " + e.getLocalizedMessage());
 								}
-								logger.error("Could not send to relay server "
-										+ otherRelayServerIp + ":"
-										+ otherRelayServerPort);
+								logger.error("Could not send to relay server " + otherRelayServerIp + ":" + otherRelayServerPort
+										+ " : " + e.getLocalizedMessage());
 							}
 						}
 						if (logger.isDebugEnabled()) {
@@ -403,107 +291,87 @@ public class DistributorImpl extends Thread implements Distributor {
 			if ((clusterLeaders != null) && (clusterLeaders.size() > 0)) {
 				for (Node clusterLeader : clusterLeaders) {
 					InetAddress clusterLeaderMainIp = clusterLeader.getMainIp();
-					InetAddress clusterLeaderIp = clusterLeader.getIp();
-					int clusterLeaderDownlinkPort = clusterLeader
-							.getDownlinkPort();
 
-					if ((clusterLeaderIp == null)
-							|| (clusterLeaderDownlinkPort == Node.DOWNLINK_PORT_INVALID)) {
-						Node substituteClusterLeader = nodes
-								.getSubstituteClusterLeader(clusterLeader);
-
+					Gateway clusterLeaderGateway = clusterLeader.getGateway();
+					if (clusterLeaderGateway == null) {
+						Node substituteClusterLeader = nodes.getSubstituteClusterLeader(clusterLeader);
 						if (substituteClusterLeader == null) {
 							if (logger.isDebugEnabled()) {
-								logger.debug("  *** cluster leader "
-										+ clusterLeaderMainIp.getHostAddress()
-										+ " has an invalid IP address and/or port"
-										+ " and no substitute cluster leader:"
-										+ " skipped");
+								logger.info("Cluster leader " + clusterLeaderMainIp.getHostAddress()
+										+ " has no gateway and no substitute cluster leader is found: skipped");
 							}
-
 							continue;
 						}
 
-						clusterLeaderIp = substituteClusterLeader.getIp();
-						clusterLeaderDownlinkPort = substituteClusterLeader
-								.getDownlinkPort();
+						clusterLeaderGateway = substituteClusterLeader.getGateway();
 						if (logger.isDebugEnabled()) {
-							logger.debug("  *** cluster leader "
-									+ clusterLeaderMainIp.getHostAddress()
-									+ " has an invalid IP address and/or port:"
-									+ " selected substitute cluster leader "
-									+ substituteClusterLeader.getMainIp()
-											.getHostAddress());
+							logger.info("Cluster leader " + clusterLeaderMainIp.getHostAddress()
+									+ " has no gateway: selected gateway " + clusterLeaderGateway.getIp().getHostAddress() + ":"
+									+ clusterLeaderGateway.getPort() + " of substitute cluster leader "
+									+ substituteClusterLeader.getMainIp().getHostAddress());
 						}
 					}
 
+					InetAddress clusterLeaderGatewayIp = clusterLeaderGateway.getIp();
+					Integer clusterLeaderGatewayPort = clusterLeaderGateway.getPort();
+
 					if (logger.isDebugEnabled()) {
-						logger.debug("  *** cluster leader "
-								+ clusterLeaderMainIp.getHostAddress() + ":"
-								+ clusterLeaderDownlinkPort + " (ip="
-								+ clusterLeaderIp.getHostAddress() + ")");
+						logger.debug("*** cluster leader " + clusterLeaderMainIp.getHostAddress() + " (gateway="
+								+ clusterLeaderGatewayIp.getHostAddress() + ":" + clusterLeaderGatewayPort + ")");
 					}
 
-					if ((myIPAddresses.isMe(clusterLeaderIp) || myIPAddresses
-							.isMe(clusterLeaderMainIp))
-							&& (clusterLeaderDownlinkPort == uplinkUdpPort)) {
+					if ((myIPAddresses.isMe(clusterLeaderGatewayIp) || myIPAddresses.isMe(clusterLeaderMainIp))
+							&& (clusterLeaderGatewayPort == uplinkUdpPort)) {
 						/* do not relay to ourselves */
 						if (logger.isDebugEnabled()) {
-							logger.debug("  this is me: skipping");
+							logger.debug("this is me: skipping");
 						}
 						continue;
 					}
 
-					List<NodePosition> p4ds = positions
-							.getPositionsForDistribution(lastDistributionTime,
-									currentTime, clusterLeader);
+					List<PositionUpdateMsg> p4ds = positions.getPositionUpdateMsgForDistribution(lastDistributionTime,
+							currentTime, clusterLeader);
 					if ((p4ds == null) || (p4ds.size() == 0)) {
 						if (logger.isDebugEnabled()) {
-							logger.debug("  p4ds EMPTY");
+							logger.debug("p4ds EMPTY");
 						}
 						continue;
 					}
 
 					if (logger.isDebugEnabled()) {
-						s.setLength(0);
-						s.append("  p4ds(" + p4ds.size() + ")=");
-						for (NodePosition p4d : p4ds) {
+						StringBuilder s = new StringBuilder();
+						s.append("p4ds(" + p4ds.size() + ")=");
+						for (PositionUpdateMsg p4d : p4ds) {
 							s.append(" " + p4d.getId());
 						}
 						logger.debug(s.toString());
 					}
 
-					Set<DatagramPacket> packets = positionsToPackets(p4ds);
+					List<DatagramPacket> packets = positionUpdateMsgsToPackets(p4ds);
 					if ((packets != null) && (packets.size() > 0)) {
-						s.setLength(0);
+						StringBuilder s = new StringBuilder();
 						if (logger.isDebugEnabled()) {
-							s.append("    tx " + packets.size()
-									+ " packet(s) to "
-									+ clusterLeaderMainIp.getHostAddress()
-									+ ":" + clusterLeaderDownlinkPort + " (ip="
-									+ clusterLeaderIp.getHostAddress()
-									+ "), sizes=");
+							s.setLength(0);
+							s.append("tx " + packets.size() + " packet(s) to " + clusterLeaderMainIp.getHostAddress() + " (gateway="
+									+ clusterLeaderGatewayIp.getHostAddress() + ":" + clusterLeaderGatewayPort + "), sizes=");
 						}
 
 						for (DatagramPacket packet : packets) {
 							if (logger.isDebugEnabled()) {
 								s.append(" " + packet.getLength());
 							}
-							packet.setAddress(clusterLeaderIp);
-							packet.setPort(clusterLeaderDownlinkPort);
+							packet.setAddress(clusterLeaderGatewayIp);
+							packet.setPort(clusterLeaderGatewayPort);
 							try {
 								sock.send(packet);
 							} catch (IOException e) {
 								if (logger.isDebugEnabled()) {
-									s.append(" ERROR:"
-											+ e.getLocalizedMessage());
+									s.append(" ERROR:" + e.getLocalizedMessage());
 									logger.debug(s.toString());
-									s.setLength(0);
 								}
-								logger.error("Could not send to cluster leader "
-										+ clusterLeaderMainIp
-										+ ":"
-										+ clusterLeaderDownlinkPort);
+								logger.error("Could not send to cluster leader " + clusterLeaderMainIp + " (gateway="
+										+ clusterLeaderGatewayIp.getHostAddress() + ":" + clusterLeaderGatewayPort + ") : "
+										+ e.getLocalizedMessage());
 							}
 						}
 						if (logger.isDebugEnabled()) {

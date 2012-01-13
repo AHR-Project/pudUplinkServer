@@ -11,20 +11,22 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.validation.constraints.NotNull;
 
 /**
- * Represents a RelayServer that receives and distributes PositionUpdate and ClusterLeader messages
+ * Represents a gateway node that sends PositionUpdate and ClusterLeader messages (from an OLSRd node) to the
+ * RelayServer
  */
 @Entity
-public class RelayServer implements Serializable {
-	private static final long serialVersionUID = -5770906949985852253L;
+public class Gateway implements Serializable {
+	private static final long serialVersionUID = 5149981674264087644L;
 
 	/**
 	 * Default constructor
 	 */
-	public RelayServer() {
+	public Gateway() {
 		super();
 	}
 
@@ -32,14 +34,17 @@ public class RelayServer implements Serializable {
 	 * Constructor
 	 * 
 	 * @param ip
-	 *          the IP address of the relay server
+	 *          the IP address of the gateway
 	 * @param port
-	 *          the port of the relay server
+	 *          the port of the gateway
+	 * @param relayServer
+	 *          the relay server that belongs to the gateway
 	 */
-	public RelayServer(InetAddress ip, Integer port) {
+	public Gateway(InetAddress ip, Integer port, RelayServer relayServer) {
 		super();
 		this.ip = ip;
 		this.port = port;
+		this.relayServer = relayServer;
 	}
 
 	@Id
@@ -61,7 +66,7 @@ public class RelayServer implements Serializable {
 		this.id = id;
 	}
 
-	/** the IP address of the relay server */
+	/** the IP address of the gateway */
 	@NotNull
 	private InetAddress ip = null;
 
@@ -80,14 +85,14 @@ public class RelayServer implements Serializable {
 		this.ip = ip;
 	}
 
-	/** port the port of the relay server */
+	/** the port of the gateway */
 	@NotNull
-	private int port = 2242;
+	private Integer port = null;
 
 	/**
 	 * @return the port
 	 */
-	public final int getPort() {
+	public final Integer getPort() {
 		return port;
 	}
 
@@ -95,27 +100,47 @@ public class RelayServer implements Serializable {
 	 * @param port
 	 *          the port to set
 	 */
-	public final void setPort(int port) {
+	public final void setPort(Integer port) {
 		this.port = port;
 	}
 
-	/** the gateways associated with the relay server */
-	@OneToMany(cascade = CascadeType.ALL, mappedBy = "relayServer")
-	private Set<Gateway> gateways = new HashSet<Gateway>();
+	/** the associated nodes */
+	@OneToMany(cascade = CascadeType.ALL, mappedBy = "gateway")
+	private Set<Node> nodes = new HashSet<Node>();
 
 	/**
-	 * @return the gateways
+	 * @return the nodes
 	 */
-	public final Set<Gateway> getGateways() {
-		return gateways;
+	public final Set<Node> getNodes() {
+		return nodes;
 	}
 
 	/**
 	 * @param nodes
 	 *          the nodes to set
 	 */
-	public final void setGateways(Set<Gateway> nodes) {
-		this.gateways = nodes;
+	public final void setNodes(Set<Node> nodes) {
+		this.nodes = nodes;
+	}
+
+	/** the relay server that belongs to the gateway */
+	@ManyToOne(cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH, CascadeType.DETACH }, optional = false)
+	@NotNull
+	private RelayServer relayServer = null;
+
+	/**
+	 * @return the relayServer
+	 */
+	public final RelayServer getRelayServer() {
+		return relayServer;
+	}
+
+	/**
+	 * @param relayServer
+	 *          the relayServer to set
+	 */
+	public final void setRelayServer(RelayServer relayServer) {
+		this.relayServer = relayServer;
 	}
 
 	@Override
@@ -124,12 +149,14 @@ public class RelayServer implements Serializable {
 		builder.append(this.getClass().getSimpleName() + " [id=");
 		builder.append(id);
 		builder.append(", ip=");
-		builder.append(ip.getHostAddress() + ":" + port);
-		builder.append(", gateways=[");
+		builder.append(ip.getHostAddress() + ":" + port.intValue());
+		builder.append(", relayServer=");
+		builder.append((relayServer != null) ? relayServer.getId() : "");
+		builder.append(", nodes=[");
 		boolean comma = false;
 		Set<Long> ids = new TreeSet<Long>();
-		for (Gateway gateway : gateways) {
-			ids.add(gateway.getId());
+		for (Node node : nodes) {
+			ids.add(node.getId());
 		}
 		for (Long id : ids) {
 			if (comma) {

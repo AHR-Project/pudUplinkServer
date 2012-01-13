@@ -6,10 +6,11 @@
 	<bean id="ExpiryNodes"
 		class="nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.expiry.ExpireNodes"
 		init-method="init" destroy-method="destroy">
-		<property name="dataLock" ref="DaoDataLock" />
+		<property name="clusterLeaderMsgs" ref="ClusterLeaderMsgs" />
+		<property name="gateways" ref="Gateways" />
 		<property name="interval" value="${node.expiry.interval}" />
 		<property name="nodes" ref="Nodes" />
-		<property name="positions" ref="Positions" />
+		<property name="positions" ref="PositionUpdateMsgs" />
 		<property name="validityTimeMultiplier" value="${node.expiry.multiplier}" />
 	</bean>
 

@@ -7,46 +7,37 @@ import java.nio.channels.FileChannel;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.ClusterLeaderMsgs;
+import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.Gateways;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.Nodes;
-import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.Positions;
+import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.PositionUpdateMsgs;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.RelayServers;
 
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Required;
 
 public class DatabaseLogger {
 	private Logger logger = Logger.getLogger(this.getClass().getName());
 
-	public static final int UPDATE_INTERVAL_MS_DEFAULT = 15000;
-
-	private boolean enabled = false;
-
-	/**
-	 * @param enabled
-	 *            the enabled to set
-	 */
-	public final void setEnabled(boolean enabled) {
-		this.enabled = enabled;
-	}
-
-	private int updateIntervalMs = UPDATE_INTERVAL_MS_DEFAULT;
+	private int updateIntervalMs = 0;
 
 	/**
 	 * @param updateIntervalMs
-	 *            the updateIntervalMs to set
+	 *          the updateIntervalMs to set
 	 */
+	@Required
 	public final void setUpdateIntervalMs(int updateIntervalMs) {
 		this.updateIntervalMs = updateIntervalMs;
 	}
 
-	public static final String DATABASELOGFILE_DEFAULT = "database.txt";
-
-	private String databaseLogFile = DATABASELOGFILE_DEFAULT;
+	private String databaseLogFile = null;
 
 	/**
 	 * @param databaseLogFile
-	 *            the databaseLogFile to set
+	 *          the databaseLogFile to set
 	 */
+	@Required
 	public final void setDatabaseLogFile(String databaseLogFile) {
 		this.databaseLogFile = databaseLogFile;
 	}
@@ -56,53 +47,76 @@ public class DatabaseLogger {
 
 	/**
 	 * @param nodes
-	 *            the nodes to set
+	 *          the nodes to set
 	 */
 	@Required
 	public final void setNodes(Nodes nodes) {
 		this.nodes = nodes;
 	}
 
-	/** the Positions handler */
-	private Positions positions;
+	/** the PositionUpdateMsgs handler */
+	private PositionUpdateMsgs positionUpdateMsgs;
 
 	/**
-	 * @param positions
-	 *            the positions to set
+	 * @param positionUpdateMsgs
+	 *          the positionUpdateMsgs to set
 	 */
 	@Required
-	public final void setPositions(Positions positions) {
-		this.positions = positions;
+	public final void setPositions(PositionUpdateMsgs positionUpdateMsgs) {
+		this.positionUpdateMsgs = positionUpdateMsgs;
+	}
+
+	/** the ClusterLeaderMsgs handler */
+	private ClusterLeaderMsgs clusterLeaderMsgs;
+
+	/**
+	 * @param clusterLeaderMsgs
+	 *          the clusterLeaderMsgs to set
+	 */
+	@Required
+	public final void setClusterLeaderMsgs(ClusterLeaderMsgs clusterLeaderMsgs) {
+		this.clusterLeaderMsgs = clusterLeaderMsgs;
 	}
 
 	private RelayServers relayServers;
 
 	/**
 	 * @param relayServers
-	 *            the relayServers to set
+	 *          the relayServers to set
 	 */
 	@Required
 	public final void setRelayServers(RelayServers relayServers) {
 		this.relayServers = relayServers;
 	}
 
+	private Gateways gateways;
+
+	/**
+	 * @param gateways
+	 *          the gateways to set
+	 */
+	@Required
+	public final void setGateways(Gateways gateways) {
+		this.gateways = gateways;
+	}
+
 	/*
 	 * Main
 	 */
 
-	private Timer timer = new Timer(this.getClass().getName());
-
-	private FileOutputStream fos;
+	private Timer timer = null;
 	private TimerTask task = null;
+	private FileOutputStream fos = null;
 	private static final byte[] eol = "\n".getBytes();
 
 	public void init() throws FileNotFoundException {
-		if (!enabled) {
+		if (updateIntervalMs <= 0) {
 			return;
 		}
 
 		fos = new FileOutputStream(databaseLogFile, false);
 
+		timer = new Timer(this.getClass().getName() + "-Timer");
 		task = new TimerTask() {
 			@Override
 			public void run() {
@@ -112,17 +126,20 @@ public class DatabaseLogger {
 
 					logger.debug("Writing database logfile");
 
+					relayServers.print(fos);
+					fos.write(eol);
+					gateways.print(fos);
+					fos.write(eol);
 					nodes.print(fos);
 					fos.write(eol);
-					positions.print(fos);
+					positionUpdateMsgs.print(fos);
 					fos.write(eol);
-					relayServers.print(fos);
+					clusterLeaderMsgs.print(fos);
 
 					channel.truncate(channel.position());
 					fos.flush();
 				} catch (Throwable t) {
-					/* ignore */
-					t.printStackTrace();
+					logger.error("Error while logging database", t);
 				}
 			}
 		};
@@ -137,11 +154,21 @@ public class DatabaseLogger {
 		}
 		timer.cancel();
 
-		try {
-			fos.close();
-		} catch (IOException e) {
-			/* ignore */
+		if (fos != null) {
+			try {
+				fos.close();
+			} catch (IOException e) {
+				/* ignore */
+			}
+			fos = null;
 		}
-		fos = null;
+	}
+
+	public void log(Logger logger, Level level) {
+		relayServers.log(logger, level);
+		gateways.log(logger, level);
+		nodes.log(logger, level);
+		positionUpdateMsgs.log(logger, level);
+		clusterLeaderMsgs.log(logger, level);
 	}
 }
