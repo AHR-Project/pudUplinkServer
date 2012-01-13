@@ -6,7 +6,6 @@
 	<bean id="PacketHandler"
 		class="nl.mindef.c2sc.nbs.olsr.pud.uplink.server.handlers.impl.PacketHandlerImpl">
 		<property name="clusterLeaderHandler" ref="ClusterLeaderHandler" />
-		<property name="dataLock" ref="DaoDataLock" />
 		<property name="faker" ref="Faker" />
 		<property name="gateways" ref="Gateways" />
 		<property name="positionUpdateHandler" ref="PositionUpdateHandler" />

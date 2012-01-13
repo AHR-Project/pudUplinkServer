@@ -16,7 +16,6 @@
 		<config>src/main/resources/META-INF/spring/positionUpdateHandler.xml</config>
 		<config>src/main/resources/META-INF/spring/clusterLeaderHandler.xml</config>
 		<config>src/main/resources/META-INF/spring/distributor.xml</config>
-		<config>src/main/resources/META-INF/spring/daoDataLock.xml</config>
 		<config>src/main/resources/META-INF/spring/relayServers.xml</config>
 		<config>src/main/resources/META-INF/spring/gateways.xml</config>
 		<config>src/main/resources/META-INF/spring/nodes.xml</config>

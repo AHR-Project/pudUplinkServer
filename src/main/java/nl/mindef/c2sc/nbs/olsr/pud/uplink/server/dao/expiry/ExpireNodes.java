@@ -2,7 +2,6 @@ package nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.expiry;
 
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.concurrent.locks.ReentrantLock;
 
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.ClusterLeaderMsgs;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.Gateways;
@@ -19,26 +18,12 @@ import org.springframework.beans.factory.annotation.Required;
 public class ExpireNodes {
 	private Logger logger = Logger.getLogger(this.getClass().getName());
 
-	// FIXME remove the data lock
-	/** the data lock used to serialize access to the database */
-	private ReentrantLock dataLock;
-
-	/**
-	 * @param dataLock
-	 *          the dataLock to set
-	 */
-	@Required
-	public void setDataLock(ReentrantLock dataLock) {
-		this.dataLock = dataLock;
-	}
-
 	/**
 	 * Timer task that does the actual expiry of out-of-date and empty objects
 	 */
 	protected class ExpiryTimerTask extends TimerTask {
 		@Override
 		public void run() {
-			dataLock.lock();
 			try {
 				if (logger.isDebugEnabled()) {
 					logger.debug("************************** expiry");
@@ -69,8 +54,8 @@ public class ExpireNodes {
 				} catch (Throwable e) {
 					logger.error("Removal of empty gateways failed", e);
 				}
-			} finally {
-				dataLock.unlock();
+			} catch (Throwable e) {
+				logger.error("error during expiry", e);
 			}
 		}
 	}

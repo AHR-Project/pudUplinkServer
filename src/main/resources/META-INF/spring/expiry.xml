@@ -7,7 +7,6 @@
 		class="nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.expiry.ExpireNodes"
 		init-method="init" destroy-method="destroy">
 		<property name="clusterLeaderMsgs" ref="ClusterLeaderMsgs" />
-		<property name="dataLock" ref="DaoDataLock" />
 		<property name="gateways" ref="Gateways" />
 		<property name="interval" value="${node.expiry.interval}" />
 		<property name="nodes" ref="Nodes" />

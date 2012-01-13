@@ -11,7 +11,6 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.locks.ReentrantLock;
 
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.Nodes;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.PositionUpdateMsgs;
@@ -37,17 +36,6 @@ public class DistributorImpl extends Thread implements Distributor {
 	 */
 	public final void setPacketMaxSize(int packetMaxSize) {
 		this.packetMaxSize = packetMaxSize;
-	}
-
-	private ReentrantLock dataLock;
-
-	/**
-	 * @param dataLock
-	 *          the dataLock to set
-	 */
-	@Required
-	public final void setDataLock(ReentrantLock dataLock) {
-		this.dataLock = dataLock;
 	}
 
 	private MyIPAddresses myIPAddresses;
@@ -150,11 +138,10 @@ public class DistributorImpl extends Thread implements Distributor {
 				}
 			}
 			if (distribute.getAndSet(false)) {
-				dataLock.lock();
 				try {
 					distribute();
-				} finally {
-					dataLock.unlock();
+				} catch (Throwable e) {
+					logger.error("error during distribution", e);
 				}
 			}
 		}

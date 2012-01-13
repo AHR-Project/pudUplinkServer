@@ -3,7 +3,6 @@ package nl.mindef.c2sc.nbs.olsr.pud.uplink.server.handlers.impl;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.util.Arrays;
-import java.util.concurrent.locks.ReentrantLock;
 
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.Gateways;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.RelayServers;
@@ -101,17 +100,6 @@ public class PacketHandlerImpl implements PacketHandler {
 	 * end fake
 	 */
 
-	private ReentrantLock dataLock;
-
-	/**
-	 * @param dataLock
-	 *          the dataLock to set
-	 */
-	@Required
-	public final void setDataLock(ReentrantLock dataLock) {
-		this.dataLock = dataLock;
-	}
-
 	@Override
 	@Transactional
 	public boolean processPacket(DatagramPacket packet) {
@@ -123,7 +111,6 @@ public class PacketHandlerImpl implements PacketHandler {
 					+ packet.getAddress().getHostAddress() + ":" + packet.getPort());
 		}
 
-		dataLock.lock();
 		try {
 			InetAddress srcIp = packet.getAddress();
 			int srcPort = packet.getPort();
@@ -173,8 +160,10 @@ public class PacketHandlerImpl implements PacketHandler {
 			}
 
 			return updated;
+		} catch (Throwable e) {
+			logger.error("error during packet handling", e);
+			return updated;
 		} finally {
-			dataLock.unlock();
 			if (useFaker) {
 				faker.setFirstFake(false);
 			}
