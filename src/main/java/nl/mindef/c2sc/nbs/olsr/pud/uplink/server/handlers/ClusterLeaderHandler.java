@@ -16,5 +16,5 @@ public interface ClusterLeaderHandler {
 	 *          the ClusterLeader message
 	 * @return true when the data in the message resulted in a database update
 	 */
-	public boolean handleClusterLeaderMessage(Gateway gateway, long timestamp, ClusterLeader clMsg);
+	public boolean handleClusterLeaderMessage(Gateway gateway, long utcTimestamp, ClusterLeader clMsg);
 }
