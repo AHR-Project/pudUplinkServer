@@ -134,7 +134,7 @@ public class PacketHandlerImpl implements PacketHandler {
 			Gateway gateway = gateways.getGateway(srcIp, srcPort);
 			if (gateway == null) {
 				gateway = new Gateway(srcIp, srcPort, me);
-				gateways.saveGateway(gateway, true);
+				gateways.saveGateway(gateway);
 			}
 
 			/* make sure the gateway is linked to this relayServer */

@@ -133,7 +133,7 @@ public class UplinkReceiver extends Thread implements StopHandlerConsumer {
 
 		/* save into database */
 		for (RelayServer relayServer : configuredRelayServers) {
-			relayServers.addRelayServer(relayServer, true);
+			relayServers.addRelayServer(relayServer);
 		}
 	}
 

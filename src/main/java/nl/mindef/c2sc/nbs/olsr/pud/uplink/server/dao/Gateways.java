@@ -45,10 +45,8 @@ public interface Gateways {
 	 * 
 	 * @param gateway
 	 *          the gateway to save
-	 * @param newObject
-	 *          true when the object is newly created, false when it already exists in the database
 	 */
-	public void saveGateway(Gateway gateway, boolean newObject);
+	public void saveGateway(Gateway gateway);
 
 	/**
 	 * Remove expired/out-of-date Gateway objects from the database

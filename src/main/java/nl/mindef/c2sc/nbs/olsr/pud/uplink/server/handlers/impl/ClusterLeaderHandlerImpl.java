@@ -66,7 +66,7 @@ public class ClusterLeaderHandlerImpl implements ClusterLeaderHandler {
 		if (originatorNode == null) {
 			/* new node */
 			originatorNode = new Node(originator, gateway);
-			nodes.saveNode(originatorNode, true);
+			nodes.saveNode(originatorNode);
 		}
 
 		/* link the node to the gateway from which it was received */
@@ -77,7 +77,7 @@ public class ClusterLeaderHandlerImpl implements ClusterLeaderHandler {
 		if (clusterLeaderNode == null) {
 			/* new node */
 			clusterLeaderNode = new Node(clusterLeader, null);
-			nodes.saveNode(clusterLeaderNode, true);
+			nodes.saveNode(clusterLeaderNode);
 		}
 
 		/* get the cluster leader update of the node */
@@ -85,7 +85,7 @@ public class ClusterLeaderHandlerImpl implements ClusterLeaderHandler {
 		if (storedClusterLeader == null) {
 			/* new cluster leader update */
 			storedClusterLeader = new ClusterLeaderMsg(originatorNode, clusterLeaderNode);
-			clusterLeaderMsgs.saveClusterLeaderMsg(storedClusterLeader, true);
+			clusterLeaderMsgs.saveClusterLeaderMsg(storedClusterLeader);
 		}
 
 		/* fill in the cluster leader update */
@@ -99,7 +99,7 @@ public class ClusterLeaderHandlerImpl implements ClusterLeaderHandler {
 		storedClusterLeader.setClusterLeaderNode(clusterLeaderNode);
 
 		/* save the nodes and cluster leader update. explicitly saving the nodes is not needed since these are cascaded */
-		clusterLeaderMsgs.saveClusterLeaderMsg(storedClusterLeader, false);
+		clusterLeaderMsgs.saveClusterLeaderMsg(storedClusterLeader);
 
 		return true;
 	}

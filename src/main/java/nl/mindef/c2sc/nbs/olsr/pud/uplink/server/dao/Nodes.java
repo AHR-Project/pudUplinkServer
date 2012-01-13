@@ -31,10 +31,8 @@ public interface Nodes {
 	 * 
 	 * @param node
 	 *          the node to save
-	 * @param newObject
-	 *          true when the object is newly created, false when it already exists in the database
 	 */
-	public void saveNode(Node node, boolean newObject);
+	public void saveNode(Node node);
 
 	/**
 	 * Remove expired/out-of-date Node objects from the database

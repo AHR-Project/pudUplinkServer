@@ -27,10 +27,8 @@ public interface ClusterLeaderMsgs {
 	 * 
 	 * @param clusterLeaderMsg
 	 *          the ClusterLeaderMsg
-	 * @param newObject
-	 *          true when the object is newly created, false when it already exists in the database
 	 */
-	public void saveClusterLeaderMsg(ClusterLeaderMsg clusterLeaderMsg, boolean newObject);
+	public void saveClusterLeaderMsg(ClusterLeaderMsg clusterLeaderMsg);
 
 	/**
 	 * Remove expired/out-of-date ClusterLeaderMsg objects from the database

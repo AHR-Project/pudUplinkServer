@@ -44,10 +44,8 @@ public interface PositionUpdateMsgs {
 	 * 
 	 * @param positionUpdateMsg
 	 *          the PositionUpdateMsg
-	 * @param newObject
-	 *          true when the object is newly created, false when it already exists in the database
 	 */
-	public void savePositionUpdateMsg(PositionUpdateMsg positionUpdateMsg, boolean newObject);
+	public void savePositionUpdateMsg(PositionUpdateMsg positionUpdateMsg);
 
 	/**
 	 * Remove expired/out-of-date PositionUpdateMsg objects from the database

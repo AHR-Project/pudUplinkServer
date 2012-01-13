@@ -119,13 +119,8 @@ public class NodesImpl implements Nodes {
 
 	@Override
 	@Transactional
-	public void saveNode(Node node, boolean newObject) {
-		// FIXME try with only the saveOrUpdate method
-		if (newObject) {
-			sessionFactory.getCurrentSession().saveOrUpdate(node);
-		} else {
-			sessionFactory.getCurrentSession().merge(node);
-		}
+	public void saveNode(Node node) {
+		sessionFactory.getCurrentSession().saveOrUpdate(node);
 	}
 
 	@Override

@@ -52,12 +52,8 @@ public class ClusterLeaderMsgsImpl implements ClusterLeaderMsgs {
 
 	@Override
 	@Transactional
-	public void saveClusterLeaderMsg(ClusterLeaderMsg clusterLeaderMsg, boolean newObject) {
-		if (newObject) {
-			sessionFactory.getCurrentSession().saveOrUpdate(clusterLeaderMsg);
-		} else {
-			sessionFactory.getCurrentSession().merge(clusterLeaderMsg);
-		}
+	public void saveClusterLeaderMsg(ClusterLeaderMsg clusterLeaderMsg) {
+		sessionFactory.getCurrentSession().saveOrUpdate(clusterLeaderMsg);
 	}
 
 	@Override

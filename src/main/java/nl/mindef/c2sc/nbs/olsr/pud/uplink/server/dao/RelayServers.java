@@ -32,10 +32,8 @@ public interface RelayServers {
 	 * 
 	 * @param relayServer
 	 *          the RelayServer
-	 * @param newObject
-	 *          true when the object is newly created, false when it already exists in the database
 	 */
-	public void addRelayServer(RelayServer relayServer, boolean newObject);
+	public void addRelayServer(RelayServer relayServer);
 
 	/**
 	 * Retrieve the RelayServer object that represent this RelayServer from the database (it will be created when not

@@ -82,12 +82,8 @@ public class PositionUpdateMsgsImpl implements PositionUpdateMsgs {
 
 	@Override
 	@Transactional
-	public void savePositionUpdateMsg(PositionUpdateMsg positionUpdateMsg, boolean newObject) {
-		if (newObject) {
-			sessionFactory.getCurrentSession().saveOrUpdate(positionUpdateMsg);
-		} else {
-			sessionFactory.getCurrentSession().merge(positionUpdateMsg);
-		}
+	public void savePositionUpdateMsg(PositionUpdateMsg positionUpdateMsg) {
+		sessionFactory.getCurrentSession().saveOrUpdate(positionUpdateMsg);
 	}
 
 	@Override

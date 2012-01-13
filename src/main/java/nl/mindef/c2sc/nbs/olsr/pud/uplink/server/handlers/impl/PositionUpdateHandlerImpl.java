@@ -66,7 +66,7 @@ public class PositionUpdateHandlerImpl implements PositionUpdateHandler {
 		if (originatorNode == null) {
 			/* new node */
 			originatorNode = new Node(originator, gateway);
-			nodes.saveNode(originatorNode, true);
+			nodes.saveNode(originatorNode);
 		}
 
 		/* link the node to the gateway from which it was received */
@@ -77,7 +77,7 @@ public class PositionUpdateHandlerImpl implements PositionUpdateHandler {
 		if (storedPositionUpdate == null) {
 			/* new position update */
 			storedPositionUpdate = new PositionUpdateMsg(originatorNode, puMsg);
-			positionUpdateMsgs.savePositionUpdateMsg(storedPositionUpdate, true);
+			positionUpdateMsgs.savePositionUpdateMsg(storedPositionUpdate);
 		} else {
 			/* check that received timestamp is later than the stored timestamp */
 			if (storedPositionUpdate.getPositionUpdateMsg() != null) {
@@ -103,7 +103,7 @@ public class PositionUpdateHandlerImpl implements PositionUpdateHandler {
 		originatorNode.setPositionUpdateMsg(storedPositionUpdate);
 
 		/* save the node and position. explicitly saving the originatorNode is not needed since that is cascaded */
-		positionUpdateMsgs.savePositionUpdateMsg(storedPositionUpdate, false);
+		positionUpdateMsgs.savePositionUpdateMsg(storedPositionUpdate);
 
 		return true;
 	}

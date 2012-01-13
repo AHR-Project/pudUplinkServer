@@ -69,12 +69,8 @@ public class RelayServersImpl implements RelayServers {
 
 	@Override
 	@Transactional
-	public void addRelayServer(RelayServer relayServer, boolean newObject) {
-		if (newObject) {
-			sessionFactory.getCurrentSession().saveOrUpdate(relayServer);
-		} else {
-			sessionFactory.getCurrentSession().merge(relayServer);
-		}
+	public void addRelayServer(RelayServer relayServer) {
+		sessionFactory.getCurrentSession().saveOrUpdate(relayServer);
 	}
 
 	private String getRelayServersDump() {
@@ -100,7 +96,7 @@ public class RelayServersImpl implements RelayServers {
 
 		if (result.size() == 0) {
 			RelayServer me = new RelayServer(myIp, uplinkUdpPort);
-			addRelayServer(me, true);
+			addRelayServer(me);
 			return me;
 		}
 

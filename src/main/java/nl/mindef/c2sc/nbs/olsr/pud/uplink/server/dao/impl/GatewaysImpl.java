@@ -73,15 +73,10 @@ public class GatewaysImpl implements Gateways {
 		return result.get(0);
 	}
 
-	// TODO this is duplicated, move it to a helper
 	@Override
 	@Transactional
-	public void saveGateway(Gateway gateway, boolean newObject) {
-		if (newObject) {
-			sessionFactory.getCurrentSession().saveOrUpdate(gateway);
-		} else {
-			sessionFactory.getCurrentSession().merge(gateway);
-		}
+	public void saveGateway(Gateway gateway) {
+		sessionFactory.getCurrentSession().saveOrUpdate(gateway);
 	}
 
 	@Override
