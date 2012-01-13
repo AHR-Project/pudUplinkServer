@@ -42,7 +42,7 @@ public class NodesImpl implements Nodes {
 	}
 
 	@Override
-	@Transactional
+	@Transactional(readOnly = true)
 	public Node getNode(InetAddress mainIp) {
 		if (mainIp == null) {
 			return null;
@@ -62,7 +62,7 @@ public class NodesImpl implements Nodes {
 	}
 
 	@Override
-	@Transactional
+	@Transactional(readOnly = true)
 	public List<Node> getClusterLeaders() {
 		@SuppressWarnings("unchecked")
 		List<Node> result = sessionFactory
@@ -90,7 +90,7 @@ public class NodesImpl implements Nodes {
 	}
 
 	@Override
-	@Transactional
+	@Transactional(readOnly = true)
 	public Node getSubstituteClusterLeader(Node clusterLeader) {
 		assert (clusterLeader != null);
 		Long clId = clusterLeader.getId();
@@ -168,7 +168,7 @@ public class NodesImpl implements Nodes {
 	}
 
 	@Override
-	@Transactional
+	@Transactional(readOnly = true)
 	public void log(Logger logger, Level level) {
 		if (logger.isEnabledFor(level)) {
 			logger.log(level, getNodesDump());
@@ -176,7 +176,7 @@ public class NodesImpl implements Nodes {
 	}
 
 	@Override
-	@Transactional
+	@Transactional(readOnly = true)
 	public void print(OutputStream out) throws IOException {
 		String s = getNodesDump();
 		out.write(s.getBytes(), 0, s.length());

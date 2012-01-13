@@ -34,7 +34,7 @@ public class GatewaysImpl implements Gateways {
 	}
 
 	@Override
-	@Transactional
+	@Transactional(readOnly = true)
 	public List<Gateway> getGateways(InetAddress ip) {
 		if (ip == null) {
 			return null;
@@ -54,7 +54,7 @@ public class GatewaysImpl implements Gateways {
 	}
 
 	@Override
-	@Transactional
+	@Transactional(readOnly = true)
 	public Gateway getGateway(InetAddress ip, int port) {
 		if (ip == null) {
 			return null;
@@ -121,7 +121,7 @@ public class GatewaysImpl implements Gateways {
 	}
 
 	@Override
-	@Transactional
+	@Transactional(readOnly = true)
 	public void log(Logger logger, Level level) {
 		if (logger.isEnabledFor(level)) {
 			logger.log(level, getGatewaysDump());
@@ -129,7 +129,7 @@ public class GatewaysImpl implements Gateways {
 	}
 
 	@Override
-	@Transactional
+	@Transactional(readOnly = true)
 	public void print(OutputStream out) throws IOException {
 		String s = getGatewaysDump();
 		out.write(s.getBytes(), 0, s.length());

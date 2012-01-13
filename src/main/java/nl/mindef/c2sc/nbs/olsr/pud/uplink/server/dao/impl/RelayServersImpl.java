@@ -41,7 +41,7 @@ public class RelayServersImpl implements RelayServers {
 	}
 
 	@Override
-	@Transactional
+	@Transactional(readOnly = true)
 	public List<RelayServer> getRelayServers() {
 		@SuppressWarnings("unchecked")
 		List<RelayServer> result = sessionFactory.getCurrentSession().createQuery("select rs from RelayServer rs").list();
@@ -54,7 +54,7 @@ public class RelayServersImpl implements RelayServers {
 	}
 
 	@Override
-	@Transactional
+	@Transactional(readOnly = true)
 	public List<RelayServer> getOtherRelayServers() {
 		@SuppressWarnings("unchecked")
 		List<RelayServer> result = sessionFactory.getCurrentSession()
@@ -120,7 +120,7 @@ public class RelayServersImpl implements RelayServers {
 	}
 
 	@Override
-	@Transactional
+	@Transactional(readOnly = true)
 	public void log(Logger logger, Level level) {
 		if (logger.isEnabledFor(level)) {
 			logger.log(level, getRelayServersDump());
@@ -128,7 +128,7 @@ public class RelayServersImpl implements RelayServers {
 	}
 
 	@Override
-	@Transactional
+	@Transactional(readOnly = true)
 	public void print(OutputStream out) throws IOException {
 		String s = getRelayServersDump();
 		out.write(s.getBytes(), 0, s.length());

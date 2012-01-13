@@ -31,7 +31,7 @@ public class ClusterLeaderMsgsImpl implements ClusterLeaderMsgs {
 	}
 
 	@Override
-	@Transactional
+	@Transactional(readOnly = true)
 	public ClusterLeaderMsg getClusterLeaderMsg(InetAddress mainIp) {
 		if (mainIp == null) {
 			return null;
@@ -60,7 +60,6 @@ public class ClusterLeaderMsgsImpl implements ClusterLeaderMsgs {
 		}
 	}
 
-	// FIXME set readonly attributes on relevant queries
 	@Override
 	@Transactional
 	public boolean removeExpiredClusterLeaderMsg(long utcTimestamp, double validityTimeMultiplier) {
@@ -104,7 +103,7 @@ public class ClusterLeaderMsgsImpl implements ClusterLeaderMsgs {
 	}
 
 	@Override
-	@Transactional
+	@Transactional(readOnly = true)
 	public void log(Logger logger, Level level) {
 		if (logger.isEnabledFor(level)) {
 			logger.log(level, getClusterLeaderMsgsDump());
@@ -112,7 +111,7 @@ public class ClusterLeaderMsgsImpl implements ClusterLeaderMsgs {
 	}
 
 	@Override
-	@Transactional
+	@Transactional(readOnly = true)
 	public void print(OutputStream out) throws IOException {
 		String s = getClusterLeaderMsgsDump();
 		out.write(s.getBytes(), 0, s.length());

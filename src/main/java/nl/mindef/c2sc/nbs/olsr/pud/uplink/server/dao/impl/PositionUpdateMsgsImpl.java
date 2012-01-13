@@ -32,7 +32,7 @@ public class PositionUpdateMsgsImpl implements PositionUpdateMsgs {
 	}
 
 	@Override
-	@Transactional
+	@Transactional(readOnly = true)
 	public PositionUpdateMsg getPositionUpdateMsg(InetAddress mainIp) {
 		if (mainIp == null) {
 			return null;
@@ -53,7 +53,7 @@ public class PositionUpdateMsgsImpl implements PositionUpdateMsgs {
 	}
 
 	@Override
-	@Transactional
+	@Transactional(readOnly = true)
 	public List<PositionUpdateMsg> getPositionUpdateMsgForDistribution(long startTime, long endTime, Node clusterLeader) {
 		if (startTime >= endTime) {
 			return null;
@@ -131,7 +131,7 @@ public class PositionUpdateMsgsImpl implements PositionUpdateMsgs {
 	}
 
 	@Override
-	@Transactional
+	@Transactional(readOnly = true)
 	public void log(Logger logger, Level level) {
 		if (logger.isEnabledFor(level)) {
 			logger.log(level, getPositionsDump());
@@ -139,7 +139,7 @@ public class PositionUpdateMsgsImpl implements PositionUpdateMsgs {
 	}
 
 	@Override
-	@Transactional
+	@Transactional(readOnly = true)
 	public void print(OutputStream out) throws IOException {
 		String s = getPositionsDump();
 		out.write(s.getBytes(), 0, s.length());
