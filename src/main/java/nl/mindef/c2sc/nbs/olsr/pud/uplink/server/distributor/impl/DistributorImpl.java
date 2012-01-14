@@ -119,25 +119,30 @@ public class DistributorImpl extends Thread implements Distributor {
 			timer.cancel();
 			timer = null;
 		}
-		synchronized (run) {
-			run.notifyAll();
+		synchronized (runWaiter) {
+			runWaiter.notifyAll();
 		}
 	}
 
 	private AtomicBoolean run = new AtomicBoolean(true);
+	private Object runWaiter = new Object();
 	private AtomicBoolean distribute = new AtomicBoolean(false);
 
 	@Override
 	public void run() {
 		while (run.get()) {
-			synchronized (run) {
+			boolean distributeNow = distribute.getAndSet(false);
+			synchronized (runWaiter) {
 				try {
-					run.wait();
+					if (!distributeNow) {
+						runWaiter.wait();
+						distributeNow = distribute.getAndSet(false);
+					}
 				} catch (InterruptedException e) {
 					/* swallow */
 				}
 			}
-			if (distribute.getAndSet(false)) {
+			if (distributeNow) {
 				try {
 					distribute();
 				} catch (Throwable e) {
@@ -163,8 +168,8 @@ public class DistributorImpl extends Thread implements Distributor {
 				@Override
 				public void run() {
 					distribute.set(true);
-					synchronized (run) {
-						run.notifyAll();
+					synchronized (runWaiter) {
+						runWaiter.notifyAll();
 					}
 				}
 			}, distributionDelay);
