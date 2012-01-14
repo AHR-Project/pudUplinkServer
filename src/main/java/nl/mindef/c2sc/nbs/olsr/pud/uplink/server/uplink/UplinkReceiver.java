@@ -151,10 +151,7 @@ public class UplinkReceiver extends Thread implements StopHandlerConsumer {
 	}
 
 	public void destroy() {
-		run.set(false);
-		synchronized (run) {
-			run.notifyAll();
-		}
+		signalStop();
 	}
 
 	/**
