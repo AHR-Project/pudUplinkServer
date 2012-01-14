@@ -94,7 +94,7 @@ public class Faker {
 			node = initialNode;
 			clusterLeaderNode = node;
 			nodeCount = 0;
-			while ((node < 255) && (nodeCount < nodeCountMax)) {
+			while (nodeCount < nodeCountMax) {
 				if (!firstNode) {
 					boolean skipNode = ((network == (initialNetwork + 1)) && (node == initialNode));
 					if (!skipNode) {
@@ -133,6 +133,9 @@ public class Faker {
 				}
 
 				node++;
+				if (node == 0) {
+					node++;
+				}
 				nodeCount++;
 			}
 			network++;
