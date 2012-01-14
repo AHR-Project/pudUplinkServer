@@ -102,6 +102,7 @@ public class Faker {
 						 * Position Update Message
 						 */
 						if (type == MSGTYPE.PU) {
+							assert (pumsg != null);
 							byte[] pumsgClone = pumsg.clone();
 							/* olsr originator */
 							pumsgClone[UplinkMessage_v4_olsrMessage_v4_originator_network] = (byte) network;
@@ -115,6 +116,7 @@ public class Faker {
 						 * Cluster Leader Message
 						 */
 						else /* if (type == MSGTYPE.CL) */{
+							assert (clmsg != null);
 							byte[] clmsgClone = clmsg.clone();
 							/* originator */
 							clmsgClone[UplinkMessage_v4_clusterLeader_originator_network] = (byte) network;
@@ -150,6 +152,7 @@ public class Faker {
 		 * Position Update Message
 		 */
 		if (type == MSGTYPE.PU) {
+			assert (pumsg != null);
 			byte[] pumsgClone = pumsg.clone();
 			// olsr originator
 			pumsgClone[UplinkMessage_v4_olsrMessage_v4_originator_network] = (byte) network;
@@ -163,6 +166,7 @@ public class Faker {
 		 * Cluster Leader Message
 		 */
 		else /* if (type == MSGTYPE.CL) */{
+			assert (clmsg != null);
 			byte[] clmsgClone = clmsg.clone();
 			// originator
 			clmsgClone[UplinkMessage_v4_clusterLeader_originator_network] = (byte) network;
