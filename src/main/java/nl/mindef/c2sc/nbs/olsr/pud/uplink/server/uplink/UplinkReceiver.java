@@ -150,7 +150,7 @@ public class UplinkReceiver extends Thread implements StopHandlerConsumer {
 		this.start();
 	}
 
-	public void destroy() {
+	public void uninit() {
 		signalStop();
 	}
 

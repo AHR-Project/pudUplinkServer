@@ -5,7 +5,7 @@
 
 	<bean id="UplinkReceiver"
 		class="nl.mindef.c2sc.nbs.olsr.pud.uplink.server.uplink.UplinkReceiver"
-		init-method="init" destroy-method="destroy">
+		init-method="init" destroy-method="uninit">
 		<property name="configuredRelayServers" value="${relaycluster.servers}" />
 		<property name="databaseLogger" ref="DatabaseLogger" />
 		<property name="distributor" ref="Distributor" />

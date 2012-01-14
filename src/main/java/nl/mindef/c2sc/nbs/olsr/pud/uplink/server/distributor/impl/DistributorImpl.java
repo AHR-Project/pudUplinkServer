@@ -112,7 +112,7 @@ public class DistributorImpl extends Thread implements Distributor {
 		this.start();
 	}
 
-	public void destroy() {
+	public void uninit() {
 		this.run.set(false);
 		if (this.timer != null) {
 			this.timer.cancel();
@@ -160,6 +160,7 @@ public class DistributorImpl extends Thread implements Distributor {
 
 	private long lastDistributionTime = -1;
 
+	@Override
 	public void signalUpdate() {
 		boolean previousSignaledUpdates = this.signaledUpdates.getAndSet(true);
 		if (!previousSignaledUpdates) {
