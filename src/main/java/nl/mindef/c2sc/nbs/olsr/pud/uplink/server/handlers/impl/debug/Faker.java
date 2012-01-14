@@ -105,7 +105,7 @@ public class Faker {
 							byte[] pumsgClone = pumsg.clone();
 							/* olsr originator */
 							pumsgClone[UplinkMessage_v4_olsrMessage_v4_originator_network] = (byte) network;
-							pumsgClone[UplinkMessage_v4_olsrMessage_v4_originator_node] = (byte) node;
+							pumsgClone[UplinkMessage_v4_olsrMessage_v4_originator_node] = node;
 
 							PositionUpdate pu = new PositionUpdate(pumsgClone, pumsgClone.length);
 							this.positionUpdateHandler.handlePositionMessage(gateway, utcTimestamp + random.nextInt(randomRange), pu);
@@ -118,11 +118,11 @@ public class Faker {
 							byte[] clmsgClone = clmsg.clone();
 							/* originator */
 							clmsgClone[UplinkMessage_v4_clusterLeader_originator_network] = (byte) network;
-							clmsgClone[UplinkMessage_v4_clusterLeader_originator_node] = (byte) node;
+							clmsgClone[UplinkMessage_v4_clusterLeader_originator_node] = node;
 
 							/* clusterLeader */
 							clmsgClone[UplinkMessage_v4_clusterLeader_clusterLeader_network] = (byte) network;
-							clmsgClone[UplinkMessage_v4_clusterLeader_clusterLeader_node] = (byte) clusterLeaderNode;
+							clmsgClone[UplinkMessage_v4_clusterLeader_clusterLeader_node] = clusterLeaderNode;
 
 							ClusterLeader cl = new ClusterLeader(clmsgClone, clmsgClone.length);
 							this.clusterLeaderHandler.handleClusterLeaderMessage(gateway, utcTimestamp + random.nextInt(randomRange),
@@ -153,7 +153,7 @@ public class Faker {
 			byte[] pumsgClone = pumsg.clone();
 			// olsr originator
 			pumsgClone[UplinkMessage_v4_olsrMessage_v4_originator_network] = (byte) network;
-			pumsgClone[UplinkMessage_v4_olsrMessage_v4_originator_node] = (byte) node;
+			pumsgClone[UplinkMessage_v4_olsrMessage_v4_originator_node] = node;
 
 			PositionUpdate pu = new PositionUpdate(pumsgClone, pumsgClone.length);
 			this.positionUpdateHandler.handlePositionMessage(gateway, utcTimestamp + random.nextInt(randomRange), pu);
@@ -166,7 +166,7 @@ public class Faker {
 			byte[] clmsgClone = clmsg.clone();
 			// originator
 			clmsgClone[UplinkMessage_v4_clusterLeader_originator_network] = (byte) network;
-			clmsgClone[UplinkMessage_v4_clusterLeader_originator_node] = (byte) node;
+			clmsgClone[UplinkMessage_v4_clusterLeader_originator_node] = node;
 
 			// clusterLeader
 			clmsgClone[UplinkMessage_v4_clusterLeader_clusterLeader_network] = (byte) (network - 1);
