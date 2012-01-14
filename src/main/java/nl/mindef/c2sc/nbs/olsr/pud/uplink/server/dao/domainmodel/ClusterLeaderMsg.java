@@ -47,7 +47,7 @@ public class ClusterLeaderMsg implements Serializable {
 	 * @return the id
 	 */
 	public final Long getId() {
-		return id;
+		return this.id;
 	}
 
 	/**
@@ -67,7 +67,7 @@ public class ClusterLeaderMsg implements Serializable {
 	 * @return the node
 	 */
 	public final Node getNode() {
-		return node;
+		return this.node;
 	}
 
 	/**
@@ -87,7 +87,7 @@ public class ClusterLeaderMsg implements Serializable {
 	 * @return the clusterLeaderNode
 	 */
 	public final Node getClusterLeaderNode() {
-		return clusterLeaderNode;
+		return this.clusterLeaderNode;
 	}
 
 	/**
@@ -105,7 +105,7 @@ public class ClusterLeaderMsg implements Serializable {
 	 * @return the receptionTime
 	 */
 	public final long getReceptionTime() {
-		return receptionTime;
+		return this.receptionTime;
 	}
 
 	/**
@@ -123,7 +123,7 @@ public class ClusterLeaderMsg implements Serializable {
 	 * @return the validityTime
 	 */
 	public final long getValidityTime() {
-		return validityTime;
+		return this.validityTime;
 	}
 
 	/**
@@ -138,15 +138,15 @@ public class ClusterLeaderMsg implements Serializable {
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
 		builder.append(this.getClass().getSimpleName() + " [id=");
-		builder.append(id);
+		builder.append(this.id);
 		builder.append(", node=");
-		builder.append(node.getId());
+		builder.append(this.node.getId());
 		builder.append(", clusterLeaderNode=");
-		builder.append(clusterLeaderNode.getId());
+		builder.append(this.clusterLeaderNode.getId());
 		builder.append(", receptionTime=");
-		builder.append(receptionTime);
+		builder.append(this.receptionTime);
 		builder.append(", validityTime=");
-		builder.append(validityTime);
+		builder.append(this.validityTime);
 		builder.append("]");
 		return builder.toString();
 	}

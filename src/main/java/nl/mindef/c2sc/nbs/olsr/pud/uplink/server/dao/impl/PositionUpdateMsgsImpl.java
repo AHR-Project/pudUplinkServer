@@ -39,7 +39,7 @@ public class PositionUpdateMsgsImpl implements PositionUpdateMsgs {
 		}
 
 		@SuppressWarnings("unchecked")
-		List<PositionUpdateMsg> result = sessionFactory.getCurrentSession()
+		List<PositionUpdateMsg> result = this.sessionFactory.getCurrentSession()
 				.createQuery("select pu from PositionUpdateMsg pu where pu.node.mainIp = :ip").setParameter("ip", mainIp)
 				.list();
 
@@ -60,7 +60,7 @@ public class PositionUpdateMsgsImpl implements PositionUpdateMsgs {
 		}
 
 		@SuppressWarnings("unchecked")
-		List<PositionUpdateMsg> result = sessionFactory
+		List<PositionUpdateMsg> result = this.sessionFactory
 				.getCurrentSession()
 				.createQuery(
 						"select pu from PositionUpdateMsg pu where"
@@ -83,14 +83,14 @@ public class PositionUpdateMsgsImpl implements PositionUpdateMsgs {
 	@Override
 	@Transactional
 	public void savePositionUpdateMsg(PositionUpdateMsg positionUpdateMsg) {
-		sessionFactory.getCurrentSession().saveOrUpdate(positionUpdateMsg);
+		this.sessionFactory.getCurrentSession().saveOrUpdate(positionUpdateMsg);
 	}
 
 	@Override
 	@Transactional
 	public boolean removeExpiredPositionUpdateMsg(long utcTimestamp, double validityTimeMultiplier) {
 		@SuppressWarnings("unchecked")
-		List<PositionUpdateMsg> result = sessionFactory
+		List<PositionUpdateMsg> result = this.sessionFactory
 				.getCurrentSession()
 				.createQuery(
 						"select pu from PositionUpdateMsg pu where (receptionTime + (validityTime * " + validityTimeMultiplier
@@ -102,12 +102,12 @@ public class PositionUpdateMsgsImpl implements PositionUpdateMsgs {
 
 		for (PositionUpdateMsg pu : result) {
 			pu.getNode().setPositionUpdateMsg(null);
-			sessionFactory.getCurrentSession().merge(pu.getNode());
-			sessionFactory.getCurrentSession().delete(pu);
+			this.sessionFactory.getCurrentSession().merge(pu.getNode());
+			this.sessionFactory.getCurrentSession().delete(pu);
 		}
 
-		if (logger.isDebugEnabled()) {
-			logger.debug("removed " + result.size() + " PositionUpdateMsg objects");
+		if (this.logger.isDebugEnabled()) {
+			this.logger.debug("removed " + result.size() + " PositionUpdateMsg objects");
 		}
 
 		return true;
@@ -115,7 +115,8 @@ public class PositionUpdateMsgsImpl implements PositionUpdateMsgs {
 
 	private String getPositionsDump() {
 		@SuppressWarnings("unchecked")
-		List<PositionUpdateMsg> result = sessionFactory.getCurrentSession().createQuery("from PositionUpdateMsg pu").list();
+		List<PositionUpdateMsg> result = this.sessionFactory.getCurrentSession().createQuery("from PositionUpdateMsg pu")
+				.list();
 
 		StringBuilder s = new StringBuilder();
 		s.append("[PositionUpdateMsgs]\n");

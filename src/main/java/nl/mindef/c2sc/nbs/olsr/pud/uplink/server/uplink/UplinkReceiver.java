@@ -97,7 +97,7 @@ public class UplinkReceiver extends Thread implements StopHandlerConsumer {
 	@Required
 	public final void setConfiguredRelayServers(String relayServers) throws UnknownHostException {
 		if ((relayServers == null) || relayServers.trim().isEmpty()) {
-			configuredRelayServers.clear();
+			this.configuredRelayServers.clear();
 			return;
 		}
 
@@ -129,11 +129,11 @@ public class UplinkReceiver extends Thread implements StopHandlerConsumer {
 	}
 
 	private void initRelayServers() {
-		this.configuredRelayServers.add(relayServers.getMe());
+		this.configuredRelayServers.add(this.relayServers.getMe());
 
 		/* save into database */
-		for (RelayServer relayServer : configuredRelayServers) {
-			relayServers.addRelayServer(relayServer);
+		for (RelayServer relayServer : this.configuredRelayServers) {
+			this.relayServers.addRelayServer(relayServer);
 		}
 	}
 
@@ -146,7 +146,7 @@ public class UplinkReceiver extends Thread implements StopHandlerConsumer {
 
 	public void init() throws SocketException {
 		this.setName(this.getClass().getSimpleName());
-		sock = new DatagramSocket(uplinkUdpPort.intValue());
+		this.sock = new DatagramSocket(this.uplinkUdpPort.intValue());
 		this.start();
 	}
 
@@ -167,16 +167,16 @@ public class UplinkReceiver extends Thread implements StopHandlerConsumer {
 		byte[] receiveBuffer = new byte[BUFFERSIZE];
 		DatagramPacket packet = new DatagramPacket(receiveBuffer, receiveBuffer.length);
 
-		while (run.get()) {
+		while (this.run.get()) {
 			try {
-				sock.receive(packet);
+				this.sock.receive(packet);
 				try {
-					if (packetHandler.processPacket(packet)) {
-						databaseLogger.log(logger, Level.DEBUG);
-						distributor.signalUpdate();
+					if (this.packetHandler.processPacket(packet)) {
+						this.databaseLogger.log(this.logger, Level.DEBUG);
+						this.distributor.signalUpdate();
 					}
 				} catch (Throwable e) {
-					logger.error(e);
+					this.logger.error(e);
 				}
 			} catch (Exception e) {
 				if (!SocketException.class.equals(e.getClass())) {
@@ -185,7 +185,7 @@ public class UplinkReceiver extends Thread implements StopHandlerConsumer {
 			}
 		}
 
-		sock.close();
+		this.sock.close();
 	}
 
 	/*
@@ -194,10 +194,10 @@ public class UplinkReceiver extends Thread implements StopHandlerConsumer {
 
 	@Override
 	public void signalStop() {
-		run.set(false);
-		if (sock != null) {
+		this.run.set(false);
+		if (this.sock != null) {
 			/* this is crude but effective */
-			sock.close();
+			this.sock.close();
 		}
 	}
 }

@@ -55,7 +55,7 @@ public class Gateway implements Serializable {
 	 * @return the id
 	 */
 	public final Long getId() {
-		return id;
+		return this.id;
 	}
 
 	/**
@@ -74,7 +74,7 @@ public class Gateway implements Serializable {
 	 * @return the ip
 	 */
 	public final InetAddress getIp() {
-		return ip;
+		return this.ip;
 	}
 
 	/**
@@ -93,7 +93,7 @@ public class Gateway implements Serializable {
 	 * @return the port
 	 */
 	public final Integer getPort() {
-		return port;
+		return this.port;
 	}
 
 	/**
@@ -112,7 +112,7 @@ public class Gateway implements Serializable {
 	 * @return the nodes
 	 */
 	public final Set<Node> getNodes() {
-		return nodes;
+		return this.nodes;
 	}
 
 	/**
@@ -132,7 +132,7 @@ public class Gateway implements Serializable {
 	 * @return the relayServer
 	 */
 	public final RelayServer getRelayServer() {
-		return relayServer;
+		return this.relayServer;
 	}
 
 	/**
@@ -147,15 +147,15 @@ public class Gateway implements Serializable {
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
 		builder.append(this.getClass().getSimpleName() + " [id=");
-		builder.append(id);
+		builder.append(this.id);
 		builder.append(", ip=");
-		builder.append(ip.getHostAddress() + ":" + port.intValue());
+		builder.append(this.ip.getHostAddress() + ":" + this.port.intValue());
 		builder.append(", relayServer=");
-		builder.append((relayServer != null) ? relayServer.getId() : "");
+		builder.append((this.relayServer != null) ? this.relayServer.getId() : "");
 		builder.append(", nodes=[");
 		boolean comma = false;
 		Set<Long> ids = new TreeSet<Long>();
-		for (Node node : nodes) {
+		for (Node node : this.nodes) {
 			ids.add(node.getId());
 		}
 		for (Long id : ids) {

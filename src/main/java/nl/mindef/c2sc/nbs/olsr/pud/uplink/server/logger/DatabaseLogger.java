@@ -110,65 +110,65 @@ public class DatabaseLogger {
 	private static final byte[] eol = "\n".getBytes();
 
 	public void init() throws FileNotFoundException {
-		if (updateIntervalMs <= 0) {
+		if (this.updateIntervalMs <= 0) {
 			return;
 		}
 
-		fos = new FileOutputStream(databaseLogFile, false);
+		this.fos = new FileOutputStream(this.databaseLogFile, false);
 
-		timer = new Timer(this.getClass().getName() + "-Timer");
-		task = new TimerTask() {
+		this.timer = new Timer(this.getClass().getName() + "-Timer");
+		this.task = new TimerTask() {
 			@Override
 			public void run() {
 				try {
-					FileChannel channel = fos.getChannel();
+					FileChannel channel = DatabaseLogger.this.fos.getChannel();
 					channel.position(0);
 
-					logger.debug("Writing database logfile");
+					DatabaseLogger.this.logger.debug("Writing database logfile");
 
-					relayServers.print(fos);
-					fos.write(eol);
-					gateways.print(fos);
-					fos.write(eol);
-					nodes.print(fos);
-					fos.write(eol);
-					positionUpdateMsgs.print(fos);
-					fos.write(eol);
-					clusterLeaderMsgs.print(fos);
+					DatabaseLogger.this.relayServers.print(DatabaseLogger.this.fos);
+					DatabaseLogger.this.fos.write(eol);
+					DatabaseLogger.this.gateways.print(DatabaseLogger.this.fos);
+					DatabaseLogger.this.fos.write(eol);
+					DatabaseLogger.this.nodes.print(DatabaseLogger.this.fos);
+					DatabaseLogger.this.fos.write(eol);
+					DatabaseLogger.this.positionUpdateMsgs.print(DatabaseLogger.this.fos);
+					DatabaseLogger.this.fos.write(eol);
+					DatabaseLogger.this.clusterLeaderMsgs.print(DatabaseLogger.this.fos);
 
 					channel.truncate(channel.position());
-					fos.flush();
+					DatabaseLogger.this.fos.flush();
 				} catch (Throwable t) {
-					logger.error("Error while logging database", t);
+					DatabaseLogger.this.logger.error("Error while logging database", t);
 				}
 			}
 		};
 
-		timer.scheduleAtFixedRate(task, 0, updateIntervalMs);
+		this.timer.scheduleAtFixedRate(this.task, 0, this.updateIntervalMs);
 	}
 
 	public void destroy() {
-		if (task != null) {
-			task.cancel();
-			task = null;
+		if (this.task != null) {
+			this.task.cancel();
+			this.task = null;
 		}
-		timer.cancel();
+		this.timer.cancel();
 
-		if (fos != null) {
+		if (this.fos != null) {
 			try {
-				fos.close();
+				this.fos.close();
 			} catch (IOException e) {
 				/* ignore */
 			}
-			fos = null;
+			this.fos = null;
 		}
 	}
 
 	public void log(Logger logger, Level level) {
-		relayServers.log(logger, level);
-		gateways.log(logger, level);
-		nodes.log(logger, level);
-		positionUpdateMsgs.log(logger, level);
-		clusterLeaderMsgs.log(logger, level);
+		this.relayServers.log(logger, level);
+		this.gateways.log(logger, level);
+		this.nodes.log(logger, level);
+		this.positionUpdateMsgs.log(logger, level);
+		this.clusterLeaderMsgs.log(logger, level);
 	}
 }

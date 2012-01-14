@@ -37,7 +37,7 @@ public class StopHandlerImpl implements SignalHandler {
 	@Override
 	public void handle(Signal signal) {
 		if (signal.equals(this.signal)) {
-			for (StopHandlerConsumer handler : handlers) {
+			for (StopHandlerConsumer handler : this.handlers) {
 				try {
 					handler.signalStop();
 				} catch (Exception e) {
@@ -47,9 +47,9 @@ public class StopHandlerImpl implements SignalHandler {
 		}
 
 		/* Chain back to previous handler, if one exists */
-		if ((oldHandler != null) && (oldHandler != SIG_DFL) && (oldHandler != SIG_IGN)) {
+		if ((this.oldHandler != null) && (this.oldHandler != SIG_DFL) && (this.oldHandler != SIG_IGN)) {
 			try {
-				oldHandler.handle(signal);
+				this.oldHandler.handle(signal);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -59,10 +59,10 @@ public class StopHandlerImpl implements SignalHandler {
 	private SignalHandler oldHandler = null;
 
 	public void init() {
-		oldHandler = Signal.handle(signal, this);
+		this.oldHandler = Signal.handle(this.signal, this);
 	}
 
 	public void destroy() {
-		Signal.handle(signal, oldHandler);
+		Signal.handle(this.signal, this.oldHandler);
 	}
 }

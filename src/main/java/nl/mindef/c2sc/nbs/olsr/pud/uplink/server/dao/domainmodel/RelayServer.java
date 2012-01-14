@@ -50,7 +50,7 @@ public class RelayServer implements Serializable {
 	 * @return the id
 	 */
 	public final Long getId() {
-		return id;
+		return this.id;
 	}
 
 	/**
@@ -69,7 +69,7 @@ public class RelayServer implements Serializable {
 	 * @return the ip
 	 */
 	public final InetAddress getIp() {
-		return ip;
+		return this.ip;
 	}
 
 	/**
@@ -87,7 +87,7 @@ public class RelayServer implements Serializable {
 	 * @return the port
 	 */
 	public final Integer getPort() {
-		return port;
+		return this.port;
 	}
 
 	/**
@@ -106,7 +106,7 @@ public class RelayServer implements Serializable {
 	 * @return the gateways
 	 */
 	public final Set<Gateway> getGateways() {
-		return gateways;
+		return this.gateways;
 	}
 
 	/**
@@ -121,13 +121,13 @@ public class RelayServer implements Serializable {
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
 		builder.append(this.getClass().getSimpleName() + " [id=");
-		builder.append(id);
+		builder.append(this.id);
 		builder.append(", ip=");
-		builder.append(ip.getHostAddress() + ":" + port);
+		builder.append(this.ip.getHostAddress() + ":" + this.port);
 		builder.append(", gateways=[");
 		boolean comma = false;
 		Set<Long> ids = new TreeSet<Long>();
-		for (Gateway gateway : gateways) {
+		for (Gateway gateway : this.gateways) {
 			ids.add(gateway.getId());
 		}
 		for (Long id : ids) {

@@ -50,8 +50,8 @@ public class ClusterLeaderHandlerImpl implements ClusterLeaderHandler {
 		assert (clMsg != null);
 
 		if (clMsg.getClusterLeaderVersion() != WireFormatConstants.VERSION) {
-			logger.error("Received wrong version of cluster leader message from " + gateway.getIp().getHostAddress() + ":"
-					+ gateway.getPort() + ", expected version " + WireFormatConstants.VERSION + ", received version "
+			this.logger.error("Received wrong version of cluster leader message from " + gateway.getIp().getHostAddress()
+					+ ":" + gateway.getPort() + ", expected version " + WireFormatConstants.VERSION + ", received version "
 					+ clMsg.getClusterLeaderVersion() + ": ignored");
 			return false;
 		}
@@ -62,22 +62,22 @@ public class ClusterLeaderHandlerImpl implements ClusterLeaderHandler {
 		InetAddress clusterLeader = clMsg.getClusterLeaderClusterLeader();
 
 		/* retrieve the node that sent the cluster leader update */
-		Node originatorNode = nodes.getNode(originator);
+		Node originatorNode = this.nodes.getNode(originator);
 		if (originatorNode == null) {
 			/* new node */
 			originatorNode = new Node(originator, gateway);
-			nodes.saveNode(originatorNode);
+			this.nodes.saveNode(originatorNode);
 		}
 
 		/* link the node to the gateway from which it was received */
 		originatorNode.setGateway(gateway);
 
 		/* retrieve the cluster leader node of the node that sent the cluster leader update */
-		Node clusterLeaderNode = nodes.getNode(clusterLeader);
+		Node clusterLeaderNode = this.nodes.getNode(clusterLeader);
 		if (clusterLeaderNode == null) {
 			/* new node */
 			clusterLeaderNode = new Node(clusterLeader, null);
-			nodes.saveNode(clusterLeaderNode);
+			this.nodes.saveNode(clusterLeaderNode);
 		}
 
 		/* get the cluster leader update of the node */
@@ -85,7 +85,7 @@ public class ClusterLeaderHandlerImpl implements ClusterLeaderHandler {
 		if (storedClusterLeader == null) {
 			/* new cluster leader update */
 			storedClusterLeader = new ClusterLeaderMsg(originatorNode, clusterLeaderNode);
-			clusterLeaderMsgs.saveClusterLeaderMsg(storedClusterLeader);
+			this.clusterLeaderMsgs.saveClusterLeaderMsg(storedClusterLeader);
 		}
 
 		/* fill in the cluster leader update */
@@ -99,7 +99,7 @@ public class ClusterLeaderHandlerImpl implements ClusterLeaderHandler {
 		storedClusterLeader.setClusterLeaderNode(clusterLeaderNode);
 
 		/* save the nodes and cluster leader update. explicitly saving the nodes is not needed since these are cascaded */
-		clusterLeaderMsgs.saveClusterLeaderMsg(storedClusterLeader);
+		this.clusterLeaderMsgs.saveClusterLeaderMsg(storedClusterLeader);
 
 		return true;
 	}

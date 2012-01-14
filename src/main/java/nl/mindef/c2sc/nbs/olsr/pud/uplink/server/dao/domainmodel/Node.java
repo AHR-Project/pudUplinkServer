@@ -52,7 +52,7 @@ public class Node implements Serializable {
 	 * @return the id
 	 */
 	public final Long getId() {
-		return id;
+		return this.id;
 	}
 
 	/**
@@ -71,7 +71,7 @@ public class Node implements Serializable {
 	 * @return the mainIp
 	 */
 	public final InetAddress getMainIp() {
-		return mainIp;
+		return this.mainIp;
 	}
 
 	/**
@@ -93,7 +93,7 @@ public class Node implements Serializable {
 	 * @return the gateway
 	 */
 	public final Gateway getGateway() {
-		return gateway;
+		return this.gateway;
 	}
 
 	/**
@@ -112,7 +112,7 @@ public class Node implements Serializable {
 	 * @return the positionUpdateMsg
 	 */
 	public final PositionUpdateMsg getPositionUpdateMsg() {
-		return positionUpdateMsg;
+		return this.positionUpdateMsg;
 	}
 
 	/**
@@ -131,7 +131,7 @@ public class Node implements Serializable {
 	 * @return the clusterLeaderMsg
 	 */
 	public final ClusterLeaderMsg getClusterLeaderMsg() {
-		return clusterLeaderMsg;
+		return this.clusterLeaderMsg;
 	}
 
 	/**
@@ -150,7 +150,7 @@ public class Node implements Serializable {
 	 * @return the clusterNodes
 	 */
 	public final Set<ClusterLeaderMsg> getClusterNodes() {
-		return clusterNodes;
+		return this.clusterNodes;
 	}
 
 	/**
@@ -165,15 +165,15 @@ public class Node implements Serializable {
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
 		builder.append(this.getClass().getSimpleName() + " [id=");
-		builder.append(id);
+		builder.append(this.id);
 		builder.append(", mainIp=");
-		builder.append(mainIp.getHostAddress());
+		builder.append(this.mainIp.getHostAddress());
 		builder.append(", gateway=");
-		builder.append((gateway == null) ? "" : gateway.getId());
+		builder.append((this.gateway == null) ? "" : this.gateway.getId());
 		builder.append(", clusterNodes=[");
 		boolean comma = false;
 		Set<Long> ids = new TreeSet<Long>();
-		for (ClusterLeaderMsg clusterNode : clusterNodes) {
+		for (ClusterLeaderMsg clusterNode : this.clusterNodes) {
 			ids.add(clusterNode.getId());
 		}
 		for (Long id : ids) {
@@ -185,9 +185,9 @@ public class Node implements Serializable {
 		}
 		builder.append("]");
 		builder.append(", positionUpdateMsg=");
-		builder.append((positionUpdateMsg == null) ? "" : positionUpdateMsg.getId());
+		builder.append((this.positionUpdateMsg == null) ? "" : this.positionUpdateMsg.getId());
 		builder.append(", clusterLeaderMsg=");
-		builder.append((clusterLeaderMsg == null) ? "" : clusterLeaderMsg.getId());
+		builder.append((this.clusterLeaderMsg == null) ? "" : this.clusterLeaderMsg.getId());
 		builder.append("]");
 		return builder.toString();
 	}

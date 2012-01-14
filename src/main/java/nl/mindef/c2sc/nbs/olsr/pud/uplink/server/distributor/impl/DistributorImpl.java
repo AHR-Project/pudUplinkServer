@@ -108,19 +108,19 @@ public class DistributorImpl extends Thread implements Distributor {
 
 	public void init() throws SocketException, UnknownHostException {
 		this.setName(this.getClass().getSimpleName());
-		timer = new Timer(this.getClass().getSimpleName() + "-Timer");
-		sock = new DatagramSocket();
+		this.timer = new Timer(this.getClass().getSimpleName() + "-Timer");
+		this.sock = new DatagramSocket();
 		this.start();
 	}
 
 	public void destroy() {
-		run.set(false);
-		if (timer != null) {
-			timer.cancel();
-			timer = null;
+		this.run.set(false);
+		if (this.timer != null) {
+			this.timer.cancel();
+			this.timer = null;
 		}
-		synchronized (runWaiter) {
-			runWaiter.notifyAll();
+		synchronized (this.runWaiter) {
+			this.runWaiter.notifyAll();
 		}
 	}
 
@@ -130,13 +130,13 @@ public class DistributorImpl extends Thread implements Distributor {
 
 	@Override
 	public void run() {
-		while (run.get()) {
-			boolean distributeNow = distribute.getAndSet(false);
-			synchronized (runWaiter) {
+		while (this.run.get()) {
+			boolean distributeNow = this.distribute.getAndSet(false);
+			synchronized (this.runWaiter) {
 				try {
 					if (!distributeNow) {
-						runWaiter.wait();
-						distributeNow = distribute.getAndSet(false);
+						this.runWaiter.wait();
+						distributeNow = this.distribute.getAndSet(false);
 					}
 				} catch (InterruptedException e) {
 					/* swallow */
@@ -146,7 +146,7 @@ public class DistributorImpl extends Thread implements Distributor {
 				try {
 					distribute();
 				} catch (Throwable e) {
-					logger.error("error during distribution", e);
+					this.logger.error("error during distribution", e);
 				}
 			}
 		}
@@ -162,17 +162,17 @@ public class DistributorImpl extends Thread implements Distributor {
 	private long lastDistributionTime = -1;
 
 	public void signalUpdate() {
-		boolean previousSignaledUpdates = signaledUpdates.getAndSet(true);
+		boolean previousSignaledUpdates = this.signaledUpdates.getAndSet(true);
 		if (!previousSignaledUpdates) {
-			timer.schedule(new TimerTask() {
+			this.timer.schedule(new TimerTask() {
 				@Override
 				public void run() {
-					distribute.set(true);
-					synchronized (runWaiter) {
-						runWaiter.notifyAll();
+					DistributorImpl.this.distribute.set(true);
+					synchronized (DistributorImpl.this.runWaiter) {
+						DistributorImpl.this.runWaiter.notifyAll();
 					}
 				}
-			}, distributionDelay);
+			}, this.distributionDelay);
 		}
 	}
 
@@ -182,7 +182,7 @@ public class DistributorImpl extends Thread implements Distributor {
 		assert (positionUpdateMsgs != null);
 		assert (positionUpdateMsgs.size() > 0);
 		assert (positionUpdateMsgsByteCount > 0);
-		assert (positionUpdateMsgsByteCount <= packetMaxSize);
+		assert (positionUpdateMsgsByteCount <= this.packetMaxSize);
 
 		DatagramPacket packet = new DatagramPacket(new byte[positionUpdateMsgsByteCount], positionUpdateMsgsByteCount);
 		byte[] packetData = packet.getData();
@@ -208,7 +208,7 @@ public class DistributorImpl extends Thread implements Distributor {
 		int packetPositionUpdateMsgsByteCount = 0;
 		for (PositionUpdateMsg positionUpdateMsgToDistribute : positionUpdateMsgsToDistribute) {
 			int positionUpdateMsgLength = positionUpdateMsgToDistribute.getPositionUpdateMsg().getData().length;
-			if ((packetPositionUpdateMsgsByteCount + positionUpdateMsgLength) > packetMaxSize) {
+			if ((packetPositionUpdateMsgsByteCount + positionUpdateMsgLength) > this.packetMaxSize) {
 				result.add(toPacket(packetPositionUpdateMsgs, packetPositionUpdateMsgsByteCount));
 				packetPositionUpdateMsgs.clear();
 				packetPositionUpdateMsgsByteCount = 0;
@@ -225,32 +225,32 @@ public class DistributorImpl extends Thread implements Distributor {
 	}
 
 	private void distribute() {
-		while (signaledUpdates.getAndSet(false)) {
+		while (this.signaledUpdates.getAndSet(false)) {
 			long currentTime = System.currentTimeMillis();
 
-			if (logger.isDebugEnabled()) {
-				logger.debug("*** Have to distribute <" + lastDistributionTime + ", " + currentTime + "]");
+			if (this.logger.isDebugEnabled()) {
+				this.logger.debug("*** Have to distribute <" + this.lastDistributionTime + ", " + currentTime + "]");
 			}
 
 			/*
 			 * Distribute to other relay servers
 			 */
 
-			if (logger.isDebugEnabled()) {
-				logger.debug("*** relay servers");
+			if (this.logger.isDebugEnabled()) {
+				this.logger.debug("*** relay servers");
 			}
 
-			List<RelayServer> otherRelayServers = relayServers.getOtherRelayServers();
+			List<RelayServer> otherRelayServers = this.relayServers.getOtherRelayServers();
 			if ((otherRelayServers != null) && (otherRelayServers.size() > 0)) {
-				List<PositionUpdateMsg> p4ds = positions.getPositionUpdateMsgForDistribution(lastDistributionTime, currentTime,
-						null);
-				if (logger.isDebugEnabled()) {
+				List<PositionUpdateMsg> p4ds = this.positions.getPositionUpdateMsgForDistribution(this.lastDistributionTime,
+						currentTime, null);
+				if (this.logger.isDebugEnabled()) {
 					StringBuilder s = new StringBuilder();
 					s.append("p4ds(" + p4ds.size() + ")=");
 					for (PositionUpdateMsg p4d : p4ds) {
 						s.append(" " + p4d.getId());
 					}
-					logger.debug(s.toString());
+					this.logger.debug(s.toString());
 				}
 
 				List<DatagramPacket> packets = positionUpdateMsgsToPackets(p4ds);
@@ -260,29 +260,29 @@ public class DistributorImpl extends Thread implements Distributor {
 						InetAddress otherRelayServerIp = otherRelayServer.getIp();
 						int otherRelayServerPort = otherRelayServer.getPort().intValue();
 
-						if (logger.isDebugEnabled()) {
+						if (this.logger.isDebugEnabled()) {
 							s.setLength(0);
 							s.append("tx " + packets.size() + " packet(s) to " + otherRelayServerIp.getHostAddress() + ":"
 									+ otherRelayServerPort + ", sizes=");
 						}
 						for (DatagramPacket packet : packets) {
-							if (logger.isDebugEnabled()) {
+							if (this.logger.isDebugEnabled()) {
 								s.append(" " + packet.getLength());
 							}
 							packet.setAddress(otherRelayServerIp);
 							packet.setPort(otherRelayServerPort);
 							try {
-								sock.send(packet);
+								this.sock.send(packet);
 							} catch (IOException e) {
-								if (logger.isDebugEnabled()) {
+								if (this.logger.isDebugEnabled()) {
 									s.append(" ERROR: " + e.getLocalizedMessage());
 								}
-								logger.error("Could not send to relay server " + otherRelayServerIp + ":" + otherRelayServerPort
+								this.logger.error("Could not send to relay server " + otherRelayServerIp + ":" + otherRelayServerPort
 										+ " : " + e.getLocalizedMessage());
 							}
 						}
-						if (logger.isDebugEnabled()) {
-							logger.debug(s.toString());
+						if (this.logger.isDebugEnabled()) {
+							this.logger.debug(s.toString());
 						}
 					}
 				}
@@ -292,25 +292,25 @@ public class DistributorImpl extends Thread implements Distributor {
 			 * Cluster Leaders
 			 */
 
-			List<Node> clusterLeaders = nodes.getClusterLeaders();
+			List<Node> clusterLeaders = this.nodes.getClusterLeaders();
 			if ((clusterLeaders != null) && (clusterLeaders.size() > 0)) {
 				for (Node clusterLeader : clusterLeaders) {
 					InetAddress clusterLeaderMainIp = clusterLeader.getMainIp();
 
 					Gateway clusterLeaderGateway = clusterLeader.getGateway();
 					if (clusterLeaderGateway == null) {
-						Node substituteClusterLeader = nodes.getSubstituteClusterLeader(clusterLeader);
+						Node substituteClusterLeader = this.nodes.getSubstituteClusterLeader(clusterLeader);
 						if (substituteClusterLeader == null) {
-							if (logger.isDebugEnabled()) {
-								logger.info("Cluster leader " + clusterLeaderMainIp.getHostAddress()
+							if (this.logger.isDebugEnabled()) {
+								this.logger.info("Cluster leader " + clusterLeaderMainIp.getHostAddress()
 										+ " has no gateway and no substitute cluster leader is found: skipped");
 							}
 							continue;
 						}
 
 						clusterLeaderGateway = substituteClusterLeader.getGateway();
-						if (logger.isDebugEnabled()) {
-							logger.info("Cluster leader " + clusterLeaderMainIp.getHostAddress()
+						if (this.logger.isDebugEnabled()) {
+							this.logger.info("Cluster leader " + clusterLeaderMainIp.getHostAddress()
 									+ " has no gateway: selected gateway " + clusterLeaderGateway.getIp().getHostAddress() + ":"
 									+ clusterLeaderGateway.getPort() + " of substitute cluster leader "
 									+ substituteClusterLeader.getMainIp().getHostAddress());
@@ -320,73 +320,73 @@ public class DistributorImpl extends Thread implements Distributor {
 					InetAddress clusterLeaderGatewayIp = clusterLeaderGateway.getIp();
 					Integer clusterLeaderGatewayPort = clusterLeaderGateway.getPort();
 
-					if (logger.isDebugEnabled()) {
-						logger.debug("*** cluster leader " + clusterLeaderMainIp.getHostAddress() + " (gateway="
+					if (this.logger.isDebugEnabled()) {
+						this.logger.debug("*** cluster leader " + clusterLeaderMainIp.getHostAddress() + " (gateway="
 								+ clusterLeaderGatewayIp.getHostAddress() + ":" + clusterLeaderGatewayPort + ")");
 					}
 
-					if ((myIPAddresses.isMe(clusterLeaderGatewayIp) || myIPAddresses.isMe(clusterLeaderMainIp))
-							&& (clusterLeaderGatewayPort.intValue() == uplinkUdpPort.intValue())) {
+					if ((this.myIPAddresses.isMe(clusterLeaderGatewayIp) || this.myIPAddresses.isMe(clusterLeaderMainIp))
+							&& (clusterLeaderGatewayPort.intValue() == this.uplinkUdpPort.intValue())) {
 						/* do not relay to ourselves */
-						if (logger.isDebugEnabled()) {
-							logger.debug("this is me: skipping");
+						if (this.logger.isDebugEnabled()) {
+							this.logger.debug("this is me: skipping");
 						}
 						continue;
 					}
 
-					List<PositionUpdateMsg> p4ds = positions.getPositionUpdateMsgForDistribution(lastDistributionTime,
+					List<PositionUpdateMsg> p4ds = this.positions.getPositionUpdateMsgForDistribution(this.lastDistributionTime,
 							currentTime, clusterLeader);
 					if ((p4ds == null) || (p4ds.size() == 0)) {
-						if (logger.isDebugEnabled()) {
-							logger.debug("p4ds EMPTY");
+						if (this.logger.isDebugEnabled()) {
+							this.logger.debug("p4ds EMPTY");
 						}
 						continue;
 					}
 
-					if (logger.isDebugEnabled()) {
+					if (this.logger.isDebugEnabled()) {
 						StringBuilder s = new StringBuilder();
 						s.append("p4ds(" + p4ds.size() + ")=");
 						for (PositionUpdateMsg p4d : p4ds) {
 							s.append(" " + p4d.getId());
 						}
-						logger.debug(s.toString());
+						this.logger.debug(s.toString());
 					}
 
 					List<DatagramPacket> packets = positionUpdateMsgsToPackets(p4ds);
 					if ((packets != null) && (packets.size() > 0)) {
 						StringBuilder s = new StringBuilder();
-						if (logger.isDebugEnabled()) {
+						if (this.logger.isDebugEnabled()) {
 							s.setLength(0);
 							s.append("tx " + packets.size() + " packet(s) to " + clusterLeaderMainIp.getHostAddress() + " (gateway="
 									+ clusterLeaderGatewayIp.getHostAddress() + ":" + clusterLeaderGatewayPort + "), sizes=");
 						}
 
 						for (DatagramPacket packet : packets) {
-							if (logger.isDebugEnabled()) {
+							if (this.logger.isDebugEnabled()) {
 								s.append(" " + packet.getLength());
 							}
 							packet.setAddress(clusterLeaderGatewayIp);
 							packet.setPort(clusterLeaderGatewayPort.intValue());
 							try {
-								sock.send(packet);
+								this.sock.send(packet);
 							} catch (IOException e) {
-								if (logger.isDebugEnabled()) {
+								if (this.logger.isDebugEnabled()) {
 									s.append(" ERROR:" + e.getLocalizedMessage());
-									logger.debug(s.toString());
+									this.logger.debug(s.toString());
 								}
-								logger.error("Could not send to cluster leader " + clusterLeaderMainIp + " (gateway="
+								this.logger.error("Could not send to cluster leader " + clusterLeaderMainIp + " (gateway="
 										+ clusterLeaderGatewayIp.getHostAddress() + ":" + clusterLeaderGatewayPort + ") : "
 										+ e.getLocalizedMessage());
 							}
 						}
-						if (logger.isDebugEnabled()) {
-							logger.debug(s.toString());
+						if (this.logger.isDebugEnabled()) {
+							this.logger.debug(s.toString());
 						}
 					}
 				}
 			}
 
-			lastDistributionTime = currentTime;
+			this.lastDistributionTime = currentTime;
 		}
 	}
 }

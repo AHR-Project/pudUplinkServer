@@ -25,37 +25,39 @@ public class ExpireNodes {
 		@Override
 		public void run() {
 			try {
-				if (logger.isDebugEnabled()) {
-					logger.debug("************************** expiry");
+				if (ExpireNodes.this.logger.isDebugEnabled()) {
+					ExpireNodes.this.logger.debug("************************** expiry");
 				}
 
 				long utcTimestamp = System.currentTimeMillis();
 
 				try {
-					clusterLeaderMsgs.removeExpiredClusterLeaderMsg(utcTimestamp, validityTimeMultiplier);
+					ExpireNodes.this.clusterLeaderMsgs.removeExpiredClusterLeaderMsg(utcTimestamp,
+							ExpireNodes.this.validityTimeMultiplier);
 				} catch (Throwable e) {
-					logger.error("Removal of expired cluster leader messages failed", e);
+					ExpireNodes.this.logger.error("Removal of expired cluster leader messages failed", e);
 				}
 
 				try {
-					positionUpdateMsgs.removeExpiredPositionUpdateMsg(utcTimestamp, validityTimeMultiplier);
+					ExpireNodes.this.positionUpdateMsgs.removeExpiredPositionUpdateMsg(utcTimestamp,
+							ExpireNodes.this.validityTimeMultiplier);
 				} catch (Throwable e) {
-					logger.error("Removal of expired position update messages failed", e);
+					ExpireNodes.this.logger.error("Removal of expired position update messages failed", e);
 				}
 
 				try {
-					nodes.removeExpiredNodes();
+					ExpireNodes.this.nodes.removeExpiredNodes();
 				} catch (Throwable e) {
-					logger.error("Removal of empty nodes failed", e);
+					ExpireNodes.this.logger.error("Removal of empty nodes failed", e);
 				}
 
 				try {
-					gateways.removeExpiredGateways();
+					ExpireNodes.this.gateways.removeExpiredGateways();
 				} catch (Throwable e) {
-					logger.error("Removal of empty gateways failed", e);
+					ExpireNodes.this.logger.error("Removal of empty gateways failed", e);
 				}
 			} catch (Throwable e) {
-				logger.error("error during expiry", e);
+				ExpireNodes.this.logger.error("error during expiry", e);
 			}
 		}
 	}
@@ -67,7 +69,7 @@ public class ExpireNodes {
 	 * @return the interval
 	 */
 	public long getInterval() {
-		return interval;
+		return this.interval;
 	}
 
 	/**
@@ -142,18 +144,18 @@ public class ExpireNodes {
 	private Timer timer = null;
 
 	public void init() {
-		if (interval <= 0) {
+		if (this.interval <= 0) {
 			return;
 		}
 
-		timer = new Timer(this.getClass().getSimpleName() + "-Timer");
-		timer.scheduleAtFixedRate(new ExpiryTimerTask(), interval, interval);
+		this.timer = new Timer(this.getClass().getSimpleName() + "-Timer");
+		this.timer.scheduleAtFixedRate(new ExpiryTimerTask(), this.interval, this.interval);
 	}
 
 	public void destroy() {
-		if (timer != null) {
-			timer.cancel();
-			timer = null;
+		if (this.timer != null) {
+			this.timer.cancel();
+			this.timer = null;
 		}
 	}
 }

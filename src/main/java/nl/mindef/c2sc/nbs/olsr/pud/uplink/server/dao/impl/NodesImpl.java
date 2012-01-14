@@ -49,7 +49,7 @@ public class NodesImpl implements Nodes {
 		}
 
 		@SuppressWarnings("unchecked")
-		List<Node> result = sessionFactory.getCurrentSession()
+		List<Node> result = this.sessionFactory.getCurrentSession()
 				.createQuery("select node from Node node where node.mainIp = :ip").setParameter("ip", mainIp).list();
 
 		if (result.size() == 0) {
@@ -65,7 +65,7 @@ public class NodesImpl implements Nodes {
 	@Transactional(readOnly = true)
 	public List<Node> getClusterLeaders() {
 		@SuppressWarnings("unchecked")
-		List<Node> result = sessionFactory
+		List<Node> result = this.sessionFactory
 				.getCurrentSession()
 				.createQuery(
 						"select node from Node node"
@@ -78,7 +78,7 @@ public class NodesImpl implements Nodes {
 								 * (when clusterLeadersIncludesTransitionalNodes is set): or node is a node that points to a cluster
 								 * leader that doesn't point to itself
 								 */
-								+ (!clusterLeadersIncludesTransitionalNodes ? ""
+								+ (!this.clusterLeadersIncludesTransitionalNodes ? ""
 										: " or (node in (select cl.node from ClusterLeaderMsg cl where cl.clusterLeaderNode.id != cl.clusterLeaderNode.clusterLeaderMsg.clusterLeaderNode.id))")
 
 								+ " order by node.mainIp").list();
@@ -96,7 +96,7 @@ public class NodesImpl implements Nodes {
 		Long clId = clusterLeader.getId();
 
 		@SuppressWarnings("unchecked")
-		List<Node> result = sessionFactory
+		List<Node> result = this.sessionFactory
 				.getCurrentSession()
 				.createQuery(
 						"select node from Node node"
@@ -120,14 +120,14 @@ public class NodesImpl implements Nodes {
 	@Override
 	@Transactional
 	public void saveNode(Node node) {
-		sessionFactory.getCurrentSession().saveOrUpdate(node);
+		this.sessionFactory.getCurrentSession().saveOrUpdate(node);
 	}
 
 	@Override
 	@Transactional
 	public boolean removeExpiredNodes() {
 		@SuppressWarnings("unchecked")
-		List<Node> result = sessionFactory
+		List<Node> result = this.sessionFactory
 				.getCurrentSession()
 				.createQuery(
 						"select node from Node node where positionUpdateMsg is null and clusterLeaderMsg is null"
@@ -139,11 +139,11 @@ public class NodesImpl implements Nodes {
 
 		for (Node node : result) {
 			node.setGateway(null);
-			sessionFactory.getCurrentSession().delete(node);
+			this.sessionFactory.getCurrentSession().delete(node);
 		}
 
-		if (logger.isDebugEnabled()) {
-			logger.debug("removed " + result.size() + " Node objects");
+		if (this.logger.isDebugEnabled()) {
+			this.logger.debug("removed " + result.size() + " Node objects");
 		}
 
 		return true;
@@ -151,7 +151,7 @@ public class NodesImpl implements Nodes {
 
 	private String getNodesDump() {
 		@SuppressWarnings("unchecked")
-		List<Node> result = sessionFactory.getCurrentSession().createQuery("from Node node").list();
+		List<Node> result = this.sessionFactory.getCurrentSession().createQuery("from Node node").list();
 
 		StringBuilder s = new StringBuilder();
 		s.append("[Nodes]\n");

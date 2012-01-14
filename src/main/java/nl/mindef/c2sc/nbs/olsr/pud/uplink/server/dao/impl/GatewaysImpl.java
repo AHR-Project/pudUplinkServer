@@ -41,7 +41,7 @@ public class GatewaysImpl implements Gateways {
 		}
 
 		@SuppressWarnings("unchecked")
-		List<Gateway> result = sessionFactory.getCurrentSession()
+		List<Gateway> result = this.sessionFactory.getCurrentSession()
 				.createQuery("select gw from Gateway gw where gw.ip = :ip").setParameter("ip", ip).list();
 
 		if (result.size() == 0) {
@@ -61,7 +61,7 @@ public class GatewaysImpl implements Gateways {
 		}
 
 		@SuppressWarnings("unchecked")
-		List<Gateway> result = sessionFactory.getCurrentSession()
+		List<Gateway> result = this.sessionFactory.getCurrentSession()
 				.createQuery("select gw from Gateway gw where gw.ip = :ip and gw.port = " + port).setParameter("ip", ip).list();
 
 		if (result.size() == 0) {
@@ -76,14 +76,14 @@ public class GatewaysImpl implements Gateways {
 	@Override
 	@Transactional
 	public void saveGateway(Gateway gateway) {
-		sessionFactory.getCurrentSession().saveOrUpdate(gateway);
+		this.sessionFactory.getCurrentSession().saveOrUpdate(gateway);
 	}
 
 	@Override
 	@Transactional
 	public boolean removeExpiredGateways() {
 		@SuppressWarnings("unchecked")
-		List<Gateway> result = sessionFactory.getCurrentSession()
+		List<Gateway> result = this.sessionFactory.getCurrentSession()
 				.createQuery("select gw from Gateway gw where size(nodes) = 0").list();
 
 		if (result.size() == 0) {
@@ -92,11 +92,11 @@ public class GatewaysImpl implements Gateways {
 
 		for (Gateway gw : result) {
 			gw.setRelayServer(null);
-			sessionFactory.getCurrentSession().delete(gw);
+			this.sessionFactory.getCurrentSession().delete(gw);
 		}
 
-		if (logger.isDebugEnabled()) {
-			logger.debug("removed " + result.size() + " Gateway objects");
+		if (this.logger.isDebugEnabled()) {
+			this.logger.debug("removed " + result.size() + " Gateway objects");
 		}
 
 		return true;
@@ -104,7 +104,7 @@ public class GatewaysImpl implements Gateways {
 
 	private String getGatewaysDump() {
 		@SuppressWarnings("unchecked")
-		List<Gateway> result = sessionFactory.getCurrentSession().createQuery("from Gateway gw").list();
+		List<Gateway> result = this.sessionFactory.getCurrentSession().createQuery("from Gateway gw").list();
 
 		StringBuilder s = new StringBuilder();
 		s.append("[Gateways]\n");

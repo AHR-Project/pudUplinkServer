@@ -48,7 +48,7 @@ public class PositionUpdateMsg implements Serializable {
 	 * @return the id
 	 */
 	public final Long getId() {
-		return id;
+		return this.id;
 	}
 
 	/**
@@ -68,7 +68,7 @@ public class PositionUpdateMsg implements Serializable {
 	 * @return the node
 	 */
 	public final Node getNode() {
-		return node;
+		return this.node;
 	}
 
 	/**
@@ -87,7 +87,7 @@ public class PositionUpdateMsg implements Serializable {
 	 * @return the positionUpdateMsg
 	 */
 	public final PositionUpdate getPositionUpdateMsg() {
-		return positionUpdateMsg;
+		return this.positionUpdateMsg;
 	}
 
 	/**
@@ -105,7 +105,7 @@ public class PositionUpdateMsg implements Serializable {
 	 * @return the receptionTime
 	 */
 	public final long getReceptionTime() {
-		return receptionTime;
+		return this.receptionTime;
 	}
 
 	/**
@@ -123,7 +123,7 @@ public class PositionUpdateMsg implements Serializable {
 	 * @return the validityTime
 	 */
 	public final long getValidityTime() {
-		return validityTime;
+		return this.validityTime;
 	}
 
 	/**
@@ -138,13 +138,13 @@ public class PositionUpdateMsg implements Serializable {
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
 		builder.append(this.getClass().getSimpleName() + " [id=");
-		builder.append(id);
+		builder.append(this.id);
 		builder.append(", node=");
-		builder.append(node.getId());
+		builder.append(this.node.getId());
 		builder.append(", receptionTime=");
-		builder.append(receptionTime);
+		builder.append(this.receptionTime);
 		builder.append(", validityTime=");
-		builder.append(validityTime);
+		builder.append(this.validityTime);
 		builder.append("]");
 		return builder.toString();
 	}

@@ -44,7 +44,8 @@ public class RelayServersImpl implements RelayServers {
 	@Transactional(readOnly = true)
 	public List<RelayServer> getRelayServers() {
 		@SuppressWarnings("unchecked")
-		List<RelayServer> result = sessionFactory.getCurrentSession().createQuery("select rs from RelayServer rs").list();
+		List<RelayServer> result = this.sessionFactory.getCurrentSession().createQuery("select rs from RelayServer rs")
+				.list();
 
 		if (result.size() == 0) {
 			return null;
@@ -57,7 +58,7 @@ public class RelayServersImpl implements RelayServers {
 	@Transactional(readOnly = true)
 	public List<RelayServer> getOtherRelayServers() {
 		@SuppressWarnings("unchecked")
-		List<RelayServer> result = sessionFactory.getCurrentSession()
+		List<RelayServer> result = this.sessionFactory.getCurrentSession()
 				.createQuery("select rs from RelayServer rs where rs.id != " + getMe().getId()).list();
 
 		if (result.size() == 0) {
@@ -70,12 +71,12 @@ public class RelayServersImpl implements RelayServers {
 	@Override
 	@Transactional
 	public void addRelayServer(RelayServer relayServer) {
-		sessionFactory.getCurrentSession().saveOrUpdate(relayServer);
+		this.sessionFactory.getCurrentSession().saveOrUpdate(relayServer);
 	}
 
 	private String getRelayServersDump() {
 		@SuppressWarnings("unchecked")
-		List<RelayServer> result = sessionFactory.getCurrentSession().createQuery("from RelayServer rs").list();
+		List<RelayServer> result = this.sessionFactory.getCurrentSession().createQuery("from RelayServer rs").list();
 
 		StringBuilder s = new StringBuilder();
 		s.append("[RelayServers]\n");
@@ -90,12 +91,12 @@ public class RelayServersImpl implements RelayServers {
 	@Transactional
 	public RelayServer getMe() {
 		@SuppressWarnings("unchecked")
-		List<RelayServer> result = sessionFactory.getCurrentSession()
-				.createQuery("select rs from RelayServer rs where rs.ip = :ip and rs.port = " + uplinkUdpPort)
+		List<RelayServer> result = this.sessionFactory.getCurrentSession()
+				.createQuery("select rs from RelayServer rs where rs.ip = :ip and rs.port = " + this.uplinkUdpPort)
 				.setParameter("ip", myIp).list();
 
 		if (result.size() == 0) {
-			RelayServer me = new RelayServer(myIp, uplinkUdpPort);
+			RelayServer me = new RelayServer(myIp, this.uplinkUdpPort);
 			addRelayServer(me);
 			return me;
 		}

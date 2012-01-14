@@ -43,7 +43,7 @@ public class Faker {
 	 * @return the firstFake
 	 */
 	public final boolean isFirstFake() {
-		return firstFake;
+		return this.firstFake;
 	}
 
 	/**
@@ -63,7 +63,7 @@ public class Faker {
 	static private final int UplinkMessage_v4_clusterLeader_clusterLeader_node = 13;
 
 	public void fakeit(Gateway gateway, long utcTimestamp, MSGTYPE type, Object msg) {
-		if (!firstFake) {
+		if (!this.firstFake) {
 			return;
 		}
 
@@ -108,7 +108,7 @@ public class Faker {
 							pumsgClone[UplinkMessage_v4_olsrMessage_v4_originator_node] = (byte) node;
 
 							PositionUpdate pu = new PositionUpdate(pumsgClone, pumsgClone.length);
-							positionUpdateHandler.handlePositionMessage(gateway, utcTimestamp + random.nextInt(randomRange), pu);
+							this.positionUpdateHandler.handlePositionMessage(gateway, utcTimestamp + random.nextInt(randomRange), pu);
 						}
 
 						/*
@@ -125,7 +125,8 @@ public class Faker {
 							clmsgClone[UplinkMessage_v4_clusterLeader_clusterLeader_node] = (byte) clusterLeaderNode;
 
 							ClusterLeader cl = new ClusterLeader(clmsgClone, clmsgClone.length);
-							clusterLeaderHandler.handleClusterLeaderMessage(gateway, utcTimestamp + random.nextInt(randomRange), cl);
+							this.clusterLeaderHandler.handleClusterLeaderMessage(gateway, utcTimestamp + random.nextInt(randomRange),
+									cl);
 						}
 					}
 				} else {
@@ -155,7 +156,7 @@ public class Faker {
 			pumsgClone[UplinkMessage_v4_olsrMessage_v4_originator_node] = (byte) node;
 
 			PositionUpdate pu = new PositionUpdate(pumsgClone, pumsgClone.length);
-			positionUpdateHandler.handlePositionMessage(gateway, utcTimestamp + random.nextInt(randomRange), pu);
+			this.positionUpdateHandler.handlePositionMessage(gateway, utcTimestamp + random.nextInt(randomRange), pu);
 		}
 
 		/*
@@ -172,7 +173,7 @@ public class Faker {
 			clmsgClone[UplinkMessage_v4_clusterLeader_clusterLeader_node] = (byte) (clusterLeaderNode + nodeCountMax - 1);
 
 			ClusterLeader cl = new ClusterLeader(clmsgClone, clmsgClone.length);
-			clusterLeaderHandler.handleClusterLeaderMessage(gateway, utcTimestamp + random.nextInt(randomRange), cl);
+			this.clusterLeaderHandler.handleClusterLeaderMessage(gateway, utcTimestamp + random.nextInt(randomRange), cl);
 		}
 	}
 }

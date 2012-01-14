@@ -106,8 +106,8 @@ public class PacketHandlerImpl implements PacketHandler {
 		long utcTimestamp = System.currentTimeMillis();
 		boolean updated = false;
 
-		if (logger.isDebugEnabled()) {
-			logger.debug("[" + utcTimestamp + "] Received " + packet.getLength() + " bytes from "
+		if (this.logger.isDebugEnabled()) {
+			this.logger.debug("[" + utcTimestamp + "] Received " + packet.getLength() + " bytes from "
 					+ packet.getAddress().getHostAddress() + ":" + packet.getPort());
 		}
 
@@ -115,13 +115,13 @@ public class PacketHandlerImpl implements PacketHandler {
 			InetAddress srcIp = packet.getAddress();
 			int srcPort = packet.getPort();
 
-			RelayServer me = relayServers.getMe();
+			RelayServer me = this.relayServers.getMe();
 
 			/* get gateway node or create */
-			Gateway gateway = gateways.getGateway(srcIp, srcPort);
+			Gateway gateway = this.gateways.getGateway(srcIp, srcPort);
 			if (gateway == null) {
 				gateway = new Gateway(srcIp, Integer.valueOf(srcPort), me);
-				gateways.saveGateway(gateway);
+				this.gateways.saveGateway(gateway);
 			}
 
 			/* make sure the gateway is linked to this relayServer */
@@ -139,21 +139,22 @@ public class PacketHandlerImpl implements PacketHandler {
 						+ UplinkMessage.getUplinkMessageLength(packetData, messageOffset);
 
 				byte[] messageData = Arrays.copyOfRange(packetData, messageOffset, messageOffset + messageLength);
-				DumpUtil.dumpUplinkMessage(logger, Level.DEBUG, messageData, srcIp, srcPort, messageType, utcTimestamp, "  ");
+				DumpUtil.dumpUplinkMessage(this.logger, Level.DEBUG, messageData, srcIp, srcPort, messageType, utcTimestamp,
+						"  ");
 				if (messageType == UplinkMessage.getUplinkMessageTypePosition()) {
 					PositionUpdate pu = new PositionUpdate(messageData, messageLength);
-					updated = positionUpdateHandler.handlePositionMessage(gateway, utcTimestamp, pu) || updated;
-					if (useFaker) {
-						faker.fakeit(gateway, utcTimestamp, Faker.MSGTYPE.PU, pu);
+					updated = this.positionUpdateHandler.handlePositionMessage(gateway, utcTimestamp, pu) || updated;
+					if (this.useFaker) {
+						this.faker.fakeit(gateway, utcTimestamp, Faker.MSGTYPE.PU, pu);
 					}
 				} else if (messageType == PositionUpdate.getUplinkMessageTypeClusterLeader()) {
 					ClusterLeader cl = new ClusterLeader(messageData, messageLength);
-					updated = clusterLeaderHandler.handleClusterLeaderMessage(gateway, utcTimestamp, cl) || updated;
-					if (useFaker) {
-						faker.fakeit(gateway, utcTimestamp, Faker.MSGTYPE.CL, cl);
+					updated = this.clusterLeaderHandler.handleClusterLeaderMessage(gateway, utcTimestamp, cl) || updated;
+					if (this.useFaker) {
+						this.faker.fakeit(gateway, utcTimestamp, Faker.MSGTYPE.CL, cl);
 					}
 				} else {
-					logger.warn("Uplink message type " + messageType + " not supported: ignored");
+					this.logger.warn("Uplink message type " + messageType + " not supported: ignored");
 				}
 
 				messageOffset += messageLength;
@@ -161,11 +162,11 @@ public class PacketHandlerImpl implements PacketHandler {
 
 			return updated;
 		} catch (Throwable e) {
-			logger.error("error during packet handling", e);
+			this.logger.error("error during packet handling", e);
 			return updated;
 		} finally {
-			if (useFaker) {
-				faker.setFirstFake(false);
+			if (this.useFaker) {
+				this.faker.setFirstFake(false);
 			}
 		}
 	}

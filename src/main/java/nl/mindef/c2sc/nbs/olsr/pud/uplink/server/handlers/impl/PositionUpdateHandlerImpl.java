@@ -51,8 +51,8 @@ public class PositionUpdateHandlerImpl implements PositionUpdateHandler {
 		assert (puMsg != null);
 
 		if (puMsg.getPositionUpdateVersion() != WireFormatConstants.VERSION) {
-			logger.error("Received wrong version of position update message from " + gateway.getIp().getHostAddress() + ":"
-					+ gateway.getPort() + ", expected version " + WireFormatConstants.VERSION + ", received version "
+			this.logger.error("Received wrong version of position update message from " + gateway.getIp().getHostAddress()
+					+ ":" + gateway.getPort() + ", expected version " + WireFormatConstants.VERSION + ", received version "
 					+ puMsg.getPositionUpdateVersion() + ": ignored");
 			return false;
 		}
@@ -62,11 +62,11 @@ public class PositionUpdateHandlerImpl implements PositionUpdateHandler {
 		InetAddress originator = puMsg.getOlsrMessageOriginator();
 
 		/* retrieve the node that sent the position update */
-		Node originatorNode = nodes.getNode(originator);
+		Node originatorNode = this.nodes.getNode(originator);
 		if (originatorNode == null) {
 			/* new node */
 			originatorNode = new Node(originator, gateway);
-			nodes.saveNode(originatorNode);
+			this.nodes.saveNode(originatorNode);
 		}
 
 		/* link the node to the gateway from which it was received */
@@ -77,7 +77,7 @@ public class PositionUpdateHandlerImpl implements PositionUpdateHandler {
 		if (storedPositionUpdate == null) {
 			/* new position update */
 			storedPositionUpdate = new PositionUpdateMsg(originatorNode, puMsg);
-			positionUpdateMsgs.savePositionUpdateMsg(storedPositionUpdate);
+			this.positionUpdateMsgs.savePositionUpdateMsg(storedPositionUpdate);
 		} else {
 			/* check that received timestamp is later than the stored timestamp */
 			if (storedPositionUpdate.getPositionUpdateMsg() != null) {
@@ -103,7 +103,7 @@ public class PositionUpdateHandlerImpl implements PositionUpdateHandler {
 		originatorNode.setPositionUpdateMsg(storedPositionUpdate);
 
 		/* save the node and position. explicitly saving the originatorNode is not needed since that is cascaded */
-		positionUpdateMsgs.savePositionUpdateMsg(storedPositionUpdate);
+		this.positionUpdateMsgs.savePositionUpdateMsg(storedPositionUpdate);
 
 		return true;
 	}

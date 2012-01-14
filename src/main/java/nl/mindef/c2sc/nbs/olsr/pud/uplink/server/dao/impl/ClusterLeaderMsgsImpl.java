@@ -38,7 +38,7 @@ public class ClusterLeaderMsgsImpl implements ClusterLeaderMsgs {
 		}
 
 		@SuppressWarnings("unchecked")
-		List<ClusterLeaderMsg> result = sessionFactory.getCurrentSession()
+		List<ClusterLeaderMsg> result = this.sessionFactory.getCurrentSession()
 				.createQuery("select cl from ClusterLeaderMsg cl where cl.node.mainIp = :ip").setParameter("ip", mainIp).list();
 
 		if (result.size() == 0) {
@@ -53,14 +53,14 @@ public class ClusterLeaderMsgsImpl implements ClusterLeaderMsgs {
 	@Override
 	@Transactional
 	public void saveClusterLeaderMsg(ClusterLeaderMsg clusterLeaderMsg) {
-		sessionFactory.getCurrentSession().saveOrUpdate(clusterLeaderMsg);
+		this.sessionFactory.getCurrentSession().saveOrUpdate(clusterLeaderMsg);
 	}
 
 	@Override
 	@Transactional
 	public boolean removeExpiredClusterLeaderMsg(long utcTimestamp, double validityTimeMultiplier) {
 		@SuppressWarnings("unchecked")
-		List<ClusterLeaderMsg> result = sessionFactory
+		List<ClusterLeaderMsg> result = this.sessionFactory
 				.getCurrentSession()
 				.createQuery(
 						"select cl from ClusterLeaderMsg cl where (receptionTime + (validityTime * " + validityTimeMultiplier
@@ -73,12 +73,12 @@ public class ClusterLeaderMsgsImpl implements ClusterLeaderMsgs {
 		for (ClusterLeaderMsg cl : result) {
 			cl.getNode().setClusterLeaderMsg(null);
 			cl.setClusterLeaderNode(null);
-			sessionFactory.getCurrentSession().merge(cl.getNode());
-			sessionFactory.getCurrentSession().delete(cl);
+			this.sessionFactory.getCurrentSession().merge(cl.getNode());
+			this.sessionFactory.getCurrentSession().delete(cl);
 		}
 
-		if (logger.isDebugEnabled()) {
-			logger.debug("removed " + result.size() + " ClusterLeaderMsg objects");
+		if (this.logger.isDebugEnabled()) {
+			this.logger.debug("removed " + result.size() + " ClusterLeaderMsg objects");
 		}
 
 		return true;
@@ -86,7 +86,7 @@ public class ClusterLeaderMsgsImpl implements ClusterLeaderMsgs {
 
 	private String getClusterLeaderMsgsDump() {
 		@SuppressWarnings("unchecked")
-		List<ClusterLeaderMsg> result = sessionFactory.getCurrentSession()
+		List<ClusterLeaderMsg> result = this.sessionFactory.getCurrentSession()
 				.createQuery("from ClusterLeaderMsg clusterLeaderMsg").list();
 
 		StringBuilder s = new StringBuilder();
