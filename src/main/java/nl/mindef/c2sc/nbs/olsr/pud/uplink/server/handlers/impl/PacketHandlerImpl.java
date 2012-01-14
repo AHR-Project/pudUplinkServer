@@ -147,7 +147,7 @@ public class PacketHandlerImpl implements PacketHandler {
 					if (this.useFaker) {
 						this.faker.fakeit(gateway, utcTimestamp, Faker.MSGTYPE.PU, pu);
 					}
-				} else if (messageType == PositionUpdate.getUplinkMessageTypeClusterLeader()) {
+				} else if (messageType == UplinkMessage.getUplinkMessageTypeClusterLeader()) {
 					ClusterLeader cl = new ClusterLeader(messageData, messageLength);
 					updated = this.clusterLeaderHandler.handleClusterLeaderMessage(gateway, utcTimestamp, cl) || updated;
 					if (this.useFaker) {
