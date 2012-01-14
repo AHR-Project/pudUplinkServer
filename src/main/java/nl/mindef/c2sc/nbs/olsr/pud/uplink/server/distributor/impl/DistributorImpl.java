@@ -125,8 +125,8 @@ public class DistributorImpl extends Thread implements Distributor {
 	}
 
 	private AtomicBoolean run = new AtomicBoolean(true);
-	private Object runWaiter = new Object();
-	private AtomicBoolean distribute = new AtomicBoolean(false);
+	Object runWaiter = new Object();
+	AtomicBoolean distribute = new AtomicBoolean(false);
 
 	@Override
 	public void run() {

@@ -18,7 +18,7 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Required;
 
 public class DatabaseLogger {
-	private Logger logger = Logger.getLogger(this.getClass().getName());
+	Logger logger = Logger.getLogger(this.getClass().getName());
 
 	private int updateIntervalMs = 0;
 
@@ -43,7 +43,7 @@ public class DatabaseLogger {
 	}
 
 	/** the Node handler */
-	private Nodes nodes;
+	Nodes nodes;
 
 	/**
 	 * @param nodes
@@ -55,7 +55,7 @@ public class DatabaseLogger {
 	}
 
 	/** the PositionUpdateMsgs handler */
-	private PositionUpdateMsgs positionUpdateMsgs;
+	PositionUpdateMsgs positionUpdateMsgs;
 
 	/**
 	 * @param positionUpdateMsgs
@@ -67,7 +67,7 @@ public class DatabaseLogger {
 	}
 
 	/** the ClusterLeaderMsgs handler */
-	private ClusterLeaderMsgs clusterLeaderMsgs;
+	ClusterLeaderMsgs clusterLeaderMsgs;
 
 	/**
 	 * @param clusterLeaderMsgs
@@ -78,7 +78,7 @@ public class DatabaseLogger {
 		this.clusterLeaderMsgs = clusterLeaderMsgs;
 	}
 
-	private RelayServers relayServers;
+	RelayServers relayServers;
 
 	/**
 	 * @param relayServers
@@ -89,7 +89,7 @@ public class DatabaseLogger {
 		this.relayServers = relayServers;
 	}
 
-	private Gateways gateways;
+	Gateways gateways;
 
 	/**
 	 * @param gateways
@@ -106,8 +106,8 @@ public class DatabaseLogger {
 
 	private Timer timer = null;
 	private TimerTask task = null;
-	private FileOutputStream fos = null;
-	private static final byte[] eol = "\n".getBytes();
+	FileOutputStream fos = null;
+	static final byte[] eol = "\n".getBytes();
 
 	public void init() throws FileNotFoundException {
 		if (this.updateIntervalMs <= 0) {

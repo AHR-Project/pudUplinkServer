@@ -16,7 +16,7 @@ import org.springframework.beans.factory.annotation.Required;
  * empty RelayServers since these are statically configured
  */
 public class ExpireNodes {
-	private Logger logger = Logger.getLogger(this.getClass().getName());
+	Logger logger = Logger.getLogger(this.getClass().getName());
 
 	/**
 	 * Timer task that does the actual expiry of out-of-date and empty objects
@@ -82,7 +82,7 @@ public class ExpireNodes {
 	}
 
 	/** the multiplier for the validity time */
-	private double validityTimeMultiplier = 3.0;
+	double validityTimeMultiplier = 3.0;
 
 	/**
 	 * @param validityTimeMultiplier
@@ -93,7 +93,7 @@ public class ExpireNodes {
 	}
 
 	/** the Node DAO */
-	private Nodes nodes;
+	Nodes nodes;
 
 	/**
 	 * @param nodes
@@ -105,7 +105,7 @@ public class ExpireNodes {
 	}
 
 	/** the PositionUpdateMsg DAO */
-	private PositionUpdateMsgs positionUpdateMsgs;
+	PositionUpdateMsgs positionUpdateMsgs;
 
 	/**
 	 * @param positionUpdateMsgs
@@ -117,7 +117,7 @@ public class ExpireNodes {
 	}
 
 	/** the ClusterLeaderMsg DAO */
-	private ClusterLeaderMsgs clusterLeaderMsgs;
+	ClusterLeaderMsgs clusterLeaderMsgs;
 
 	/**
 	 * @param clusterLeaderMsgs
@@ -129,7 +129,7 @@ public class ExpireNodes {
 	}
 
 	/** the Gateway DAO */
-	private Gateways gateways;
+	Gateways gateways;
 
 	/**
 	 * @param gateways
