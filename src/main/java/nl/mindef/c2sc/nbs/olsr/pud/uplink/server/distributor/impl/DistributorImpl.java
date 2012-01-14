@@ -5,7 +5,6 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
-import java.net.UnknownHostException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Timer;
@@ -106,7 +105,7 @@ public class DistributorImpl extends Thread implements Distributor {
 		this.distributionDelay = distributionDelay;
 	}
 
-	public void init() throws SocketException, UnknownHostException {
+	public void init() throws SocketException {
 		this.setName(this.getClass().getSimpleName());
 		this.timer = new Timer(this.getClass().getSimpleName() + "-Timer");
 		this.sock = new DatagramSocket();
