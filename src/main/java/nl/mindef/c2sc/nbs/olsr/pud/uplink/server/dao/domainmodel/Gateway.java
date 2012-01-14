@@ -158,11 +158,11 @@ public class Gateway implements Serializable {
 		for (Node node : this.nodes) {
 			ids.add(node.getId());
 		}
-		for (Long id : ids) {
+		for (Long idIterator : ids) {
 			if (comma) {
 				builder.append(", ");
 			}
-			builder.append(id);
+			builder.append(idIterator);
 			comma = true;
 		}
 		builder.append("]]");

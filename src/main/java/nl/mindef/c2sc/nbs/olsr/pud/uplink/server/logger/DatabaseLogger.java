@@ -164,11 +164,11 @@ public class DatabaseLogger {
 		}
 	}
 
-	public void log(Logger logger, Level level) {
-		this.relayServers.log(logger, level);
-		this.gateways.log(logger, level);
-		this.nodes.log(logger, level);
-		this.positionUpdateMsgs.log(logger, level);
-		this.clusterLeaderMsgs.log(logger, level);
+	public void log(Logger log, Level level) {
+		this.relayServers.log(log, level);
+		this.gateways.log(log, level);
+		this.nodes.log(log, level);
+		this.positionUpdateMsgs.log(log, level);
+		this.clusterLeaderMsgs.log(log, level);
 	}
 }

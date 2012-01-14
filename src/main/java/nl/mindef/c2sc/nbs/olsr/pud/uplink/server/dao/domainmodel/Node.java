@@ -176,11 +176,11 @@ public class Node implements Serializable {
 		for (ClusterLeaderMsg clusterNode : this.clusterNodes) {
 			ids.add(clusterNode.getId());
 		}
-		for (Long id : ids) {
+		for (Long idIterator : ids) {
 			if (comma) {
 				builder.append(", ");
 			}
-			builder.append(id);
+			builder.append(idIterator);
 			comma = true;
 		}
 		builder.append("]");

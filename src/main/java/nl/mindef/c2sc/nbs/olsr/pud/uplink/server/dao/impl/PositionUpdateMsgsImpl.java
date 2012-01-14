@@ -129,9 +129,9 @@ public class PositionUpdateMsgsImpl implements PositionUpdateMsgs {
 
 	@Override
 	@Transactional(readOnly = true)
-	public void log(Logger logger, Level level) {
-		if (logger.isEnabledFor(level)) {
-			logger.log(level, getPositionsDump());
+	public void log(Logger log, Level level) {
+		if (log.isEnabledFor(level)) {
+			log.log(level, getPositionsDump());
 		}
 	}
 

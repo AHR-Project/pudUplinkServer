@@ -35,8 +35,8 @@ public class StopHandlerImpl implements SignalHandler {
 	}
 
 	@Override
-	public void handle(Signal signal) {
-		if (signal.equals(this.signal)) {
+	public void handle(Signal signl) {
+		if (signl.equals(this.signal)) {
 			for (StopHandlerConsumer handler : this.handlers) {
 				try {
 					handler.signalStop();
@@ -49,7 +49,7 @@ public class StopHandlerImpl implements SignalHandler {
 		/* Chain back to previous handler, if one exists */
 		if ((this.oldHandler != null) && (this.oldHandler != SIG_DFL) && (this.oldHandler != SIG_IGN)) {
 			try {
-				this.oldHandler.handle(signal);
+				this.oldHandler.handle(signl);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
