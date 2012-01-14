@@ -36,7 +36,7 @@ public class RelayServersImpl implements RelayServers {
 	 *          the uplinkUdpPort to set
 	 */
 	@Required
-	public final void setUplinkUdpPort(int uplinkUdpPort) {
+	public final void setUplinkUdpPort(Integer uplinkUdpPort) {
 		this.uplinkUdpPort = uplinkUdpPort;
 	}
 

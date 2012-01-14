@@ -120,7 +120,7 @@ public class PacketHandlerImpl implements PacketHandler {
 			/* get gateway node or create */
 			Gateway gateway = gateways.getGateway(srcIp, srcPort);
 			if (gateway == null) {
-				gateway = new Gateway(srcIp, srcPort, me);
+				gateway = new Gateway(srcIp, Integer.valueOf(srcPort), me);
 				gateways.saveGateway(gateway);
 			}
 

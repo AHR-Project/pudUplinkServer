@@ -40,16 +40,16 @@ public class DumpUtil {
 					s.append("  ");
 				}
 			}
-			s.append(String.format(" %02x", data[index]));
+			s.append(String.format(" %02x", Byte.valueOf(data[index])));
 		}
 		s.append("\n");
-		s.append(String.format(indent + "sender = %s:%d\n", ip.getHostAddress(), port));
-		s.append(String.format(indent + "size   = %d bytes\n", data.length));
+		s.append(String.format(indent + "sender = %s:%d\n", ip.getHostAddress(), Integer.valueOf(port)));
+		s.append(String.format(indent + "size   = %d bytes\n", Integer.valueOf(data.length)));
 
 		s.append(indent + "  *** UplinkHeader ***\n");
-		s.append(String.format(indent + "  type   = %d\n", type));
-		s.append(String.format(indent + "  length = %d bytes\n", ul.getUplinkMessageLength()));
-		s.append(String.format(indent + "  ipv6   = %b\n", ul.isUplinkMessageIPv6()));
+		s.append(String.format(indent + "  type   = %d\n", Integer.valueOf(type)));
+		s.append(String.format(indent + "  length = %d bytes\n", Integer.valueOf(ul.getUplinkMessageLength())));
+		s.append(String.format(indent + "  ipv6   = %b\n", Boolean.valueOf(ul.isUplinkMessageIPv6())));
 
 		if (type == UplinkMessage.getUplinkMessageTypePosition()) {
 			PositionUpdate pu = (PositionUpdate) ul;
@@ -59,30 +59,32 @@ public class DumpUtil {
 			s.append(String.format(indent + "    originator   = %s\n", pu.getOlsrMessageOriginator().getHostAddress()));
 
 			s.append(indent + "    *** PudOlsrPositionUpdate ***\n");
-			s.append(String.format(indent + "    version      = %d\n", pu.getPositionUpdateVersion()));
-			s.append(String.format(indent + "    validity     = %d sec\n", pu.getPositionUpdateValidityTime()));
-			s.append(String.format(indent + "    smask        = 0x%02x\n", pu.getPositionUpdateSMask()));
-			s.append(String.format(indent + "    flags        = 0x%02x\n", pu.getPositionUpdateFlags()));
+			s.append(String.format(indent + "    version      = %d\n", Integer.valueOf(pu.getPositionUpdateVersion())));
+			s.append(String.format(indent + "    validity     = %d sec\n", Long.valueOf(pu.getPositionUpdateValidityTime())));
+			s.append(String.format(indent + "    smask        = 0x%02x\n", Integer.valueOf(pu.getPositionUpdateSMask())));
+			s.append(String.format(indent + "    flags        = 0x%02x\n", Integer.valueOf(pu.getPositionUpdateFlags())));
 
 			s.append(indent + "      *** GpsInfo ***\n");
 			s.append(String.format(indent + "      time       = %d\n",
-					pu.getPositionUpdateTime(utcTimestamp, TimeZoneUtil.getTimezoneOffset())));
-			s.append(String.format(indent + "      lat        = %f\n", NmeaUtil.nmeaDeg2Ndeg(pu.getPositionUpdateLatitude())));
-			s.append(String.format(indent + "      lon        = %f\n", NmeaUtil.nmeaDeg2Ndeg(pu.getPositionUpdateLongitude())));
-			s.append(String.format(indent + "      alt        = %d m\n", pu.getPositionUpdateAltitude()));
-			s.append(String.format(indent + "      speed      = %d kph\n", pu.getPositionUpdateSpeed()));
-			s.append(String.format(indent + "      track      = %d deg\n", pu.getPositionUpdateTrack()));
-			s.append(String.format(indent + "      hdop       = %f\n", pu.getPositionUpdateHdop()));
+					Long.valueOf(pu.getPositionUpdateTime(utcTimestamp, TimeZoneUtil.getTimezoneOffset()))));
+			s.append(String.format(indent + "      lat        = %f\n",
+					Double.valueOf(NmeaUtil.nmeaDeg2Ndeg(pu.getPositionUpdateLatitude()))));
+			s.append(String.format(indent + "      lon        = %f\n",
+					Double.valueOf(NmeaUtil.nmeaDeg2Ndeg(pu.getPositionUpdateLongitude()))));
+			s.append(String.format(indent + "      alt        = %d m\n", Long.valueOf(pu.getPositionUpdateAltitude())));
+			s.append(String.format(indent + "      speed      = %d kph\n", Long.valueOf(pu.getPositionUpdateSpeed())));
+			s.append(String.format(indent + "      track      = %d deg\n", Long.valueOf(pu.getPositionUpdateTrack())));
+			s.append(String.format(indent + "      hdop       = %f\n", Double.valueOf(pu.getPositionUpdateHdop())));
 
 			s.append(indent + "      *** NodeInfo ***\n");
-			s.append(String.format(indent + "      nodeIdType = %d\n", pu.getPositionUpdateNodeIdType()));
+			s.append(String.format(indent + "      nodeIdType = %d\n", Integer.valueOf(pu.getPositionUpdateNodeIdType())));
 			s.append(String.format(indent + "      nodeId     = %s\n", pu.getPositionUpdateNodeId()));
 		} else if (type == UplinkMessage.getUplinkMessageTypeClusterLeader()) {
 			ClusterLeader cl = (ClusterLeader) ul;
 
 			s.append(indent + "    *** UplinkClusterLeader ***\n");
-			s.append(String.format(indent + "    version       = %d\n", cl.getClusterLeaderVersion()));
-			s.append(String.format(indent + "    validity      = %d sec\n", cl.getClusterLeaderValidityTime()));
+			s.append(String.format(indent + "    version       = %d\n", Integer.valueOf(cl.getClusterLeaderVersion())));
+			s.append(String.format(indent + "    validity      = %d sec\n", Long.valueOf(cl.getClusterLeaderValidityTime())));
 			s.append(String.format(indent + "    originator    = %s\n", cl.getClusterLeaderOriginator().getHostAddress()));
 			s.append(String.format(indent + "    clusterLeader = %s\n", cl.getClusterLeaderClusterLeader().getHostAddress()));
 		}

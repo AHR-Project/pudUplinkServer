@@ -33,7 +33,7 @@ public class UplinkReceiver extends Thread implements StopHandlerConsumer {
 	 *          the uplinkUdpPort to set
 	 */
 	@Required
-	public final void setUplinkUdpPort(int uplinkUdpPort) {
+	public final void setUplinkUdpPort(Integer uplinkUdpPort) {
 		this.uplinkUdpPort = uplinkUdpPort;
 	}
 
@@ -117,11 +117,11 @@ public class UplinkReceiver extends Thread implements StopHandlerConsumer {
 
 			if (fields.length == 2) {
 				Integer port = Integer.valueOf(fields[1].trim());
-				if ((port <= 0) || (port > 65535)) {
-					throw new IllegalArgumentException("Configured port " + port + " for IP address " + ip.getHostAddress()
-							+ " is outside valid range of [1, 65535]");
+				if ((port.intValue() <= 0) || (port.intValue() > 65535)) {
+					throw new IllegalArgumentException("Configured port " + port.intValue() + " for IP address "
+							+ ip.getHostAddress() + " is outside valid range of [1, 65535]");
 				}
-				relayServer.setPort(port.intValue());
+				relayServer.setPort(port);
 			}
 
 			this.configuredRelayServers.add(relayServer);
@@ -146,7 +146,7 @@ public class UplinkReceiver extends Thread implements StopHandlerConsumer {
 
 	public void init() throws SocketException {
 		this.setName(this.getClass().getSimpleName());
-		sock = new DatagramSocket(uplinkUdpPort);
+		sock = new DatagramSocket(uplinkUdpPort.intValue());
 		this.start();
 	}
 

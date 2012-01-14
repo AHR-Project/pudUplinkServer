@@ -81,13 +81,12 @@ public class RelayServer implements Serializable {
 	}
 
 	/** port the port of the relay server */
-	@NotNull
-	private int port = 2242;
+	private Integer port = Integer.valueOf(2242);
 
 	/**
 	 * @return the port
 	 */
-	public final int getPort() {
+	public final Integer getPort() {
 		return port;
 	}
 
@@ -95,7 +94,7 @@ public class RelayServer implements Serializable {
 	 * @param port
 	 *          the port to set
 	 */
-	public final void setPort(int port) {
+	public final void setPort(Integer port) {
 		this.port = port;
 	}
 

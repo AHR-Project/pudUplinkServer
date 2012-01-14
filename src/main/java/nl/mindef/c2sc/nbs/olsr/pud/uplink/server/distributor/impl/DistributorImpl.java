@@ -57,7 +57,7 @@ public class DistributorImpl extends Thread implements Distributor {
 	 *          the uplinkUdpPort to set
 	 */
 	@Required
-	public final void setUplinkUdpPort(int uplinkUdpPort) {
+	public final void setUplinkUdpPort(Integer uplinkUdpPort) {
 		this.uplinkUdpPort = uplinkUdpPort;
 	}
 
@@ -258,7 +258,7 @@ public class DistributorImpl extends Thread implements Distributor {
 					StringBuilder s = new StringBuilder();
 					for (RelayServer otherRelayServer : otherRelayServers) {
 						InetAddress otherRelayServerIp = otherRelayServer.getIp();
-						int otherRelayServerPort = otherRelayServer.getPort();
+						int otherRelayServerPort = otherRelayServer.getPort().intValue();
 
 						if (logger.isDebugEnabled()) {
 							s.setLength(0);
@@ -366,7 +366,7 @@ public class DistributorImpl extends Thread implements Distributor {
 								s.append(" " + packet.getLength());
 							}
 							packet.setAddress(clusterLeaderGatewayIp);
-							packet.setPort(clusterLeaderGatewayPort);
+							packet.setPort(clusterLeaderGatewayPort.intValue());
 							try {
 								sock.send(packet);
 							} catch (IOException e) {
