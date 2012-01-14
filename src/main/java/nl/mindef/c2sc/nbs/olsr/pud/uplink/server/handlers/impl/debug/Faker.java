@@ -35,7 +35,7 @@ public class Faker {
 
 	public enum MSGTYPE {
 		PU, CL
-	};
+	}
 
 	private boolean firstFake = true;
 
