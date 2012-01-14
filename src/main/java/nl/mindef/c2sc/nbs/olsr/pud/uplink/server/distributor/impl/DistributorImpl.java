@@ -326,7 +326,7 @@ public class DistributorImpl extends Thread implements Distributor {
 					}
 
 					if ((myIPAddresses.isMe(clusterLeaderGatewayIp) || myIPAddresses.isMe(clusterLeaderMainIp))
-							&& (clusterLeaderGatewayPort == uplinkUdpPort)) {
+							&& (clusterLeaderGatewayPort.intValue() == uplinkUdpPort.intValue())) {
 						/* do not relay to ourselves */
 						if (logger.isDebugEnabled()) {
 							logger.debug("this is me: skipping");
