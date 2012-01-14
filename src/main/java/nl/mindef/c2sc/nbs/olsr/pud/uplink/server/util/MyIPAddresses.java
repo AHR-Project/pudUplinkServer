@@ -31,6 +31,7 @@ public class MyIPAddresses {
 		}
 	}
 
+	@SuppressWarnings("static-method")
 	public boolean isMe(InetAddress ip) {
 		return myIpAddresses.contains(ip);
 	}
