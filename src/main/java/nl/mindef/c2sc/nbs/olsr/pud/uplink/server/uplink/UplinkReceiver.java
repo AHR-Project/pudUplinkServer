@@ -156,9 +156,6 @@ public class UplinkReceiver extends Thread implements StopHandlerConsumer {
 
 	/**
 	 * Run the relay server.
-	 * 
-	 * @throws SocketException
-	 *           when the socket could not be created
 	 */
 	@Override
 	public void run() {
