@@ -8,8 +8,8 @@ import java.io.OutputStream;
 import java.net.InetAddress;
 import java.util.List;
 
-import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.Gateways;
-import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.domainmodel.Gateway;
+import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.Senders;
+import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.domainmodel.Sender;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -19,7 +19,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 @Repository
-public class GatewaysImpl implements Gateways {
+public class SendersImpl implements Senders {
 	private Logger logger = Logger.getLogger(this.getClass().getName());
 
 	private SessionFactory sessionFactory;
@@ -35,14 +35,14 @@ public class GatewaysImpl implements Gateways {
 
 	@Override
 	@Transactional(readOnly = true)
-	public List<Gateway> getGateways(InetAddress ip) {
+	public List<Sender> getSenders(InetAddress ip) {
 		if (ip == null) {
 			return null;
 		}
 
 		@SuppressWarnings("unchecked")
-		List<Gateway> result = this.sessionFactory.getCurrentSession()
-				.createQuery("select gw from Gateway gw where gw.ip = :ip").setParameter("ip", ip).list();
+		List<Sender> result = this.sessionFactory.getCurrentSession()
+				.createQuery("select gw from Sender gw where gw.ip = :ip").setParameter("ip", ip).list();
 
 		if (result.size() == 0) {
 			return null;
@@ -55,14 +55,14 @@ public class GatewaysImpl implements Gateways {
 
 	@Override
 	@Transactional(readOnly = true)
-	public Gateway getGateway(InetAddress ip, int port) {
+	public Sender getSender(InetAddress ip, int port) {
 		if (ip == null) {
 			return null;
 		}
 
 		@SuppressWarnings("unchecked")
-		List<Gateway> result = this.sessionFactory.getCurrentSession()
-				.createQuery("select gw from Gateway gw where gw.ip = :ip and gw.port = " + port).setParameter("ip", ip).list();
+		List<Sender> result = this.sessionFactory.getCurrentSession()
+				.createQuery("select gw from Sender gw where gw.ip = :ip and gw.port = " + port).setParameter("ip", ip).list();
 
 		if (result.size() == 0) {
 			return null;
@@ -75,40 +75,40 @@ public class GatewaysImpl implements Gateways {
 
 	@Override
 	@Transactional
-	public void saveGateway(Gateway gateway) {
-		this.sessionFactory.getCurrentSession().saveOrUpdate(gateway);
+	public void saveSender(Sender sender) {
+		this.sessionFactory.getCurrentSession().saveOrUpdate(sender);
 	}
 
 	@Override
 	@Transactional
-	public boolean removeExpiredGateways() {
+	public boolean removeExpiredSenders() {
 		@SuppressWarnings("unchecked")
-		List<Gateway> result = this.sessionFactory.getCurrentSession()
-				.createQuery("select gw from Gateway gw where size(nodes) = 0").list();
+		List<Sender> result = this.sessionFactory.getCurrentSession()
+				.createQuery("select gw from Sender gw where size(nodes) = 0").list();
 
 		if (result.size() == 0) {
 			return false;
 		}
 
-		for (Gateway gw : result) {
+		for (Sender gw : result) {
 			gw.setRelayServer(null);
 			this.sessionFactory.getCurrentSession().delete(gw);
 		}
 
 		if (this.logger.isDebugEnabled()) {
-			this.logger.debug("removed " + result.size() + " Gateway objects");
+			this.logger.debug("removed " + result.size() + " Sender objects");
 		}
 
 		return true;
 	}
 
-	private String getGatewaysDump() {
+	private String getSendersDump() {
 		@SuppressWarnings("unchecked")
-		List<Gateway> result = this.sessionFactory.getCurrentSession().createQuery("from Gateway gw").list();
+		List<Sender> result = this.sessionFactory.getCurrentSession().createQuery("from Sender gw").list();
 
 		StringBuilder s = new StringBuilder();
-		s.append("[Gateways]\n");
-		for (Gateway gw : result) {
+		s.append("[Senders]\n");
+		for (Sender gw : result) {
 			s.append(gw.toString() + "\n");
 		}
 
@@ -119,14 +119,14 @@ public class GatewaysImpl implements Gateways {
 	@Transactional(readOnly = true)
 	public void log(Logger log, Level level) {
 		if (log.isEnabledFor(level)) {
-			log.log(level, getGatewaysDump());
+			log.log(level, getSendersDump());
 		}
 	}
 
 	@Override
 	@Transactional(readOnly = true)
 	public void print(OutputStream out) throws IOException {
-		String s = getGatewaysDump();
+		String s = getSendersDump();
 		out.write(s.getBytes(), 0, s.length());
 	}
 }

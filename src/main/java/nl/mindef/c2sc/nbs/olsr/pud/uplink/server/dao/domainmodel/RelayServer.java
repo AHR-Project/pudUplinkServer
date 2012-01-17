@@ -98,23 +98,23 @@ public class RelayServer implements Serializable {
 		this.port = port;
 	}
 
-	/** the gateways associated with the relay server */
+	/** the senders associated with the relay server */
 	@OneToMany(cascade = CascadeType.ALL, mappedBy = "relayServer")
-	private Set<Gateway> gateways = new HashSet<Gateway>();
+	private Set<Sender> senders = new HashSet<Sender>();
 
 	/**
-	 * @return the gateways
+	 * @return the senders
 	 */
-	public final Set<Gateway> getGateways() {
-		return this.gateways;
+	public final Set<Sender> getSenders() {
+		return this.senders;
 	}
 
 	/**
 	 * @param nodes
 	 *          the nodes to set
 	 */
-	public final void setGateways(Set<Gateway> nodes) {
-		this.gateways = nodes;
+	public final void setSenders(Set<Sender> nodes) {
+		this.senders = nodes;
 	}
 
 	@Override
@@ -124,11 +124,11 @@ public class RelayServer implements Serializable {
 		builder.append(this.id);
 		builder.append(", ip=");
 		builder.append(this.ip.getHostAddress() + ":" + this.port);
-		builder.append(", gateways=[");
+		builder.append(", senders=[");
 		boolean comma = false;
 		Set<Long> ids = new TreeSet<Long>();
-		for (Gateway gateway : this.gateways) {
-			ids.add(gateway.getId());
+		for (Sender sender : this.senders) {
+			ids.add(sender.getId());
 		}
 		for (Long idIterator : ids) {
 			if (comma) {

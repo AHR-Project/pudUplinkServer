@@ -17,7 +17,7 @@ import javax.persistence.OneToOne;
 import javax.validation.constraints.NotNull;
 
 /**
- * Represents an OLSRd node that sends PositionUpdate and ClusterLeader messages to a gateway node
+ * Represents an OLSRd node that sends PositionUpdate and ClusterLeader messages to a sender node
  */
 @Entity
 public class Node implements Serializable {
@@ -35,13 +35,13 @@ public class Node implements Serializable {
 	 * 
 	 * @param mainIp
 	 *          the main IP address of the OLSR stack of the OLSRd node
-	 * @param gateway
-	 *          the gateway to which the node belongs
+	 * @param sender
+	 *          the sender to which the node belongs
 	 */
-	public Node(InetAddress mainIp, Gateway gateway) {
+	public Node(InetAddress mainIp, Sender sender) {
 		super();
 		this.mainIp = mainIp;
-		this.gateway = gateway;
+		this.sender = sender;
 	}
 
 	@Id
@@ -83,25 +83,25 @@ public class Node implements Serializable {
 	}
 
 	/**
-	 * the gateway to which the node belongs; can be null when an OLSRd node sends a ClusterLeader message that points at
+	 * the sender to which the node belongs; can be null when an OLSRd node sends a ClusterLeader message that points at
 	 * a cluster leader node that has not been seen yet by the RelayServer
 	 */
 	@ManyToOne(cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH, CascadeType.DETACH })
-	private Gateway gateway = null;
+	private Sender sender = null;
 
 	/**
-	 * @return the gateway
+	 * @return the sender
 	 */
-	public final Gateway getGateway() {
-		return this.gateway;
+	public final Sender getSender() {
+		return this.sender;
 	}
 
 	/**
-	 * @param gateway
-	 *          the gateway to set
+	 * @param sender
+	 *          the sender to set
 	 */
-	public final void setGateway(Gateway gateway) {
-		this.gateway = gateway;
+	public final void setSender(Sender sender) {
+		this.sender = sender;
 	}
 
 	/** the associated position update message */
@@ -168,8 +168,8 @@ public class Node implements Serializable {
 		builder.append(this.id);
 		builder.append(", mainIp=");
 		builder.append(this.mainIp.getHostAddress());
-		builder.append(", gateway=");
-		builder.append((this.gateway == null) ? "" : this.gateway.getId());
+		builder.append(", sender=");
+		builder.append((this.sender == null) ? "" : this.sender.getId());
 		builder.append(", clusterNodes=[");
 		boolean comma = false;
 		Set<Long> ids = new TreeSet<Long>();

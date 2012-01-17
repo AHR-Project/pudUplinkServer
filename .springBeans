@@ -17,7 +17,7 @@
 		<config>src/main/resources/META-INF/spring/clusterLeaderHandler.xml</config>
 		<config>src/main/resources/META-INF/spring/distributor.xml</config>
 		<config>src/main/resources/META-INF/spring/relayServers.xml</config>
-		<config>src/main/resources/META-INF/spring/gateways.xml</config>
+		<config>src/main/resources/META-INF/spring/senders.xml</config>
 		<config>src/main/resources/META-INF/spring/nodes.xml</config>
 		<config>src/main/resources/META-INF/spring/positionUpdateMsgs.xml</config>
 		<config>src/main/resources/META-INF/spring/clusterLeaderMsgs.xml</config>

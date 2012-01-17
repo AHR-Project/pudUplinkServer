@@ -4,9 +4,9 @@ import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.util.Arrays;
 
-import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.Gateways;
+import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.Senders;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.RelayServers;
-import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.domainmodel.Gateway;
+import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.domainmodel.Sender;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.domainmodel.RelayServer;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.handlers.ClusterLeaderHandler;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.handlers.PacketHandler;
@@ -49,15 +49,15 @@ public class PacketHandlerImpl implements PacketHandler {
 		this.clusterLeaderHandler = clusterLeaderHandler;
 	}
 
-	private Gateways gateways = null;
+	private Senders senders = null;
 
 	/**
-	 * @param gateways
-	 *          the gateways to set
+	 * @param senders
+	 *          the senders to set
 	 */
 	@Required
-	public final void setGateways(Gateways gateways) {
-		this.gateways = gateways;
+	public final void setSenders(Senders senders) {
+		this.senders = senders;
 	}
 
 	private RelayServers relayServers = null;
@@ -117,14 +117,14 @@ public class PacketHandlerImpl implements PacketHandler {
 
 			RelayServer me = this.relayServers.getMe();
 
-			/* get gateway node or create */
-			Gateway gateway = this.gateways.getGateway(srcIp, srcPort);
-			if (gateway == null) {
-				gateway = new Gateway(srcIp, Integer.valueOf(srcPort), me);
+			/* get sender or create */
+			Sender sender = this.senders.getSender(srcIp, srcPort);
+			if (sender == null) {
+				sender = new Sender(srcIp, Integer.valueOf(srcPort), me);
 			}
 
-			/* make sure the gateway is linked to this relayServer */
-			gateway.setRelayServer(me);
+			/* make sure the sender is linked to this relayServer */
+			sender.setRelayServer(me);
 
 			/* get packet data */
 			byte[] packetData = packet.getData();
@@ -149,15 +149,15 @@ public class PacketHandlerImpl implements PacketHandler {
 					boolean msgCausedUpdate = false;
 					if (messageType == UplinkMessage.getUplinkMessageTypePosition()) {
 						msg = new PositionUpdate(messageData, messageLength);
-						msgCausedUpdate = this.positionUpdateHandler.handlePositionMessage(gateway, utcTimestamp,
+						msgCausedUpdate = this.positionUpdateHandler.handlePositionMessage(sender, utcTimestamp,
 								(PositionUpdate) msg);
 					} else /* if (messageType == UplinkMessage.getUplinkMessageTypeClusterLeader()) */{
 						msg = new ClusterLeader(messageData, messageLength);
-						msgCausedUpdate = this.clusterLeaderHandler.handleClusterLeaderMessage(gateway, utcTimestamp,
+						msgCausedUpdate = this.clusterLeaderHandler.handleClusterLeaderMessage(sender, utcTimestamp,
 								(ClusterLeader) msg);
 					}
 					if (msgCausedUpdate && this.useFaker) {
-						this.faker.fakeit(gateway, utcTimestamp, msg);
+						this.faker.fakeit(sender, utcTimestamp, msg);
 					}
 					updated = msgCausedUpdate || updated;
 				}

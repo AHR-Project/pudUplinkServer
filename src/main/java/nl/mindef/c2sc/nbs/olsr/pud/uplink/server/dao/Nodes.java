@@ -44,7 +44,7 @@ public interface Nodes {
 	/**
 	 * Get a list of all cluster leaders.<br/>
 	 * <br/>
-	 * Only the cluster leader nodes themselves are retrieved along with their gateways (eager), no _other_ linked objects
+	 * Only the cluster leader nodes themselves are retrieved along with their senders (eager), no _other_ linked objects
 	 * (non-eager fetching) <br/>
 	 * <br/>
 	 * 
@@ -66,13 +66,13 @@ public interface Nodes {
 	/**
 	 * Get a substitute cluster leader for a given cluster leader.<br/>
 	 * <br/>
-	 * Only the substitute cluster leader node is retrieved along with its gateway (eager), no _other_ linked objects
+	 * Only the substitute cluster leader node is retrieved along with its sender (eager), no _other_ linked objects
 	 * (non-eager fetching)<br/>
 	 * <br/>
 	 * The substitute cluster leader is:
 	 * <ul>
 	 * <li>a node that is in the same cluster as the cluster leader, but is not the cluster leader itself</li>
-	 * <li>a node that has a valid Gateway</li>
+	 * <li>a node that has a valid Sender</li>
 	 * </ul>
 	 * 
 	 * @param clusterLeader

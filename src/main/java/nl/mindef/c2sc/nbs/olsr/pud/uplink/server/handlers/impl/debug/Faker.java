@@ -2,7 +2,7 @@ package nl.mindef.c2sc.nbs.olsr.pud.uplink.server.handlers.impl.debug;
 
 import java.util.Random;
 
-import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.domainmodel.Gateway;
+import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.domainmodel.Sender;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.handlers.ClusterLeaderHandler;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.handlers.PositionUpdateHandler;
 
@@ -58,7 +58,7 @@ public class Faker {
 	static private final int UplinkMessage_v4_clusterLeader_clusterLeader_network = 12;
 	static private final int UplinkMessage_v4_clusterLeader_clusterLeader_node = 13;
 
-	public void fakeit(Gateway gateway, long utcTimestamp, Object msg) {
+	public void fakeit(Sender sender, long utcTimestamp, Object msg) {
 		assert ((msg instanceof PositionUpdate) || (msg instanceof ClusterLeader));
 
 		if (!this.firstFake) {
@@ -107,7 +107,7 @@ public class Faker {
 							pumsgClone[UplinkMessage_v4_olsrMessage_v4_originator_node] = node;
 
 							PositionUpdate pu = new PositionUpdate(pumsgClone, pumsgClone.length);
-							this.positionUpdateHandler.handlePositionMessage(gateway, utcTimestamp + random.nextInt(randomRange), pu);
+							this.positionUpdateHandler.handlePositionMessage(sender, utcTimestamp + random.nextInt(randomRange), pu);
 						}
 
 						/*
@@ -125,7 +125,7 @@ public class Faker {
 							clmsgClone[UplinkMessage_v4_clusterLeader_clusterLeader_node] = clusterLeaderNode;
 
 							ClusterLeader cl = new ClusterLeader(clmsgClone, clmsgClone.length);
-							this.clusterLeaderHandler.handleClusterLeaderMessage(gateway, utcTimestamp + random.nextInt(randomRange),
+							this.clusterLeaderHandler.handleClusterLeaderMessage(sender, utcTimestamp + random.nextInt(randomRange),
 									cl);
 						}
 					}
@@ -157,7 +157,7 @@ public class Faker {
 			pumsgClone[UplinkMessage_v4_olsrMessage_v4_originator_node] = node;
 
 			PositionUpdate pu = new PositionUpdate(pumsgClone, pumsgClone.length);
-			this.positionUpdateHandler.handlePositionMessage(gateway, utcTimestamp + random.nextInt(randomRange), pu);
+			this.positionUpdateHandler.handlePositionMessage(sender, utcTimestamp + random.nextInt(randomRange), pu);
 		}
 
 		/*
@@ -175,7 +175,7 @@ public class Faker {
 			clmsgClone[UplinkMessage_v4_clusterLeader_clusterLeader_node] = (byte) (clusterLeaderNode + nodeCountMax - 1);
 
 			ClusterLeader cl = new ClusterLeader(clmsgClone, clmsgClone.length);
-			this.clusterLeaderHandler.handleClusterLeaderMessage(gateway, utcTimestamp + random.nextInt(randomRange), cl);
+			this.clusterLeaderHandler.handleClusterLeaderMessage(sender, utcTimestamp + random.nextInt(randomRange), cl);
 		}
 	}
 }

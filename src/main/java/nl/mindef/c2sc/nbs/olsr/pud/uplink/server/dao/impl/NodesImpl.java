@@ -69,8 +69,8 @@ public class NodesImpl implements Nodes {
 				.getCurrentSession()
 				.createQuery(
 						"select node from Node node"
-								/* do an eager fetch of the gateway */
-								+ " left join node.gateway"
+								/* do an eager fetch of the sender */
+								+ " left join node.sender"
 								/* node has cluster nodes AND node is not a cluster leader that doesn't point to itself */
 								+ " where (node.clusterNodes is not empty and node not in (select cl.clusterLeaderNode from ClusterLeaderMsg cl where cl.clusterLeaderNode.id != cl.clusterLeaderNode.clusterLeaderMsg.clusterLeaderNode.id))"
 
@@ -100,13 +100,13 @@ public class NodesImpl implements Nodes {
 				.getCurrentSession()
 				.createQuery(
 						"select node from Node node"
-						/* do an eager fetch of the gateway */
-						+ " left join node.gateway where"
+						/* do an eager fetch of the sender */
+						+ " left join node.sender where"
 						/* node is not the cluster leader itself and node points to cluster leader */
 						+ " node.id != " + clId
 								+ " and node.clusterLeaderMsg is not null and node.clusterLeaderMsg.clusterLeaderNode.id = " + clId
-								/* node has a valid gateway (a gateway always has a valid IP address and a valid port) */
-								+ " and node.gateway is not null"
+								/* node has a valid sender (a sender always has a valid IP address and a valid port) */
+								+ " and node.sender is not null"
 								/* keep the node with the most recently received cluster leader message on top of the list */
 								+ " order by node.clusterLeaderMsg.receptionTime desc").list();
 
@@ -138,7 +138,7 @@ public class NodesImpl implements Nodes {
 		}
 
 		for (Node node : result) {
-			node.setGateway(null);
+			node.setSender(null);
 			this.sessionFactory.getCurrentSession().delete(node);
 		}
 

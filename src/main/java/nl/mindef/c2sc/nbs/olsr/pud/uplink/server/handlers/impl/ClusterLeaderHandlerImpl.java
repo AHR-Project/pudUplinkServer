@@ -3,10 +3,10 @@ package nl.mindef.c2sc.nbs.olsr.pud.uplink.server.handlers.impl;
 import java.net.InetAddress;
 
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.ClusterLeaderMsgs;
-import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.Gateways;
+import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.Senders;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.Nodes;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.domainmodel.ClusterLeaderMsg;
-import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.domainmodel.Gateway;
+import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.domainmodel.Sender;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.domainmodel.Node;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.handlers.ClusterLeaderHandler;
 
@@ -33,15 +33,15 @@ public class ClusterLeaderHandlerImpl implements ClusterLeaderHandler {
 		this.clusterLeaderMsgs = clusterLeaderMsgs;
 	}
 
-	private Gateways gateways = null;
+	private Senders senders = null;
 
 	/**
-	 * @param gateways
-	 *          the gateways to set
+	 * @param senders
+	 *          the senders to set
 	 */
 	@Required
-	public final void setGateways(Gateways gateways) {
-		this.gateways = gateways;
+	public final void setSenders(Senders senders) {
+		this.senders = senders;
 	}
 
 	/** the Node handler */
@@ -58,20 +58,20 @@ public class ClusterLeaderHandlerImpl implements ClusterLeaderHandler {
 
 	@Override
 	@Transactional
-	public boolean handleClusterLeaderMessage(Gateway gateway, long utcTimestamp, ClusterLeader clMsg) {
+	public boolean handleClusterLeaderMessage(Sender sender, long utcTimestamp, ClusterLeader clMsg) {
 		assert (clMsg != null);
 
 		if (clMsg.getClusterLeaderVersion() != WireFormatConstants.VERSION) {
-			this.logger.error("Received wrong version of cluster leader message from " + gateway.getIp().getHostAddress()
-					+ ":" + gateway.getPort() + ", expected version " + WireFormatConstants.VERSION + ", received version "
+			this.logger.error("Received wrong version of cluster leader message from " + sender.getIp().getHostAddress()
+					+ ":" + sender.getPort() + ", expected version " + WireFormatConstants.VERSION + ", received version "
 					+ clMsg.getClusterLeaderVersion() + ": ignored");
 			return false;
 		}
 
-		assert (gateway != null);
+		assert (sender != null);
 
-		if (gateway.getId() == null) {
-			this.gateways.saveGateway(gateway);
+		if (sender.getId() == null) {
+			this.senders.saveSender(sender);
 		}
 
 		InetAddress originator = clMsg.getClusterLeaderOriginator();
@@ -81,12 +81,12 @@ public class ClusterLeaderHandlerImpl implements ClusterLeaderHandler {
 		Node originatorNode = this.nodes.getNode(originator);
 		if (originatorNode == null) {
 			/* new node */
-			originatorNode = new Node(originator, gateway);
+			originatorNode = new Node(originator, sender);
 			this.nodes.saveNode(originatorNode);
 		}
 
-		/* link the node to the gateway from which it was received */
-		originatorNode.setGateway(gateway);
+		/* link the node to the sender from which it was received */
+		originatorNode.setSender(sender);
 
 		/* retrieve the cluster leader node of the node that sent the cluster leader update */
 		Node clusterLeaderNode = this.nodes.getNode(clusterLeader);

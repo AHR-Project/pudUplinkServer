@@ -2,10 +2,10 @@ package nl.mindef.c2sc.nbs.olsr.pud.uplink.server.handlers.impl;
 
 import java.net.InetAddress;
 
-import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.Gateways;
+import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.Senders;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.Nodes;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.PositionUpdateMsgs;
-import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.domainmodel.Gateway;
+import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.domainmodel.Sender;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.domainmodel.Node;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.domainmodel.PositionUpdateMsg;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.handlers.PositionUpdateHandler;
@@ -34,15 +34,15 @@ public class PositionUpdateHandlerImpl implements PositionUpdateHandler {
 		this.positionUpdateMsgs = positionUpdateMsgs;
 	}
 
-	private Gateways gateways = null;
+	private Senders senders = null;
 
 	/**
-	 * @param gateways
-	 *          the gateways to set
+	 * @param senders
+	 *          the senders to set
 	 */
 	@Required
-	public final void setGateways(Gateways gateways) {
-		this.gateways = gateways;
+	public final void setSenders(Senders senders) {
+		this.senders = senders;
 	}
 
 	/** the Node handler */
@@ -59,20 +59,20 @@ public class PositionUpdateHandlerImpl implements PositionUpdateHandler {
 
 	@Override
 	@Transactional
-	public boolean handlePositionMessage(Gateway gateway, long utcTimestamp, PositionUpdate puMsg) {
+	public boolean handlePositionMessage(Sender sender, long utcTimestamp, PositionUpdate puMsg) {
 		assert (puMsg != null);
 
 		if (puMsg.getPositionUpdateVersion() != WireFormatConstants.VERSION) {
-			this.logger.error("Received wrong version of position update message from " + gateway.getIp().getHostAddress()
-					+ ":" + gateway.getPort() + ", expected version " + WireFormatConstants.VERSION + ", received version "
+			this.logger.error("Received wrong version of position update message from " + sender.getIp().getHostAddress()
+					+ ":" + sender.getPort() + ", expected version " + WireFormatConstants.VERSION + ", received version "
 					+ puMsg.getPositionUpdateVersion() + ": ignored");
 			return false;
 		}
 
-		assert (gateway != null);
+		assert (sender != null);
 
-		if (gateway.getId() == null) {
-			this.gateways.saveGateway(gateway);
+		if (sender.getId() == null) {
+			this.senders.saveSender(sender);
 		}
 
 		InetAddress originator = puMsg.getOlsrMessageOriginator();
@@ -81,12 +81,12 @@ public class PositionUpdateHandlerImpl implements PositionUpdateHandler {
 		Node originatorNode = this.nodes.getNode(originator);
 		if (originatorNode == null) {
 			/* new node */
-			originatorNode = new Node(originator, gateway);
+			originatorNode = new Node(originator, sender);
 			this.nodes.saveNode(originatorNode);
 		}
 
-		/* link the node to the gateway from which it was received */
-		originatorNode.setGateway(gateway);
+		/* link the node to the sender from which it was received */
+		originatorNode.setSender(sender);
 
 		/* get the position update of the node */
 		PositionUpdateMsg storedPositionUpdate = originatorNode.getPositionUpdateMsg();

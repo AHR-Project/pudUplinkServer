@@ -14,7 +14,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.Nodes;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.PositionUpdateMsgs;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.RelayServers;
-import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.domainmodel.Gateway;
+import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.domainmodel.Sender;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.domainmodel.Node;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.domainmodel.PositionUpdateMsg;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.domainmodel.RelayServer;
@@ -297,36 +297,36 @@ public class DistributorImpl extends Thread implements Distributor {
 				for (Node clusterLeader : clusterLeaders) {
 					InetAddress clusterLeaderMainIp = clusterLeader.getMainIp();
 
-					Gateway clusterLeaderGateway = clusterLeader.getGateway();
-					if (clusterLeaderGateway == null) {
+					Sender clusterLeaderSender = clusterLeader.getSender();
+					if (clusterLeaderSender == null) {
 						Node substituteClusterLeader = this.nodes.getSubstituteClusterLeader(clusterLeader);
 						if (substituteClusterLeader == null) {
 							if (this.logger.isDebugEnabled()) {
 								this.logger.info("Cluster leader " + clusterLeaderMainIp.getHostAddress()
-										+ " has no gateway and no substitute cluster leader is found: skipped");
+										+ " has no sender and no substitute cluster leader is found: skipped");
 							}
 							continue;
 						}
 
-						clusterLeaderGateway = substituteClusterLeader.getGateway();
+						clusterLeaderSender = substituteClusterLeader.getSender();
 						if (this.logger.isDebugEnabled()) {
 							this.logger.info("Cluster leader " + clusterLeaderMainIp.getHostAddress()
-									+ " has no gateway: selected gateway " + clusterLeaderGateway.getIp().getHostAddress() + ":"
-									+ clusterLeaderGateway.getPort() + " of substitute cluster leader "
+									+ " has no sender: selected sender " + clusterLeaderSender.getIp().getHostAddress() + ":"
+									+ clusterLeaderSender.getPort() + " of substitute cluster leader "
 									+ substituteClusterLeader.getMainIp().getHostAddress());
 						}
 					}
 
-					InetAddress clusterLeaderGatewayIp = clusterLeaderGateway.getIp();
-					Integer clusterLeaderGatewayPort = clusterLeaderGateway.getPort();
+					InetAddress clusterLeaderSenderIp = clusterLeaderSender.getIp();
+					Integer clusterLeaderSenderPort = clusterLeaderSender.getPort();
 
 					if (this.logger.isDebugEnabled()) {
-						this.logger.debug("*** cluster leader " + clusterLeaderMainIp.getHostAddress() + " (gateway="
-								+ clusterLeaderGatewayIp.getHostAddress() + ":" + clusterLeaderGatewayPort + ")");
+						this.logger.debug("*** cluster leader " + clusterLeaderMainIp.getHostAddress() + " (sender="
+								+ clusterLeaderSenderIp.getHostAddress() + ":" + clusterLeaderSenderPort + ")");
 					}
 
-					if ((this.myIPAddresses.isMe(clusterLeaderGatewayIp) || this.myIPAddresses.isMe(clusterLeaderMainIp))
-							&& (clusterLeaderGatewayPort.intValue() == this.uplinkUdpPort.intValue())) {
+					if ((this.myIPAddresses.isMe(clusterLeaderSenderIp) || this.myIPAddresses.isMe(clusterLeaderMainIp))
+							&& (clusterLeaderSenderPort.intValue() == this.uplinkUdpPort.intValue())) {
 						/* do not relay to ourselves */
 						if (this.logger.isDebugEnabled()) {
 							this.logger.debug("this is me: skipping");
@@ -357,16 +357,16 @@ public class DistributorImpl extends Thread implements Distributor {
 						StringBuilder s = new StringBuilder();
 						if (this.logger.isDebugEnabled()) {
 							s.setLength(0);
-							s.append("tx " + packets.size() + " packet(s) to " + clusterLeaderMainIp.getHostAddress() + " (gateway="
-									+ clusterLeaderGatewayIp.getHostAddress() + ":" + clusterLeaderGatewayPort + "), sizes=");
+							s.append("tx " + packets.size() + " packet(s) to " + clusterLeaderMainIp.getHostAddress() + " (sender="
+									+ clusterLeaderSenderIp.getHostAddress() + ":" + clusterLeaderSenderPort + "), sizes=");
 						}
 
 						for (DatagramPacket packet : packets) {
 							if (this.logger.isDebugEnabled()) {
 								s.append(" " + packet.getLength());
 							}
-							packet.setAddress(clusterLeaderGatewayIp);
-							packet.setPort(clusterLeaderGatewayPort.intValue());
+							packet.setAddress(clusterLeaderSenderIp);
+							packet.setPort(clusterLeaderSenderPort.intValue());
 							try {
 								this.sock.send(packet);
 							} catch (IOException e) {
@@ -374,8 +374,8 @@ public class DistributorImpl extends Thread implements Distributor {
 									s.append(" ERROR:" + e.getLocalizedMessage());
 									this.logger.debug(s.toString());
 								}
-								this.logger.error("Could not send to cluster leader " + clusterLeaderMainIp + " (gateway="
-										+ clusterLeaderGatewayIp.getHostAddress() + ":" + clusterLeaderGatewayPort + ") : "
+								this.logger.error("Could not send to cluster leader " + clusterLeaderMainIp + " (sender="
+										+ clusterLeaderSenderIp.getHostAddress() + ":" + clusterLeaderSenderPort + ") : "
 										+ e.getLocalizedMessage());
 							}
 						}

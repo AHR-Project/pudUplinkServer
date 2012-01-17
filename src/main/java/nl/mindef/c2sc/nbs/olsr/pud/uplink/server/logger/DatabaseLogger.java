@@ -8,7 +8,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.ClusterLeaderMsgs;
-import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.Gateways;
+import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.Senders;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.Nodes;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.PositionUpdateMsgs;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.RelayServers;
@@ -89,15 +89,15 @@ public class DatabaseLogger {
 		this.relayServers = relayServers;
 	}
 
-	Gateways gateways;
+	Senders senders;
 
 	/**
-	 * @param gateways
-	 *          the gateways to set
+	 * @param senders
+	 *          the senders to set
 	 */
 	@Required
-	public final void setGateways(Gateways gateways) {
-		this.gateways = gateways;
+	public final void setSenders(Senders senders) {
+		this.senders = senders;
 	}
 
 	/*
@@ -128,7 +128,7 @@ public class DatabaseLogger {
 
 					DatabaseLogger.this.relayServers.print(DatabaseLogger.this.fos);
 					DatabaseLogger.this.fos.write(eol);
-					DatabaseLogger.this.gateways.print(DatabaseLogger.this.fos);
+					DatabaseLogger.this.senders.print(DatabaseLogger.this.fos);
 					DatabaseLogger.this.fos.write(eol);
 					DatabaseLogger.this.nodes.print(DatabaseLogger.this.fos);
 					DatabaseLogger.this.fos.write(eol);
@@ -166,7 +166,7 @@ public class DatabaseLogger {
 
 	public void log(Logger log, Level level) {
 		this.relayServers.log(log, level);
-		this.gateways.log(log, level);
+		this.senders.log(log, level);
 		this.nodes.log(log, level);
 		this.positionUpdateMsgs.log(log, level);
 		this.clusterLeaderMsgs.log(log, level);

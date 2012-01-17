@@ -8,7 +8,7 @@
 		init-method="init" destroy-method="destroy">
 		<property name="clusterLeaderMsgs" ref="ClusterLeaderMsgs" />
 		<property name="databaseLogFile" value="${database.logger.filename}" />
-		<property name="gateways" ref="Gateways" />
+		<property name="senders" ref="Senders" />
 		<property name="nodes" ref="Nodes" />
 		<property name="positions" ref="PositionUpdateMsgs" />
 		<property name="relayServers" ref="RelayServers" />

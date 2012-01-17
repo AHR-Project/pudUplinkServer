@@ -4,7 +4,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.ClusterLeaderMsgs;
-import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.Gateways;
+import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.Senders;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.Nodes;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.PositionUpdateMsgs;
 
@@ -12,7 +12,7 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Required;
 
 /**
- * Expire out-of-date PositionUpdate and ClusterLeader messages, and then remove empty Nodes and Gateways. Do NOT remove
+ * Expire out-of-date PositionUpdate and ClusterLeader messages, and then remove empty Nodes and Senders. Do NOT remove
  * empty RelayServers since these are statically configured
  */
 public class ExpireNodes {
@@ -52,9 +52,9 @@ public class ExpireNodes {
 				}
 
 				try {
-					ExpireNodes.this.gateways.removeExpiredGateways();
+					ExpireNodes.this.senders.removeExpiredSenders();
 				} catch (Throwable e) {
-					ExpireNodes.this.logger.error("Removal of empty gateways failed", e);
+					ExpireNodes.this.logger.error("Removal of empty senders failed", e);
 				}
 			} catch (Throwable e) {
 				ExpireNodes.this.logger.error("error during expiry", e);
@@ -128,16 +128,16 @@ public class ExpireNodes {
 		this.clusterLeaderMsgs = clusterLeaderMsgs;
 	}
 
-	/** the Gateway DAO */
-	Gateways gateways;
+	/** the Sender DAO */
+	Senders senders;
 
 	/**
-	 * @param gateways
-	 *          the gateways to set
+	 * @param senders
+	 *          the senders to set
 	 */
 	@Required
-	public void setGateways(Gateways gateways) {
-		this.gateways = gateways;
+	public void setSenders(Senders senders) {
+		this.senders = senders;
 	}
 
 	/** the timer from which the expiry task runs */

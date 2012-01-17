@@ -16,17 +16,17 @@ import javax.persistence.OneToMany;
 import javax.validation.constraints.NotNull;
 
 /**
- * Represents a gateway node that sends PositionUpdate and ClusterLeader messages (from an OLSRd node) to the
+ * Represents a sender node that sends PositionUpdate and ClusterLeader messages (from an OLSRd node) to the
  * RelayServer
  */
 @Entity
-public class Gateway implements Serializable {
+public class Sender implements Serializable {
 	private static final long serialVersionUID = 5149981674264087644L;
 
 	/**
 	 * Default constructor
 	 */
-	public Gateway() {
+	public Sender() {
 		super();
 	}
 
@@ -34,13 +34,13 @@ public class Gateway implements Serializable {
 	 * Constructor
 	 * 
 	 * @param ip
-	 *          the IP address of the gateway
+	 *          the IP address of the sender
 	 * @param port
-	 *          the port of the gateway
+	 *          the port of the sender
 	 * @param relayServer
-	 *          the relay server that belongs to the gateway
+	 *          the relay server that belongs to the sender
 	 */
-	public Gateway(InetAddress ip, Integer port, RelayServer relayServer) {
+	public Sender(InetAddress ip, Integer port, RelayServer relayServer) {
 		super();
 		this.ip = ip;
 		this.port = port;
@@ -66,7 +66,7 @@ public class Gateway implements Serializable {
 		this.id = id;
 	}
 
-	/** the IP address of the gateway */
+	/** the IP address of the sender */
 	@NotNull
 	private InetAddress ip = null;
 
@@ -85,7 +85,7 @@ public class Gateway implements Serializable {
 		this.ip = ip;
 	}
 
-	/** the port of the gateway */
+	/** the port of the sender */
 	@NotNull
 	private Integer port = null;
 
@@ -105,7 +105,7 @@ public class Gateway implements Serializable {
 	}
 
 	/** the associated nodes */
-	@OneToMany(cascade = CascadeType.ALL, mappedBy = "gateway")
+	@OneToMany(cascade = CascadeType.ALL, mappedBy = "sender")
 	private Set<Node> nodes = new HashSet<Node>();
 
 	/**
@@ -123,7 +123,7 @@ public class Gateway implements Serializable {
 		this.nodes = nodes;
 	}
 
-	/** the relay server that belongs to the gateway */
+	/** the relay server that belongs to the sender */
 	@ManyToOne(cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH, CascadeType.DETACH }, optional = false)
 	@NotNull
 	private RelayServer relayServer = null;
