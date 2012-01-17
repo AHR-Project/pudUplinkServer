@@ -3,6 +3,7 @@ package nl.mindef.c2sc.nbs.olsr.pud.uplink.server.handlers.impl;
 import java.net.InetAddress;
 
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.ClusterLeaderMsgs;
+import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.Gateways;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.Nodes;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.domainmodel.ClusterLeaderMsg;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.domainmodel.Gateway;
@@ -32,6 +33,17 @@ public class ClusterLeaderHandlerImpl implements ClusterLeaderHandler {
 		this.clusterLeaderMsgs = clusterLeaderMsgs;
 	}
 
+	private Gateways gateways = null;
+
+	/**
+	 * @param gateways
+	 *          the gateways to set
+	 */
+	@Required
+	public final void setGateways(Gateways gateways) {
+		this.gateways = gateways;
+	}
+
 	/** the Node handler */
 	private Nodes nodes;
 
@@ -57,6 +69,10 @@ public class ClusterLeaderHandlerImpl implements ClusterLeaderHandler {
 		}
 
 		assert (gateway != null);
+
+		if (gateway.getId() == null) {
+			this.gateways.saveGateway(gateway);
+		}
 
 		InetAddress originator = clMsg.getClusterLeaderOriginator();
 		InetAddress clusterLeader = clMsg.getClusterLeaderClusterLeader();

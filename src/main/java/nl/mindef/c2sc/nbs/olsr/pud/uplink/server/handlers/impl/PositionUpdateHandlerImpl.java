@@ -2,6 +2,7 @@ package nl.mindef.c2sc.nbs.olsr.pud.uplink.server.handlers.impl;
 
 import java.net.InetAddress;
 
+import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.Gateways;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.Nodes;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.PositionUpdateMsgs;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.domainmodel.Gateway;
@@ -33,6 +34,17 @@ public class PositionUpdateHandlerImpl implements PositionUpdateHandler {
 		this.positionUpdateMsgs = positionUpdateMsgs;
 	}
 
+	private Gateways gateways = null;
+
+	/**
+	 * @param gateways
+	 *          the gateways to set
+	 */
+	@Required
+	public final void setGateways(Gateways gateways) {
+		this.gateways = gateways;
+	}
+
 	/** the Node handler */
 	private Nodes nodes;
 
@@ -58,6 +70,10 @@ public class PositionUpdateHandlerImpl implements PositionUpdateHandler {
 		}
 
 		assert (gateway != null);
+
+		if (gateway.getId() == null) {
+			this.gateways.saveGateway(gateway);
+		}
 
 		InetAddress originator = puMsg.getOlsrMessageOriginator();
 
