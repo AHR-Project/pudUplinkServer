@@ -137,26 +137,30 @@ public class PacketHandlerImpl implements PacketHandler {
 				int messageLength = UplinkMessage.getUplinkMessageHeaderLength()
 						+ UplinkMessage.getUplinkMessageLength(packetData, messageOffset);
 
-				byte[] messageData = Arrays.copyOfRange(packetData, messageOffset, messageOffset + messageLength);
-				DumpUtil.dumpUplinkMessage(this.logger, Level.DEBUG, messageData, srcIp, srcPort, messageType, utcTimestamp,
-						"  ");
-				boolean msgCausedUpdate = false;
-				if (messageType == UplinkMessage.getUplinkMessageTypePosition()) {
-					PositionUpdate pu = new PositionUpdate(messageData, messageLength);
-					msgCausedUpdate = this.positionUpdateHandler.handlePositionMessage(gateway, utcTimestamp, pu);
-					if (msgCausedUpdate && this.useFaker) {
-						this.faker.fakeit(gateway, utcTimestamp, Faker.MSGTYPE.PU, pu);
-					}
-				} else if (messageType == UplinkMessage.getUplinkMessageTypeClusterLeader()) {
-					ClusterLeader cl = new ClusterLeader(messageData, messageLength);
-					msgCausedUpdate = this.clusterLeaderHandler.handleClusterLeaderMessage(gateway, utcTimestamp, cl);
-					if (msgCausedUpdate && this.useFaker) {
-						this.faker.fakeit(gateway, utcTimestamp, Faker.MSGTYPE.CL, cl);
-					}
-				} else {
+				if ((messageType != UplinkMessage.getUplinkMessageTypePosition())
+						&& (messageType != UplinkMessage.getUplinkMessageTypeClusterLeader())) {
 					this.logger.warn("Uplink message type " + messageType + " not supported: ignored");
+				} else {
+					byte[] messageData = Arrays.copyOfRange(packetData, messageOffset, messageOffset + messageLength);
+					DumpUtil.dumpUplinkMessage(this.logger, Level.DEBUG, messageData, srcIp, srcPort, messageType, utcTimestamp,
+							"  ");
+
+					Object msg = null;
+					boolean msgCausedUpdate = false;
+					if (messageType == UplinkMessage.getUplinkMessageTypePosition()) {
+						msg = new PositionUpdate(messageData, messageLength);
+						msgCausedUpdate = this.positionUpdateHandler.handlePositionMessage(gateway, utcTimestamp,
+								(PositionUpdate) msg);
+					} else /* if (messageType == UplinkMessage.getUplinkMessageTypeClusterLeader()) */{
+						msg = new ClusterLeader(messageData, messageLength);
+						msgCausedUpdate = this.clusterLeaderHandler.handleClusterLeaderMessage(gateway, utcTimestamp,
+								(ClusterLeader) msg);
+					}
+					if (msgCausedUpdate && this.useFaker) {
+						this.faker.fakeit(gateway, utcTimestamp, msg);
+					}
+					updated = msgCausedUpdate || updated;
 				}
-				updated = msgCausedUpdate || updated;
 
 				messageOffset += messageLength;
 			}

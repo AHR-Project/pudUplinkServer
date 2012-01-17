@@ -33,10 +33,6 @@ public class Faker {
 		this.positionUpdateHandler = positionUpdateHandler;
 	}
 
-	public enum MSGTYPE {
-		PU, CL
-	}
-
 	private boolean firstFake = true;
 
 	/**
@@ -62,7 +58,9 @@ public class Faker {
 	static private final int UplinkMessage_v4_clusterLeader_clusterLeader_network = 12;
 	static private final int UplinkMessage_v4_clusterLeader_clusterLeader_node = 13;
 
-	public void fakeit(Gateway gateway, long utcTimestamp, MSGTYPE type, Object msg) {
+	public void fakeit(Gateway gateway, long utcTimestamp, Object msg) {
+		assert ((msg instanceof PositionUpdate) || (msg instanceof ClusterLeader));
+
 		if (!this.firstFake) {
 			return;
 		}
@@ -73,11 +71,11 @@ public class Faker {
 		byte[] pumsg = null;
 		int initialNetwork = 0;
 		byte initialNode = 1;
-		if (type == MSGTYPE.PU) {
+		if (msg instanceof PositionUpdate) {
 			pumsg = ((PositionUpdate) msg).getData();
 			initialNetwork = pumsg[UplinkMessage_v4_olsrMessage_v4_originator_network];
 			initialNode = pumsg[UplinkMessage_v4_olsrMessage_v4_originator_node];
-		} else /* if (type == MSGTYPE.CL) */{
+		} else /* if (msg instanceof ClusterLeader) */{
 			clmsg = ((ClusterLeader) msg).getData();
 			initialNetwork = clmsg[UplinkMessage_v4_clusterLeader_originator_network];
 			initialNode = clmsg[UplinkMessage_v4_clusterLeader_originator_node];
@@ -101,7 +99,7 @@ public class Faker {
 						/*
 						 * Position Update Message
 						 */
-						if (type == MSGTYPE.PU) {
+						if (msg instanceof PositionUpdate) {
 							assert (pumsg != null);
 							byte[] pumsgClone = pumsg.clone();
 							/* olsr originator */
@@ -115,7 +113,7 @@ public class Faker {
 						/*
 						 * Cluster Leader Message
 						 */
-						else /* if (type == MSGTYPE.CL) */{
+						else /* if (msg instanceof ClusterLeader) */{
 							assert (clmsg != null);
 							byte[] clmsgClone = clmsg.clone();
 							/* originator */
@@ -151,7 +149,7 @@ public class Faker {
 		/*
 		 * Position Update Message
 		 */
-		if (type == MSGTYPE.PU) {
+		if (msg instanceof PositionUpdate) {
 			assert (pumsg != null);
 			byte[] pumsgClone = pumsg.clone();
 			// olsr originator
@@ -165,7 +163,7 @@ public class Faker {
 		/*
 		 * Cluster Leader Message
 		 */
-		else /* if (type == MSGTYPE.CL) */{
+		else /* if (msg instanceof ClusterLeader) */{
 			assert (clmsg != null);
 			byte[] clmsgClone = clmsg.clone();
 			// originator
