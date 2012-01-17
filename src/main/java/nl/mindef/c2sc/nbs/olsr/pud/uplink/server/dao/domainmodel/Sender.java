@@ -21,7 +21,7 @@ import javax.validation.constraints.NotNull;
  */
 @Entity
 public class Sender implements Serializable {
-	private static final long serialVersionUID = 5149981674264087644L;
+	private static final long serialVersionUID = -8727383276093376224L;
 
 	/**
 	 * Default constructor

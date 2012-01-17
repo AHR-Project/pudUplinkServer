@@ -21,7 +21,7 @@ import javax.validation.constraints.NotNull;
  */
 @Entity
 public class Node implements Serializable {
-	private static final long serialVersionUID = -1275132193159715216L;
+	private static final long serialVersionUID = 3025709519453023866L;
 
 	/**
 	 * Default constructor

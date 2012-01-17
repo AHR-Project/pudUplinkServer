@@ -19,7 +19,7 @@ import javax.validation.constraints.NotNull;
  */
 @Entity
 public class RelayServer implements Serializable {
-	private static final long serialVersionUID = -5770906949985852253L;
+	private static final long serialVersionUID = 7450468040325248095L;
 
 	/**
 	 * Default constructor
