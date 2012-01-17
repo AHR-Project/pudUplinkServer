@@ -140,21 +140,23 @@ public class PacketHandlerImpl implements PacketHandler {
 				byte[] messageData = Arrays.copyOfRange(packetData, messageOffset, messageOffset + messageLength);
 				DumpUtil.dumpUplinkMessage(this.logger, Level.DEBUG, messageData, srcIp, srcPort, messageType, utcTimestamp,
 						"  ");
+				boolean msgCausedUpdate = false;
 				if (messageType == UplinkMessage.getUplinkMessageTypePosition()) {
 					PositionUpdate pu = new PositionUpdate(messageData, messageLength);
-					updated = this.positionUpdateHandler.handlePositionMessage(gateway, utcTimestamp, pu) || updated;
-					if (this.useFaker) {
+					msgCausedUpdate = this.positionUpdateHandler.handlePositionMessage(gateway, utcTimestamp, pu);
+					if (msgCausedUpdate && this.useFaker) {
 						this.faker.fakeit(gateway, utcTimestamp, Faker.MSGTYPE.PU, pu);
 					}
 				} else if (messageType == UplinkMessage.getUplinkMessageTypeClusterLeader()) {
 					ClusterLeader cl = new ClusterLeader(messageData, messageLength);
-					updated = this.clusterLeaderHandler.handleClusterLeaderMessage(gateway, utcTimestamp, cl) || updated;
-					if (this.useFaker) {
+					msgCausedUpdate = this.clusterLeaderHandler.handleClusterLeaderMessage(gateway, utcTimestamp, cl);
+					if (msgCausedUpdate && this.useFaker) {
 						this.faker.fakeit(gateway, utcTimestamp, Faker.MSGTYPE.CL, cl);
 					}
 				} else {
 					this.logger.warn("Uplink message type " + messageType + " not supported: ignored");
 				}
+				updated = msgCausedUpdate || updated;
 
 				messageOffset += messageLength;
 			}
