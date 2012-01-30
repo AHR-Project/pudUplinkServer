@@ -2,4 +2,4 @@
 
 cd "$(dirname "${0}")"
 
-java -Djava.library.path=__project.libdir__ -jar __project.build.finalName__.jar
+java -Xmx100m -Djava.library.path=__project.libdir__ -jar __project.build.finalName__.jar
