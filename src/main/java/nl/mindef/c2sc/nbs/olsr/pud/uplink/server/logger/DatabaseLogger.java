@@ -30,7 +30,7 @@ public class DatabaseLogger {
 	 *          the updateIntervalMs to set
 	 */
 	@Required
-	public final void setUpdateIntervalMs(int updateIntervalMs) {
+	public void setUpdateIntervalMs(int updateIntervalMs) {
 		this.updateIntervalMs = updateIntervalMs;
 	}
 
@@ -41,7 +41,7 @@ public class DatabaseLogger {
 	 *          the databaseLogFile to set
 	 */
 	@Required
-	public final void setDatabaseLogFile(String databaseLogFile) {
+	public void setDatabaseLogFile(String databaseLogFile) {
 		this.databaseLogFile = databaseLogFile;
 	}
 
@@ -53,7 +53,7 @@ public class DatabaseLogger {
 	 *          the nodes to set
 	 */
 	@Required
-	public final void setNodes(Nodes nodes) {
+	public void setNodes(Nodes nodes) {
 		this.nodes = nodes;
 	}
 
@@ -65,7 +65,7 @@ public class DatabaseLogger {
 	 *          the positionUpdateMsgs to set
 	 */
 	@Required
-	public final void setPositions(PositionUpdateMsgs positionUpdateMsgs) {
+	public void setPositions(PositionUpdateMsgs positionUpdateMsgs) {
 		this.positionUpdateMsgs = positionUpdateMsgs;
 	}
 
@@ -77,7 +77,7 @@ public class DatabaseLogger {
 	 *          the clusterLeaderMsgs to set
 	 */
 	@Required
-	public final void setClusterLeaderMsgs(ClusterLeaderMsgs clusterLeaderMsgs) {
+	public void setClusterLeaderMsgs(ClusterLeaderMsgs clusterLeaderMsgs) {
 		this.clusterLeaderMsgs = clusterLeaderMsgs;
 	}
 
@@ -88,7 +88,7 @@ public class DatabaseLogger {
 	 *          the relayServers to set
 	 */
 	@Required
-	public final void setRelayServers(RelayServers relayServers) {
+	public void setRelayServers(RelayServers relayServers) {
 		this.relayServers = relayServers;
 	}
 
@@ -99,7 +99,7 @@ public class DatabaseLogger {
 	 *          the senders to set
 	 */
 	@Required
-	public final void setSenders(Senders senders) {
+	public void setSenders(Senders senders) {
 		this.senders = senders;
 	}
 
