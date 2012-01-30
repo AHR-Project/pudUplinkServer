@@ -16,7 +16,10 @@ import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.RelayServers;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Required;
+import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
+@Repository
 public class DatabaseLogger {
 	Logger logger = Logger.getLogger(this.getClass().getName());
 
@@ -119,6 +122,7 @@ public class DatabaseLogger {
 		this.timer = new Timer(this.getClass().getSimpleName() + "-Timer");
 		this.task = new TimerTask() {
 			@Override
+			@Transactional(readOnly = true)
 			public void run() {
 				try {
 					FileChannel channel = DatabaseLogger.this.fos.getChannel();
