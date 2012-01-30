@@ -116,7 +116,7 @@ public class DatabaseLogger {
 
 		this.fos = new FileOutputStream(this.databaseLogFile, false);
 
-		this.timer = new Timer(this.getClass().getName() + "-Timer");
+		this.timer = new Timer(this.getClass().getSimpleName() + "-Timer");
 		this.task = new TimerTask() {
 			@Override
 			public void run() {
