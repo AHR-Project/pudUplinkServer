@@ -59,7 +59,8 @@ public class RelayServersImpl implements RelayServers {
 	public List<RelayServer> getOtherRelayServers() {
 		@SuppressWarnings("unchecked")
 		List<RelayServer> result = this.sessionFactory.getCurrentSession()
-				.createQuery("select rs from RelayServer rs where rs.id != :id").setParameter(":id", getMe().getId()).list();
+				.createQuery("select rs from RelayServer rs where rs.id != :id").setLong("id", getMe().getId().longValue())
+				.list();
 
 		if (result.size() == 0) {
 			return null;
@@ -93,7 +94,7 @@ public class RelayServersImpl implements RelayServers {
 		@SuppressWarnings("unchecked")
 		List<RelayServer> result = this.sessionFactory.getCurrentSession()
 				.createQuery("select rs from RelayServer rs where rs.ip = :ip and rs.port = :port").setParameter("ip", myIp)
-				.setParameter("port", this.uplinkUdpPort).list();
+				.setInteger("port", this.uplinkUdpPort.intValue()).list();
 
 		if (result.size() == 0) {
 			RelayServer me = new RelayServer(myIp, this.uplinkUdpPort);

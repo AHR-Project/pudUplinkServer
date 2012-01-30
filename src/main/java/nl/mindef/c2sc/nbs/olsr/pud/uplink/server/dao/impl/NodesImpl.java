@@ -93,7 +93,7 @@ public class NodesImpl implements Nodes {
 	@Transactional(readOnly = true)
 	public Node getSubstituteClusterLeader(Node clusterLeader) {
 		assert (clusterLeader != null);
-		Long clId = clusterLeader.getId();
+		long clId = clusterLeader.getId().longValue();
 
 		@SuppressWarnings("unchecked")
 		List<Node> result = this.sessionFactory
@@ -108,7 +108,7 @@ public class NodesImpl implements Nodes {
 								/* node has a valid sender (a sender always has a valid IP address and a valid port) */
 								+ " and node.sender is not null"
 								/* keep the node with the most recently received cluster leader message on top of the list */
-								+ " order by node.clusterLeaderMsg.receptionTime desc").setParameter("clId", clId).list();
+								+ " order by node.clusterLeaderMsg.receptionTime desc").setLong("clId", clId).list();
 
 		if (result.size() == 0) {
 			return null;

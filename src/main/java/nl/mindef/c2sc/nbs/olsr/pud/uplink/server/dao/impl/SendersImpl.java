@@ -63,7 +63,7 @@ public class SendersImpl implements Senders {
 		@SuppressWarnings("unchecked")
 		List<Sender> result = this.sessionFactory.getCurrentSession()
 				.createQuery("select gw from Sender gw where gw.ip = :ip and gw.port = :port").setParameter("ip", ip)
-				.setParameter("port", Integer.valueOf(port)).list();
+				.setInteger("port", port).list();
 
 		if (result.size() == 0) {
 			return null;
