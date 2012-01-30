@@ -65,13 +65,12 @@ public class PositionUpdateMsgsImpl implements PositionUpdateMsgs {
 				.createQuery(
 						"select pu from PositionUpdateMsg pu where"
 								/* receptionTime in <startTime, endTime] */
-								+ " pu.receptionTime > "
-								+ startTime
-								+ " and pu.receptionTime <= "
-								+ endTime
+								+ " pu.receptionTime > :startTime and pu.receptionTime <= :endTime"
 								/* the cluster leader of the node is not the specified cluster leader */
 								+ ((clusterLeader == null) ? "" : " and pu.node.clusterLeaderMsg is not null"
-										+ " and pu.node.clusterLeaderMsg.clusterLeaderNode.id != " + clusterLeader.getId())).list();
+										+ " and pu.node.clusterLeaderMsg.clusterLeaderNode.id != :clId"))
+				.setParameter("startTime", Long.valueOf(startTime)).setParameter("endTime", Long.valueOf(endTime))
+				.setParameter("clId", (clusterLeader == null) ? null : clusterLeader.getId()).list();
 
 		if (result.size() == 0) {
 			return null;
@@ -93,8 +92,10 @@ public class PositionUpdateMsgsImpl implements PositionUpdateMsgs {
 		List<PositionUpdateMsg> result = this.sessionFactory
 				.getCurrentSession()
 				.createQuery(
-						"select pu from PositionUpdateMsg pu where (receptionTime + (validityTime * " + validityTimeMultiplier
-								+ ")) < " + utcTimestamp).list();
+						"select pu from PositionUpdateMsg pu where"
+								+ " (receptionTime + (validityTime * 1.0 * :validityTimeMultiplier)) < :utcTimestamp")
+				.setParameter("validityTimeMultiplier", Double.valueOf(validityTimeMultiplier))
+				.setParameter("utcTimestamp", Double.valueOf(utcTimestamp)).list();
 
 		if (result.size() == 0) {
 			return false;

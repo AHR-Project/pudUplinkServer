@@ -62,7 +62,8 @@ public class SendersImpl implements Senders {
 
 		@SuppressWarnings("unchecked")
 		List<Sender> result = this.sessionFactory.getCurrentSession()
-				.createQuery("select gw from Sender gw where gw.ip = :ip and gw.port = " + port).setParameter("ip", ip).list();
+				.createQuery("select gw from Sender gw where gw.ip = :ip and gw.port = :port").setParameter("ip", ip)
+				.setParameter("port", Integer.valueOf(port)).list();
 
 		if (result.size() == 0) {
 			return null;
@@ -84,7 +85,7 @@ public class SendersImpl implements Senders {
 	public boolean removeExpiredSenders() {
 		@SuppressWarnings("unchecked")
 		List<Sender> result = this.sessionFactory.getCurrentSession()
-				.createQuery("select gw from Sender gw where size(nodes) = 0").list();
+				.createQuery("select sender from Sender sender where size(nodes) = 0").list();
 
 		if (result.size() == 0) {
 			return false;

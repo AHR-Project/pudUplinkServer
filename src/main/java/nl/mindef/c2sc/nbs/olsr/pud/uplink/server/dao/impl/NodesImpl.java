@@ -103,12 +103,12 @@ public class NodesImpl implements Nodes {
 						/* do an eager fetch of the sender */
 						+ " left join node.sender where"
 						/* node is not the cluster leader itself and node points to cluster leader */
-						+ " node.id != " + clId
-								+ " and node.clusterLeaderMsg is not null and node.clusterLeaderMsg.clusterLeaderNode.id = " + clId
+						+ " node.id != :clId"
+								+ " and node.clusterLeaderMsg is not null and node.clusterLeaderMsg.clusterLeaderNode.id = :clId"
 								/* node has a valid sender (a sender always has a valid IP address and a valid port) */
 								+ " and node.sender is not null"
 								/* keep the node with the most recently received cluster leader message on top of the list */
-								+ " order by node.clusterLeaderMsg.receptionTime desc").list();
+								+ " order by node.clusterLeaderMsg.receptionTime desc").setParameter("clId", clId).list();
 
 		if (result.size() == 0) {
 			return null;
@@ -130,8 +130,8 @@ public class NodesImpl implements Nodes {
 		List<Node> result = this.sessionFactory
 				.getCurrentSession()
 				.createQuery(
-						"select node from Node node where positionUpdateMsg is null and clusterLeaderMsg is null"
-								+ " and size(clusterNodes) = 0").list();
+						"select node from Node node where positionUpdateMsg is null and clusterLeaderMsg is null and size(clusterNodes) = 0")
+				.list();
 
 		if (result.size() == 0) {
 			return false;
