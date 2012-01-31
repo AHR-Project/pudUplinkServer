@@ -107,6 +107,27 @@ public class DatabaseLogger {
 	 * Main
 	 */
 
+	@Transactional(readOnly = true)
+	public void logit() throws IOException {
+		FileChannel channel = this.fos.getChannel();
+		channel.position(0);
+
+		this.logger.debug("Writing database logfile");
+
+		this.relayServers.print(this.fos);
+		this.fos.write(eol);
+		this.senders.print(this.fos);
+		this.fos.write(eol);
+		this.nodes.print(this.fos);
+		this.fos.write(eol);
+		this.positionUpdateMsgs.print(this.fos);
+		this.fos.write(eol);
+		this.clusterLeaderMsgs.print(this.fos);
+
+		channel.truncate(channel.position());
+		this.fos.flush();
+	}
+
 	private Timer timer = null;
 	private TimerTask task = null;
 	FileOutputStream fos = null;
@@ -122,26 +143,9 @@ public class DatabaseLogger {
 		this.timer = new Timer(this.getClass().getSimpleName() + "-Timer");
 		this.task = new TimerTask() {
 			@Override
-			@Transactional(readOnly = true)
 			public void run() {
 				try {
-					FileChannel channel = DatabaseLogger.this.fos.getChannel();
-					channel.position(0);
-
-					DatabaseLogger.this.logger.debug("Writing database logfile");
-
-					DatabaseLogger.this.relayServers.print(DatabaseLogger.this.fos);
-					DatabaseLogger.this.fos.write(eol);
-					DatabaseLogger.this.senders.print(DatabaseLogger.this.fos);
-					DatabaseLogger.this.fos.write(eol);
-					DatabaseLogger.this.nodes.print(DatabaseLogger.this.fos);
-					DatabaseLogger.this.fos.write(eol);
-					DatabaseLogger.this.positionUpdateMsgs.print(DatabaseLogger.this.fos);
-					DatabaseLogger.this.fos.write(eol);
-					DatabaseLogger.this.clusterLeaderMsgs.print(DatabaseLogger.this.fos);
-
-					channel.truncate(channel.position());
-					DatabaseLogger.this.fos.flush();
+					logit();
 				} catch (Throwable t) {
 					DatabaseLogger.this.logger.error("Error while logging database", t);
 				}

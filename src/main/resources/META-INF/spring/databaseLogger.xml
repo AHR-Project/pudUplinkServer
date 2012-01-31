@@ -5,7 +5,7 @@
 
 	<bean id="DatabaseLogger"
 		class="nl.mindef.c2sc.nbs.olsr.pud.uplink.server.logger.DatabaseLogger"
-		init-method="init" destroy-method="destroy">
+		destroy-method="destroy">
 		<property name="clusterLeaderMsgs" ref="ClusterLeaderMsgs" />
 		<property name="databaseLogFile" value="${database.logger.filename}" />
 		<property name="senders" ref="Senders" />

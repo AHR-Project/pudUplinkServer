@@ -1,5 +1,6 @@
 package nl.mindef.c2sc.nbs.olsr.pud.uplink.server.uplink;
 
+import java.io.FileNotFoundException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
@@ -159,6 +160,12 @@ public class UplinkReceiver extends Thread implements StopHandlerConsumer {
 	 */
 	@Override
 	public void run() {
+		try {
+			this.databaseLogger.init();
+		} catch (FileNotFoundException e) {
+			this.logger.warn("Could not open or create database log file, database logging will not be performed", e);
+		}
+
 		initRelayServers();
 
 		byte[] receiveBuffer = new byte[BUFFERSIZE];
