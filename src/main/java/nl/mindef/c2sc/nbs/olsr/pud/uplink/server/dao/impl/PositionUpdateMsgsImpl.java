@@ -102,7 +102,6 @@ public class PositionUpdateMsgsImpl implements PositionUpdateMsgs {
 
 		for (PositionUpdateMsg pu : result) {
 			pu.getNode().setPositionUpdateMsg(null);
-			this.sessionFactory.getCurrentSession().merge(pu.getNode());
 			this.sessionFactory.getCurrentSession().delete(pu);
 		}
 

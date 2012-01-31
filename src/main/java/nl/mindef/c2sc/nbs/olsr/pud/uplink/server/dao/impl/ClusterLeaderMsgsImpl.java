@@ -74,7 +74,6 @@ public class ClusterLeaderMsgsImpl implements ClusterLeaderMsgs {
 		for (ClusterLeaderMsg cl : result) {
 			cl.getNode().setClusterLeaderMsg(null);
 			cl.setClusterLeaderNode(null);
-			this.sessionFactory.getCurrentSession().merge(cl.getNode());
 			this.sessionFactory.getCurrentSession().delete(cl);
 		}
 
