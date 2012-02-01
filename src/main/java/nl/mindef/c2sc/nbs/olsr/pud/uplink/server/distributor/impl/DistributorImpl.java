@@ -23,7 +23,10 @@ import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.util.MyIPAddresses;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Required;
+import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
+@Repository
 public class DistributorImpl extends Thread implements Distributor {
 	private Logger logger = Logger.getLogger(this.getClass().getName());
 
@@ -224,7 +227,8 @@ public class DistributorImpl extends Thread implements Distributor {
 		return result;
 	}
 
-	private void distribute() {
+	@Transactional(readOnly = true)
+	public void distribute() {
 		while (this.signaledUpdates.getAndSet(false)) {
 			long currentTime = System.currentTimeMillis();
 
