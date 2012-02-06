@@ -10,6 +10,8 @@ import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.PositionUpdateMsgs;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Required;
+import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Expire out-of-date PositionUpdate and ClusterLeader messages, and then remove empty Nodes and Senders. Do NOT remove
@@ -21,8 +23,10 @@ public class ExpireNodes {
 	/**
 	 * Timer task that does the actual expiry of out-of-date and empty objects
 	 */
+	@Repository
 	protected class ExpiryTimerTask extends TimerTask {
 		@Override
+		@Transactional
 		public void run() {
 			try {
 				if (ExpireNodes.this.logger.isDebugEnabled()) {
