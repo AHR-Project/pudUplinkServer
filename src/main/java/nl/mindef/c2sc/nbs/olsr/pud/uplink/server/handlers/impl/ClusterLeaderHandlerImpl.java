@@ -3,24 +3,20 @@ package nl.mindef.c2sc.nbs.olsr.pud.uplink.server.handlers.impl;
 import java.net.InetAddress;
 
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.ClusterLeaderMsgs;
-import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.Senders;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.Nodes;
+import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.Senders;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.domainmodel.ClusterLeaderMsg;
-import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.domainmodel.Sender;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.domainmodel.Node;
+import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.domainmodel.Sender;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.handlers.ClusterLeaderHandler;
 
-import org.apache.log4j.Logger;
 import org.olsr.plugin.pud.ClusterLeader;
-import org.olsr.plugin.pud.WireFormatConstants;
 import org.springframework.beans.factory.annotation.Required;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 @Repository
 public class ClusterLeaderHandlerImpl implements ClusterLeaderHandler {
-	private Logger logger = Logger.getLogger(this.getClass().getName());
-
 	/** the PositionUpdateMsgs handler */
 	private ClusterLeaderMsgs clusterLeaderMsgs;
 
@@ -56,19 +52,27 @@ public class ClusterLeaderHandlerImpl implements ClusterLeaderHandler {
 		this.nodes = nodes;
 	}
 
+	/** the wire format checker */
+	private WireFormatChecker wireFormatChecker;
+
+	/**
+	 * @param wireFormatChecker
+	 *          the wireFormatChecker to set
+	 */
+	@Required
+	public final void setWireFormatChecker(WireFormatChecker wireFormatChecker) {
+		this.wireFormatChecker = wireFormatChecker;
+	}
+
 	@Override
 	@Transactional
 	public boolean handleClusterLeaderMessage(Sender sender, long utcTimestamp, ClusterLeader clMsg) {
 		assert (clMsg != null);
+		assert (sender != null);
 
-		if (clMsg.getClusterLeaderVersion() != WireFormatConstants.VERSION) {
-			this.logger.error("Received wrong version of cluster leader message from " + sender.getIp().getHostAddress()
-					+ ":" + sender.getPort() + ", expected version " + WireFormatConstants.VERSION + ", received version "
-					+ clMsg.getClusterLeaderVersion() + ": ignored");
+		if (!this.wireFormatChecker.checkUplinkMessageWireFormat(sender, clMsg)) {
 			return false;
 		}
-
-		assert (sender != null);
 
 		if (sender.getId() == null) {
 			this.senders.saveSender(sender);

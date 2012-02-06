@@ -2,26 +2,22 @@ package nl.mindef.c2sc.nbs.olsr.pud.uplink.server.handlers.impl;
 
 import java.net.InetAddress;
 
-import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.Senders;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.Nodes;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.PositionUpdateMsgs;
-import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.domainmodel.Sender;
+import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.Senders;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.domainmodel.Node;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.domainmodel.PositionUpdateMsg;
+import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.domainmodel.Sender;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.handlers.PositionUpdateHandler;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.util.TimeZoneUtil;
 
-import org.apache.log4j.Logger;
 import org.olsr.plugin.pud.PositionUpdate;
-import org.olsr.plugin.pud.WireFormatConstants;
 import org.springframework.beans.factory.annotation.Required;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 @Repository
 public class PositionUpdateHandlerImpl implements PositionUpdateHandler {
-	private Logger logger = Logger.getLogger(this.getClass().getName());
-
 	/** the PositionUpdateMsgs handler */
 	private PositionUpdateMsgs positionUpdateMsgs;
 
@@ -57,19 +53,27 @@ public class PositionUpdateHandlerImpl implements PositionUpdateHandler {
 		this.nodes = nodes;
 	}
 
+	/** the wire format checker */
+	private WireFormatChecker wireFormatChecker;
+
+	/**
+	 * @param wireFormatChecker
+	 *          the wireFormatChecker to set
+	 */
+	@Required
+	public final void setWireFormatChecker(WireFormatChecker wireFormatChecker) {
+		this.wireFormatChecker = wireFormatChecker;
+	}
+
 	@Override
 	@Transactional
 	public boolean handlePositionMessage(Sender sender, long utcTimestamp, PositionUpdate puMsg) {
 		assert (puMsg != null);
+		assert (sender != null);
 
-		if (puMsg.getPositionUpdateVersion() != WireFormatConstants.VERSION) {
-			this.logger.error("Received wrong version of position update message from " + sender.getIp().getHostAddress()
-					+ ":" + sender.getPort() + ", expected version " + WireFormatConstants.VERSION + ", received version "
-					+ puMsg.getPositionUpdateVersion() + ": ignored");
+		if (!this.wireFormatChecker.checkUplinkMessageWireFormat(sender, puMsg)) {
 			return false;
 		}
-
-		assert (sender != null);
 
 		if (sender.getId() == null) {
 			this.senders.saveSender(sender);
