@@ -172,6 +172,7 @@ public class DatabaseLogger {
 		}
 	}
 
+	@Transactional(readOnly = true)
 	public void log(Logger log, Level level) {
 		this.relayServers.log(log, level);
 		this.senders.log(log, level);
