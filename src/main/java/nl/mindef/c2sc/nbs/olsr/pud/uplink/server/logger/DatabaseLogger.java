@@ -8,10 +8,10 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.ClusterLeaderMsgs;
-import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.Senders;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.Nodes;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.PositionUpdateMsgs;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.RelayServers;
+import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.Senders;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -21,7 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Repository
 public class DatabaseLogger {
-	Logger logger = Logger.getLogger(this.getClass().getName());
+	private Logger logger = Logger.getLogger(this.getClass().getName());
 
 	private int updateIntervalMs = 0;
 
@@ -46,7 +46,7 @@ public class DatabaseLogger {
 	}
 
 	/** the Node handler */
-	Nodes nodes;
+	private Nodes nodes;
 
 	/**
 	 * @param nodes
@@ -58,7 +58,7 @@ public class DatabaseLogger {
 	}
 
 	/** the PositionUpdateMsgs handler */
-	PositionUpdateMsgs positionUpdateMsgs;
+	private PositionUpdateMsgs positionUpdateMsgs;
 
 	/**
 	 * @param positionUpdateMsgs
@@ -70,7 +70,7 @@ public class DatabaseLogger {
 	}
 
 	/** the ClusterLeaderMsgs handler */
-	ClusterLeaderMsgs clusterLeaderMsgs;
+	private ClusterLeaderMsgs clusterLeaderMsgs;
 
 	/**
 	 * @param clusterLeaderMsgs
@@ -81,7 +81,7 @@ public class DatabaseLogger {
 		this.clusterLeaderMsgs = clusterLeaderMsgs;
 	}
 
-	RelayServers relayServers;
+	private RelayServers relayServers;
 
 	/**
 	 * @param relayServers
@@ -92,7 +92,7 @@ public class DatabaseLogger {
 		this.relayServers = relayServers;
 	}
 
-	Senders senders;
+	private Senders senders;
 
 	/**
 	 * @param senders
@@ -108,30 +108,34 @@ public class DatabaseLogger {
 	 */
 
 	@Transactional(readOnly = true)
-	public void logit() throws IOException {
-		FileChannel channel = this.fos.getChannel();
-		channel.position(0);
+	public void logit() {
+		try {
+			FileChannel channel = this.fos.getChannel();
+			channel.position(0);
 
-		this.logger.debug("Writing database logfile");
+			this.logger.debug("Writing database logfile");
 
-		this.relayServers.print(this.fos);
-		this.fos.write(eol);
-		this.senders.print(this.fos);
-		this.fos.write(eol);
-		this.nodes.print(this.fos);
-		this.fos.write(eol);
-		this.positionUpdateMsgs.print(this.fos);
-		this.fos.write(eol);
-		this.clusterLeaderMsgs.print(this.fos);
+			this.relayServers.print(this.fos);
+			this.fos.write(eol);
+			this.senders.print(this.fos);
+			this.fos.write(eol);
+			this.nodes.print(this.fos);
+			this.fos.write(eol);
+			this.positionUpdateMsgs.print(this.fos);
+			this.fos.write(eol);
+			this.clusterLeaderMsgs.print(this.fos);
 
-		channel.truncate(channel.position());
-		this.fos.flush();
+			channel.truncate(channel.position());
+			this.fos.flush();
+		} catch (Throwable t) {
+			this.logger.error("Error while logging database", t);
+		}
 	}
 
 	private Timer timer = null;
 	private TimerTask task = null;
-	FileOutputStream fos = null;
-	static final byte[] eol = "\n".getBytes();
+	private FileOutputStream fos = null;
+	private static final byte[] eol = "\n".getBytes();
 
 	public void init() throws FileNotFoundException {
 		if (this.updateIntervalMs <= 0) {
@@ -144,11 +148,7 @@ public class DatabaseLogger {
 		this.task = new TimerTask() {
 			@Override
 			public void run() {
-				try {
-					logit();
-				} catch (Throwable t) {
-					DatabaseLogger.this.logger.error("Error while logging database", t);
-				}
+				logit();
 			}
 		};
 
@@ -174,10 +174,14 @@ public class DatabaseLogger {
 
 	@Transactional(readOnly = true)
 	public void log(Logger log, Level level) {
-		this.relayServers.log(log, level);
-		this.senders.log(log, level);
-		this.nodes.log(log, level);
-		this.positionUpdateMsgs.log(log, level);
-		this.clusterLeaderMsgs.log(log, level);
+		try {
+			this.relayServers.log(log, level);
+			this.senders.log(log, level);
+			this.nodes.log(log, level);
+			this.positionUpdateMsgs.log(log, level);
+			this.clusterLeaderMsgs.log(log, level);
+		} catch (Throwable t) {
+			this.logger.error("Error while logging database", t);
+		}
 	}
 }
