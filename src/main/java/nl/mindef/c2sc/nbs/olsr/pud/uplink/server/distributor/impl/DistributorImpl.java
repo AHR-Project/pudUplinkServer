@@ -227,6 +227,7 @@ public class DistributorImpl extends Thread implements Distributor {
 		return result;
 	}
 
+	@Override
 	@Transactional(readOnly = true)
 	public void distribute() {
 		while (this.signaledUpdates.getAndSet(false)) {
