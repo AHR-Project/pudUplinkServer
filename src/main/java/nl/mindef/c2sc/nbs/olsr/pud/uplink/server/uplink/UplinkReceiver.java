@@ -142,7 +142,7 @@ public class UplinkReceiver extends Thread implements StopHandlerConsumer {
 	 * Main
 	 */
 
-	private DatagramSocket sock = null;
+	private DatagramSocket sock;
 	private AtomicBoolean run = new AtomicBoolean(true);
 
 	public void init() throws SocketException {

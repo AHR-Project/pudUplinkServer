@@ -118,6 +118,10 @@ public class DistributorImpl implements Distributor {
 			this.timer.cancel();
 			this.timer = null;
 		}
+		if (this.sock != null) {
+			this.sock.close();
+			this.sock = null;
+		}
 	}
 
 	/*
