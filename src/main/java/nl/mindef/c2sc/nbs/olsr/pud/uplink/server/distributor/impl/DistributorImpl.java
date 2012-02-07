@@ -9,15 +9,15 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.Nodes;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.PositionUpdateMsgs;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.RelayServers;
-import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.domainmodel.Sender;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.domainmodel.Node;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.domainmodel.PositionUpdateMsg;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.domainmodel.RelayServer;
+import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.domainmodel.Sender;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.distributor.Distributor;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.util.MyIPAddresses;
 
@@ -27,7 +27,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 @Repository
-public class DistributorImpl extends Thread implements Distributor {
+public class DistributorImpl implements Distributor {
 	private Logger logger = Logger.getLogger(this.getClass().getName());
 
 	private int packetMaxSize = 1450;
@@ -109,48 +109,14 @@ public class DistributorImpl extends Thread implements Distributor {
 	}
 
 	public void init() throws SocketException {
-		this.setName(this.getClass().getSimpleName());
 		this.timer = new Timer(this.getClass().getSimpleName() + "-Timer");
 		this.sock = new DatagramSocket();
-		this.start();
 	}
 
 	public void uninit() {
-		this.run.set(false);
 		if (this.timer != null) {
 			this.timer.cancel();
 			this.timer = null;
-		}
-		synchronized (this.runWaiter) {
-			this.runWaiter.notifyAll();
-		}
-	}
-
-	private AtomicBoolean run = new AtomicBoolean(true);
-	Object runWaiter = new Object();
-	AtomicBoolean distribute = new AtomicBoolean(false);
-
-	@Override
-	public void run() {
-		while (this.run.get()) {
-			boolean distributeNow = this.distribute.getAndSet(false);
-			synchronized (this.runWaiter) {
-				try {
-					if (!distributeNow) {
-						this.runWaiter.wait();
-						distributeNow = this.distribute.getAndSet(false);
-					}
-				} catch (InterruptedException e) {
-					/* swallow */
-				}
-			}
-			if (distributeNow) {
-				try {
-					distribute();
-				} catch (Throwable e) {
-					this.logger.error("error during distribution", e);
-				}
-			}
 		}
 	}
 
@@ -158,29 +124,15 @@ public class DistributorImpl extends Thread implements Distributor {
 	 * Distribution
 	 */
 
-	private class DistributionTimerTask extends TimerTask {
-		public DistributionTimerTask() {
-			super();
-		}
-
-		@Override
-		public void run() {
-			DistributorImpl.this.distribute.set(true);
-			synchronized (DistributorImpl.this.runWaiter) {
-				DistributorImpl.this.runWaiter.notifyAll();
-			}
-		}
-	}
-
 	private Timer timer = null;
-	private AtomicBoolean signaledUpdates = new AtomicBoolean(false);
+	private AtomicInteger signaledUpdates = new AtomicInteger(0);
 
 	private long lastDistributionTime = -1;
 
 	@Override
 	public void signalUpdate() {
-		boolean previousSignaledUpdates = this.signaledUpdates.getAndSet(true);
-		if (!previousSignaledUpdates) {
+		int previousSignaledUpdates = this.signaledUpdates.getAndIncrement();
+		if (previousSignaledUpdates <= 0) {
 			this.timer.schedule(new DistributionTimerTask(), this.distributionDelay);
 		}
 	}
@@ -233,10 +185,21 @@ public class DistributorImpl extends Thread implements Distributor {
 		return result;
 	}
 
+	protected class DistributionTimerTask extends TimerTask {
+		@Override
+		public void run() {
+			distribute();
+		}
+	}
+
 	@Override
 	@Transactional(readOnly = true)
 	public void distribute() {
-		while (this.signaledUpdates.getAndSet(false)) {
+		int currentSignaledUpdates = this.signaledUpdates.get();
+		if (currentSignaledUpdates > 0) {
+			this.logger.warn("Distribution overrun detected (" + currentSignaledUpdates + ")");
+		}
+		if (this.signaledUpdates.getAndSet(0) > 0) {
 			long currentTime = System.currentTimeMillis();
 
 			if (this.logger.isDebugEnabled()) {
