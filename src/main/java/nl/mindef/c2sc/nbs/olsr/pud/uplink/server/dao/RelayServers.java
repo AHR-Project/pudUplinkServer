@@ -2,6 +2,7 @@ package nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.net.InetAddress;
 import java.util.List;
 
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.domainmodel.RelayServer;
@@ -19,6 +20,17 @@ public interface RelayServers {
 	 * @return a list of all RelayServer objects, or null when none found
 	 */
 	public List<RelayServer> getRelayServers();
+
+	/**
+	 * Get the RelayServer with the specified IP address and UDP port, or create a new one and return that one.
+	 * 
+	 * @param ip
+	 *          the IP address
+	 * @param port
+	 *          the UDP port
+	 * @return the RelayServer with the specified IP address and UDP port
+	 */
+	public RelayServer getOrAdd(InetAddress ip, int port);
 
 	/**
 	 * Retrieve a list of other (not me) RelayServer objects from the database
