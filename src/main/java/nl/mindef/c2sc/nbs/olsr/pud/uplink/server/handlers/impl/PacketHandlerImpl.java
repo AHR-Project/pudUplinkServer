@@ -5,9 +5,8 @@ import java.net.InetAddress;
 import java.util.Arrays;
 
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.Senders;
-import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.RelayServers;
-import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.domainmodel.Sender;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.domainmodel.RelayServer;
+import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.domainmodel.Sender;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.handlers.ClusterLeaderHandler;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.handlers.PacketHandler;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.handlers.PositionUpdateHandler;
@@ -60,17 +59,6 @@ public class PacketHandlerImpl implements PacketHandler {
 		this.senders = senders;
 	}
 
-	private RelayServers relayServers = null;
-
-	/**
-	 * @param relayServers
-	 *          the relayServers to set
-	 */
-	@Required
-	public final void setRelayServers(RelayServers relayServers) {
-		this.relayServers = relayServers;
-	}
-
 	/*
 	 * Fake data
 	 */
@@ -102,7 +90,7 @@ public class PacketHandlerImpl implements PacketHandler {
 
 	@Override
 	@Transactional
-	public boolean processPacket(DatagramPacket packet) {
+	public boolean processPacket(RelayServer relayServer, DatagramPacket packet) {
 		long utcTimestamp = System.currentTimeMillis();
 		boolean updated = false;
 
@@ -115,16 +103,14 @@ public class PacketHandlerImpl implements PacketHandler {
 			InetAddress srcIp = packet.getAddress();
 			int srcPort = packet.getPort();
 
-			RelayServer me = this.relayServers.getMe();
-
 			/* get sender or create */
 			Sender sender = this.senders.getSender(srcIp, srcPort);
 			if (sender == null) {
-				sender = new Sender(srcIp, Integer.valueOf(srcPort), me);
+				sender = new Sender(srcIp, Integer.valueOf(srcPort), relayServer);
 			}
 
 			/* make sure the sender is linked to this relayServer */
-			sender.setRelayServer(me);
+			sender.setRelayServer(relayServer);
 
 			/* get packet data */
 			byte[] packetData = packet.getData();

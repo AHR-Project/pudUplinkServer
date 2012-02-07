@@ -175,7 +175,7 @@ public class UplinkReceiver extends Thread implements StopHandlerConsumer {
 			try {
 				this.sock.receive(packet);
 				try {
-					if (this.packetHandler.processPacket(packet)) {
+					if (this.packetHandler.processPacket(this.relayServers.getMe(), packet)) {
 						this.databaseLogger.log(this.logger, Level.DEBUG);
 						this.distributor.signalUpdate();
 					}

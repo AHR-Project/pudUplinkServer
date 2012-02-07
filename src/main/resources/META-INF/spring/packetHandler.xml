@@ -9,7 +9,6 @@
 		<property name="faker" ref="Faker" />
 		<property name="senders" ref="Senders" />
 		<property name="positionUpdateHandler" ref="PositionUpdateHandler" />
-		<property name="relayServers" ref="RelayServers" />
 		<property name="useFaker" value="${faker.use}" />
 	</bean>
 
