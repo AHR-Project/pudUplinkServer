@@ -195,11 +195,7 @@ public class DistributorImpl implements Distributor {
 	@Override
 	@Transactional(readOnly = true)
 	public void distribute() {
-		int currentSignaledUpdates = this.signaledUpdates.get();
-		if (currentSignaledUpdates > 0) {
-			this.logger.warn("Distribution overrun detected (" + currentSignaledUpdates + ")");
-		}
-		if (this.signaledUpdates.getAndSet(0) > 0) {
+		while (this.signaledUpdates.getAndSet(0) > 0) {
 			long currentTime = System.currentTimeMillis();
 
 			if (this.logger.isDebugEnabled()) {
