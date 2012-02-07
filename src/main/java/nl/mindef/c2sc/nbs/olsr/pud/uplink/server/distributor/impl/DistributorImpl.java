@@ -158,6 +158,20 @@ public class DistributorImpl extends Thread implements Distributor {
 	 * Distribution
 	 */
 
+	private class DistributionTimerTask extends TimerTask {
+		public DistributionTimerTask() {
+			super();
+		}
+
+		@Override
+		public void run() {
+			DistributorImpl.this.distribute.set(true);
+			synchronized (DistributorImpl.this.runWaiter) {
+				DistributorImpl.this.runWaiter.notifyAll();
+			}
+		}
+	}
+
 	private Timer timer = null;
 	private AtomicBoolean signaledUpdates = new AtomicBoolean(false);
 
@@ -167,15 +181,7 @@ public class DistributorImpl extends Thread implements Distributor {
 	public void signalUpdate() {
 		boolean previousSignaledUpdates = this.signaledUpdates.getAndSet(true);
 		if (!previousSignaledUpdates) {
-			this.timer.schedule(new TimerTask() {
-				@Override
-				public void run() {
-					DistributorImpl.this.distribute.set(true);
-					synchronized (DistributorImpl.this.runWaiter) {
-						DistributorImpl.this.runWaiter.notifyAll();
-					}
-				}
-			}, this.distributionDelay);
+			this.timer.schedule(new DistributionTimerTask(), this.distributionDelay);
 		}
 	}
 
