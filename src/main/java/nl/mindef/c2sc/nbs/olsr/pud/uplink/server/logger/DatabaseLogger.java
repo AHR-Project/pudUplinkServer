@@ -160,7 +160,10 @@ public class DatabaseLogger {
 			this.task.cancel();
 			this.task = null;
 		}
-		this.timer.cancel();
+		if (this.timer != null) {
+			this.timer.cancel();
+			this.timer = null;
+		}
 
 		if (this.fos != null) {
 			try {
