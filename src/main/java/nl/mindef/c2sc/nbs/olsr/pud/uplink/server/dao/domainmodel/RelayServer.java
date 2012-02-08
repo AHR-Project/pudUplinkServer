@@ -80,8 +80,8 @@ public class RelayServer implements Serializable {
 		this.ip = ip;
 	}
 
-	/** port the port of the relay server */
-	private Integer port = Integer.valueOf(2242);
+	/** the port of the relay server */
+	private Integer port = Integer.valueOf(2243);
 
 	/**
 	 * @return the port
