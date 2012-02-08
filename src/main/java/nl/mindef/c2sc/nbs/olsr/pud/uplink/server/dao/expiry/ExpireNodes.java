@@ -19,7 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Repository
 public class ExpireNodes {
-	private Logger logger = Logger.getLogger(this.getClass().getName());
+	protected Logger logger = Logger.getLogger(this.getClass().getName());
 
 	/**
 	 * Timer task that does the actual expiry of out-of-date and empty objects
@@ -27,46 +27,46 @@ public class ExpireNodes {
 	protected class ExpiryTimerTask extends TimerTask {
 		@Override
 		public void run() {
-			expire();
+			try {
+				expire();
+			} catch (Throwable e) {
+				ExpireNodes.this.logger.error("error during expiry", e);
+			}
 		}
 	}
 
 	@Transactional
 	public void expire() {
+		if (this.logger.isDebugEnabled()) {
+			this.logger.debug("************************** expiry");
+		}
+
+		long utcTimestamp = System.currentTimeMillis();
+
 		try {
-			if (ExpireNodes.this.logger.isDebugEnabled()) {
-				ExpireNodes.this.logger.debug("************************** expiry");
-			}
-
-			long utcTimestamp = System.currentTimeMillis();
-
-			try {
-				ExpireNodes.this.clusterLeaderMsgs.removeExpiredClusterLeaderMsg(utcTimestamp,
-						ExpireNodes.this.validityTimeMultiplier);
-			} catch (Throwable e) {
-				ExpireNodes.this.logger.error("Removal of expired cluster leader messages failed", e);
-			}
-
-			try {
-				ExpireNodes.this.positionUpdateMsgs.removeExpiredPositionUpdateMsg(utcTimestamp,
-						ExpireNodes.this.validityTimeMultiplier);
-			} catch (Throwable e) {
-				ExpireNodes.this.logger.error("Removal of expired position update messages failed", e);
-			}
-
-			try {
-				ExpireNodes.this.nodes.removeExpiredNodes();
-			} catch (Throwable e) {
-				ExpireNodes.this.logger.error("Removal of empty nodes failed", e);
-			}
-
-			try {
-				ExpireNodes.this.senders.removeExpiredSenders();
-			} catch (Throwable e) {
-				ExpireNodes.this.logger.error("Removal of empty senders failed", e);
-			}
+			ExpireNodes.this.clusterLeaderMsgs.removeExpiredClusterLeaderMsg(utcTimestamp,
+					ExpireNodes.this.validityTimeMultiplier);
 		} catch (Throwable e) {
-			ExpireNodes.this.logger.error("error during expiry", e);
+			this.logger.error("Removal of expired cluster leader messages failed", e);
+		}
+
+		try {
+			ExpireNodes.this.positionUpdateMsgs.removeExpiredPositionUpdateMsg(utcTimestamp,
+					ExpireNodes.this.validityTimeMultiplier);
+		} catch (Throwable e) {
+			this.logger.error("Removal of expired position update messages failed", e);
+		}
+
+		try {
+			ExpireNodes.this.nodes.removeExpiredNodes();
+		} catch (Throwable e) {
+			this.logger.error("Removal of empty nodes failed", e);
+		}
+
+		try {
+			ExpireNodes.this.senders.removeExpiredSenders();
+		} catch (Throwable e) {
+			this.logger.error("Removal of empty senders failed", e);
 		}
 	}
 

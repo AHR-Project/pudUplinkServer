@@ -28,7 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Repository
 public class DistributorImpl implements Distributor {
-	private Logger logger = Logger.getLogger(this.getClass().getName());
+	protected Logger logger = Logger.getLogger(this.getClass().getName());
 
 	private int packetMaxSize = 1450;
 
@@ -192,7 +192,11 @@ public class DistributorImpl implements Distributor {
 	protected class DistributionTimerTask extends TimerTask {
 		@Override
 		public void run() {
-			distribute();
+			try {
+				distribute();
+			} catch (Throwable e) {
+				DistributorImpl.this.logger.error("error during distribution", e);
+			}
 		}
 	}
 

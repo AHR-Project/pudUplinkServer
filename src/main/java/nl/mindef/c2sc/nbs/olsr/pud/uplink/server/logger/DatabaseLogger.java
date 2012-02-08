@@ -21,7 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Repository
 public class DatabaseLogger {
-	private Logger logger = Logger.getLogger(this.getClass().getName());
+	protected Logger logger = Logger.getLogger(this.getClass().getName());
 
 	private int updateIntervalMs = 0;
 
@@ -108,33 +108,29 @@ public class DatabaseLogger {
 	 */
 
 	@Transactional(readOnly = true)
-	public void logit() {
-		try {
-			FileChannel channel = this.fos.getChannel();
-			channel.position(0);
+	public void logit() throws IOException {
+		this.channel.position(0);
 
-			this.logger.debug("Writing database logfile");
+		this.logger.debug("Writing database logfile");
 
-			this.relayServers.print(this.fos);
-			this.fos.write(eol);
-			this.senders.print(this.fos);
-			this.fos.write(eol);
-			this.nodes.print(this.fos);
-			this.fos.write(eol);
-			this.positionUpdateMsgs.print(this.fos);
-			this.fos.write(eol);
-			this.clusterLeaderMsgs.print(this.fos);
+		this.relayServers.print(this.fos);
+		this.fos.write(eol);
+		this.senders.print(this.fos);
+		this.fos.write(eol);
+		this.nodes.print(this.fos);
+		this.fos.write(eol);
+		this.positionUpdateMsgs.print(this.fos);
+		this.fos.write(eol);
+		this.clusterLeaderMsgs.print(this.fos);
 
-			channel.truncate(channel.position());
-			this.fos.flush();
-		} catch (Throwable t) {
-			this.logger.error("Error while logging database", t);
-		}
+		this.channel.truncate(this.channel.position());
+		this.fos.flush();
 	}
 
 	private Timer timer = null;
 	private TimerTask task = null;
 	private FileOutputStream fos = null;
+	private FileChannel channel = null;
 	private static final byte[] eol = "\n".getBytes();
 
 	public void init() throws FileNotFoundException {
@@ -143,12 +139,17 @@ public class DatabaseLogger {
 		}
 
 		this.fos = new FileOutputStream(this.databaseLogFile, false);
+		this.channel = this.fos.getChannel();
 
 		this.timer = new Timer(this.getClass().getSimpleName() + "-Timer");
 		this.task = new TimerTask() {
 			@Override
 			public void run() {
-				logit();
+				try {
+					logit();
+				} catch (Throwable e) {
+					DatabaseLogger.this.logger.error("error during database logging", e);
+				}
 			}
 		};
 
@@ -165,6 +166,14 @@ public class DatabaseLogger {
 			this.timer = null;
 		}
 
+		if (this.channel != null) {
+			try {
+				this.channel.close();
+			} catch (IOException e) {
+				/* ignore */
+			}
+			this.channel = null;
+		}
 		if (this.fos != null) {
 			try {
 				this.fos.close();
