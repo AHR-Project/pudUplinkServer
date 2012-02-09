@@ -9,6 +9,7 @@
 		<property name="handlers">
 			<set>
 				<ref bean="UplinkReceiver" />
+				<ref bean="Distributor" />
 			</set>
 		</property>
 		<property name="signal" value="INT" />

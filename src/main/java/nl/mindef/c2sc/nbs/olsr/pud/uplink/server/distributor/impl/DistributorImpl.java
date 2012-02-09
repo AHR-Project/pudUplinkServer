@@ -19,6 +19,7 @@ import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.domainmodel.PositionUpdateM
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.domainmodel.RelayServer;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.domainmodel.Sender;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.distributor.Distributor;
+import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.signals.StopHandlerConsumer;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.util.MyIPAddresses;
 
 import org.apache.log4j.Logger;
@@ -27,7 +28,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 @Repository
-public class DistributorImpl implements Distributor {
+public class DistributorImpl implements Distributor, StopHandlerConsumer {
 	protected Logger logger = Logger.getLogger(this.getClass().getName());
 
 	private int packetMaxSize;
@@ -117,10 +118,7 @@ public class DistributorImpl implements Distributor {
 	}
 
 	public void uninit() {
-		if (this.timer != null) {
-			this.timer.cancel();
-			this.timer = null;
-		}
+		signalStop();
 		if (this.sock != null) {
 			this.sock.close();
 			this.sock = null;
@@ -368,6 +366,14 @@ public class DistributorImpl implements Distributor {
 			}
 
 			this.lastDistributionTime = currentTime;
+		}
+	}
+
+	@Override
+	public void signalStop() {
+		if (this.timer != null) {
+			this.timer.cancel();
+			this.timer = null;
 		}
 	}
 }
