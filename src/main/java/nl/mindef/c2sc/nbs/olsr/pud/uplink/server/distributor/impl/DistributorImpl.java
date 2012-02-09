@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
-import java.net.SocketException;
+import java.net.InetSocketAddress;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Timer;
@@ -108,9 +108,11 @@ public class DistributorImpl implements Distributor {
 		this.distributionDelay = distributionDelay;
 	}
 
-	public void init() throws SocketException {
+	public void init() throws IOException {
 		this.timer = new Timer(this.getClass().getSimpleName() + "-Timer");
-		this.sock = new DatagramSocket();
+		this.sock = new DatagramSocket(null);
+		this.sock.setReuseAddress(true);
+		this.sock.bind(new InetSocketAddress(this.uplinkUdpPort));
 	}
 
 	public void uninit() {
