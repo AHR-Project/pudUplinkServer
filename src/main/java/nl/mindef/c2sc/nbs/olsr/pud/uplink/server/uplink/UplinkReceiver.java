@@ -208,6 +208,7 @@ public class UplinkReceiver extends Thread implements StopHandlerConsumer {
 		if (this.sock != null) {
 			/* this is crude but effective */
 			this.sock.close();
+			this.sock = null;
 		}
 	}
 }
