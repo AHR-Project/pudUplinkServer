@@ -68,18 +68,27 @@ public class NodesImpl implements Nodes {
 		List<Node> result = this.sessionFactory
 				.getCurrentSession()
 				.createQuery(
-						"select node from Node node"
-								/* do an eager fetch of the sender */
-								+ " left join node.sender"
-								/* node has cluster nodes AND node is not a cluster leader that doesn't point to itself */
-								+ " where (node.clusterNodes is not empty and node not in (select cl.clusterLeaderNode from ClusterLeaderMsg cl where cl.clusterLeaderNode.id != cl.clusterLeaderNode.clusterLeaderMsg.clusterLeaderNode.id))"
+						/* get nodes and their senders (eagerly fetched) */
+						"select node from Node node left join node.sender where "
+
+								/* node has cluster nodes AND node is NOT a cluster leader that doesn't point to itself */
+								+ "(node.clusterNodes is not empty and"
+								+ " node not in"
+								+ " (select cl.clusterLeaderNode from ClusterLeaderMsg cl where"
+								+ "   cl.clusterLeaderNode.clusterLeaderMsg is not null and"
+								+ "   cl.clusterLeaderNode.clusterLeaderMsg.clusterLeaderNode.id != cl.clusterLeaderNode.id"
+								+ " )"
+								+ ")"
 
 								/*
 								 * (when clusterLeadersIncludesTransitionalNodes is set): or node is a node that points to a cluster
 								 * leader that doesn't point to itself
 								 */
-								+ (!this.clusterLeadersIncludesTransitionalNodes ? ""
-										: " or (node in (select cl.node from ClusterLeaderMsg cl where cl.clusterLeaderNode.id != cl.clusterLeaderNode.clusterLeaderMsg.clusterLeaderNode.id))")
+								+ (!this.clusterLeadersIncludesTransitionalNodes ? "" : " or (node in"
+										+ "  (select cl.node from ClusterLeaderMsg cl where"
+										+ "   cl.clusterLeaderNode.clusterLeaderMsg is not null and"
+										+ "   cl.clusterLeaderNode.clusterLeaderMsg.clusterLeaderNode.id != cl.clusterLeaderNode.id"
+										+ "  ))")
 
 								+ " order by node.mainIp").list();
 		if (result.size() == 0) {
@@ -99,16 +108,15 @@ public class NodesImpl implements Nodes {
 		List<Node> result = this.sessionFactory
 				.getCurrentSession()
 				.createQuery(
-						"select node from Node node"
-						/* do an eager fetch of the sender */
-						+ " left join node.sender where"
-						/* node is not the cluster leader itself and node points to cluster leader */
+						/* get nodes and their senders (eagerly fetched) */
+						"select node from Node node left join node.sender where"
+						/* node is not the cluster leader itself and node points to the cluster leader */
 						+ " node.id != :clId"
 								+ " and node.clusterLeaderMsg is not null and node.clusterLeaderMsg.clusterLeaderNode.id = :clId"
 								/* node has a valid sender (a sender always has a valid IP address and a valid port) */
-								+ " and node.sender is not null"
+								+ " and node.sender is not null "
 								/* keep the node with the most recently received cluster leader message on top of the list */
-								+ " order by node.clusterLeaderMsg.receptionTime desc").setLong("clId", clId).list();
+								+ "order by node.clusterLeaderMsg.receptionTime desc").setLong("clId", clId).list();
 
 		if (result.size() == 0) {
 			return null;
