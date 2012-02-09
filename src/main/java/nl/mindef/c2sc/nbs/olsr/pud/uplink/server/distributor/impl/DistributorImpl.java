@@ -30,12 +30,13 @@ import org.springframework.transaction.annotation.Transactional;
 public class DistributorImpl implements Distributor {
 	protected Logger logger = Logger.getLogger(this.getClass().getName());
 
-	private int packetMaxSize = 1450;
+	private int packetMaxSize;
 
 	/**
 	 * @param packetMaxSize
 	 *          the packetMaxSize to set
 	 */
+	@Required
 	public final void setPacketMaxSize(int packetMaxSize) {
 		this.packetMaxSize = packetMaxSize;
 	}
