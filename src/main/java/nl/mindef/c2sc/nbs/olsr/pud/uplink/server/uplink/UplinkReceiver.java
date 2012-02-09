@@ -27,14 +27,14 @@ public class UplinkReceiver extends Thread implements StopHandlerConsumer {
 	static public int BUFFERSIZE = 2 * 1024; /* 16KB */
 
 	/** the UDP port to listen on for uplink messages */
-	private Integer uplinkUdpPort = null;
+	private int uplinkUdpPort = -1;
 
 	/**
 	 * @param uplinkUdpPort
 	 *          the uplinkUdpPort to set
 	 */
 	@Required
-	public final void setUplinkUdpPort(Integer uplinkUdpPort) {
+	public final void setUplinkUdpPort(int uplinkUdpPort) {
 		this.uplinkUdpPort = uplinkUdpPort;
 	}
 
@@ -147,7 +147,7 @@ public class UplinkReceiver extends Thread implements StopHandlerConsumer {
 
 	public void init() throws SocketException {
 		this.setName(this.getClass().getSimpleName());
-		this.sock = new DatagramSocket(this.uplinkUdpPort.intValue());
+		this.sock = new DatagramSocket(this.uplinkUdpPort);
 		this.start();
 	}
 

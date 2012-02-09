@@ -51,15 +51,15 @@ public class DistributorImpl implements Distributor {
 		this.myIPAddresses = myIPAddresses;
 	}
 
-	/** the UDP port to listen on for uplink messages */
-	private Integer uplinkUdpPort = null;
+	/** the UDP port to distribute on */
+	private int uplinkUdpPort = -1;
 
 	/**
 	 * @param uplinkUdpPort
 	 *          the uplinkUdpPort to set
 	 */
 	@Required
-	public final void setUplinkUdpPort(Integer uplinkUdpPort) {
+	public final void setUplinkUdpPort(int uplinkUdpPort) {
 		this.uplinkUdpPort = uplinkUdpPort;
 	}
 
@@ -304,7 +304,7 @@ public class DistributorImpl implements Distributor {
 					}
 
 					if ((this.myIPAddresses.isMe(clusterLeaderSenderIp) || this.myIPAddresses.isMe(clusterLeaderMainIp))
-							&& (clusterLeaderSenderPort.intValue() == this.uplinkUdpPort.intValue())) {
+							&& (clusterLeaderSenderPort.intValue() == this.uplinkUdpPort)) {
 						/* do not relay to ourselves */
 						if (this.logger.isDebugEnabled()) {
 							this.logger.debug("this is me: skipping");
