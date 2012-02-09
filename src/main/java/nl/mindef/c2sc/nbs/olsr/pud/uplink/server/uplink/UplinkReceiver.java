@@ -4,6 +4,7 @@ import java.io.FileNotFoundException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.HashSet;
@@ -147,7 +148,9 @@ public class UplinkReceiver extends Thread implements StopHandlerConsumer {
 
 	public void init() throws SocketException {
 		this.setName(this.getClass().getSimpleName());
-		this.sock = new DatagramSocket(this.uplinkUdpPort);
+		this.sock = new DatagramSocket(null);
+		this.sock.setReuseAddress(true);
+		this.sock.bind(new InetSocketAddress(this.uplinkUdpPort));
 		this.start();
 	}
 
@@ -189,7 +192,10 @@ public class UplinkReceiver extends Thread implements StopHandlerConsumer {
 			}
 		}
 
-		this.sock.close();
+		if (this.sock != null) {
+			this.sock.close();
+			this.sock = null;
+		}
 	}
 
 	/*
