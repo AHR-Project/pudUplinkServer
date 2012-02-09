@@ -83,10 +83,10 @@ public class Node implements Serializable {
 	}
 
 	/**
-	 * the sender to which the node belongs; can be null when an OLSRd node sends a ClusterLeader message that points at
-	 * a cluster leader node that has not been seen yet by the RelayServer
+	 * the sender to which the node belongs; can be null when an OLSRd node sends a ClusterLeader message that points at a
+	 * cluster leader node that has not been seen yet by the RelayServer
 	 */
-	@ManyToOne(cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH, CascadeType.DETACH })
+	@ManyToOne(cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH, CascadeType.DETACH }, optional = true)
 	private Sender sender = null;
 
 	/**
@@ -105,7 +105,7 @@ public class Node implements Serializable {
 	}
 
 	/** the associated position update message */
-	@OneToOne(cascade = CascadeType.ALL)
+	@OneToOne(cascade = CascadeType.ALL, optional = true)
 	private PositionUpdateMsg positionUpdateMsg = null;
 
 	/**
@@ -124,7 +124,7 @@ public class Node implements Serializable {
 	}
 
 	/** the associated cluster leader message */
-	@OneToOne(cascade = CascadeType.ALL)
+	@OneToOne(cascade = CascadeType.ALL, optional = true)
 	private ClusterLeaderMsg clusterLeaderMsg = null;
 
 	/**
