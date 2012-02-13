@@ -30,17 +30,6 @@ public class NodesImpl implements Nodes {
 		this.sessionFactory = sessionFactory;
 	}
 
-	private boolean clusterLeadersIncludesTransitionalNodes = false;
-
-	/**
-	 * @param clusterLeadersIncludesTransitionalNodes
-	 *          the clusterLeadersIncludesTransitionalNodes to set
-	 */
-	@Required
-	public final void setClusterLeadersIncludesTransitionalNodes(boolean clusterLeadersIncludesTransitionalNodes) {
-		this.clusterLeadersIncludesTransitionalNodes = clusterLeadersIncludesTransitionalNodes;
-	}
-
 	@Override
 	@Transactional(readOnly = true)
 	public Node getNode(InetAddress mainIp) {
@@ -69,27 +58,9 @@ public class NodesImpl implements Nodes {
 				.getCurrentSession()
 				.createQuery(
 						/* get nodes and their senders (eagerly fetched) */
-						"select node from Node node left join node.sender where "
-
-								/* node has cluster nodes AND node is NOT a cluster leader that doesn't point to itself */
-								+ "(node.clusterNodes is not empty and"
-								+ " node not in"
-								+ " (select cl.clusterLeaderNode from ClusterLeaderMsg cl where"
-								+ "   cl.clusterLeaderNode.clusterLeaderMsg is not null and"
-								+ "   cl.clusterLeaderNode.clusterLeaderMsg.clusterLeaderNode.id != cl.clusterLeaderNode.id"
-								+ " )"
-								+ ")"
-
-								/*
-								 * (when clusterLeadersIncludesTransitionalNodes is set): or node is a node that points to a cluster
-								 * leader that doesn't point to itself
-								 */
-								+ (!this.clusterLeadersIncludesTransitionalNodes ? "" : " or (node in"
-										+ "  (select cl.node from ClusterLeaderMsg cl where"
-										+ "   cl.clusterLeaderNode.clusterLeaderMsg is not null and"
-										+ "   cl.clusterLeaderNode.clusterLeaderMsg.clusterLeaderNode.id != cl.clusterLeaderNode.id"
-										+ "  ))")
-
+						"select node from Node node left join node.sender where"
+								/* node has cluster nodes */
+								+ " node.clusterNodes is not empty"
 								+ " order by node.mainIp").list();
 		if (result.size() == 0) {
 			return null;
