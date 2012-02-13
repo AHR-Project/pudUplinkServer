@@ -66,6 +66,17 @@ public class DatabaseLogger {
 		this.generateGraphviz = generateGraphviz;
 	}
 
+	private String graphvizSimpleFile = null;
+
+	/**
+	 * @param graphvizSimpleFile
+	 *          the graphvizFile to set
+	 */
+	@Required
+	public void setGraphvizSimpleFile(String graphvizSimpleFile) {
+		this.graphvizSimpleFile = graphvizSimpleFile;
+	}
+
 	private String graphvizFile = null;
 
 	/**
@@ -86,6 +97,17 @@ public class DatabaseLogger {
 	@Required
 	public void setGenerateSVG(boolean generateSVG) {
 		this.generateSVG = generateSVG;
+	}
+
+	private String svgSimpleFile = null;
+
+	/**
+	 * @param svgSimpleFile
+	 *          the svgSimpleFile to set
+	 */
+	@Required
+	public void setSvgSimpleFile(String svgSimpleFile) {
+		this.svgSimpleFile = svgSimpleFile;
 	}
 
 	private String svgFile = null;
@@ -161,6 +183,8 @@ public class DatabaseLogger {
 	 * Main
 	 */
 
+	private static final String gvNodeTemplateSimple = "  \"%s\" [color=%s]\n";
+
 	private static final String gvNodeTemplateIp = "  %s [shape=box, margin=0, label=<\n"
 			+ "    <table border=\"0\" cellborder=\"1\" cellspacing=\"2\" cellpadding=\"4\">\n"
 			+ "      <tr><td bgcolor=\"%s\">%s</td></tr>\n" + "      <tr><td bgcolor=\"%s\">%s</td></tr>\n"
@@ -171,39 +195,70 @@ public class DatabaseLogger {
 			+ "      <tr><td bgcolor=\"%s\">%s</td></tr>\n" + "      <tr><td bgcolor=\"%s\">%s</td></tr>\n"
 			+ "      <tr><td bgcolor=\"%s\">%s</td></tr>\n" + "    </table>>];\n";
 
+	private static final String colorOkSimple = "black";
+	private static final String colorNotOkSimple = "red";
 	private static final String colorOk = "white";
 	private static final String colorNotOk = "red";
 
-	private static void writeGraphvizNode(OutputStream gvos, Node node) throws IllegalFormatException,
-			FormatterClosedException, IOException {
+	private static boolean useIPNodeNameInDot(PositionUpdate nodePUMsg) {
+		// FIXME no magic numbers, add them to WireFormatConstants
+		return ((nodePUMsg == null) || (nodePUMsg.getPositionUpdateNodeIdType() == 4) || (nodePUMsg
+				.getPositionUpdateNodeIdType() == 6));
+	}
+
+	private static String getNodeNameForDot(Node node) {
+		PositionUpdateMsg nodePU = node.getPositionUpdateMsg();
+		PositionUpdate nodePUMsg = (nodePU == null) ? null : nodePU.getPositionUpdateMsg();
+
+		if (useIPNodeNameInDot(nodePUMsg)) {
+			/* use IP variant */
+			return node.getMainIp().getHostAddress().toString();
+		}
+
+		/* use named variant */
+		assert (nodePUMsg != null);
+		return nodePUMsg.getPositionUpdateNodeId();
+	}
+
+	private static void writeGraphvizNode(OutputStream gvoss, OutputStream gvos, Node node)
+			throws IllegalFormatException, FormatterClosedException, IOException {
+		StringBuilder sbs = new StringBuilder();
 		StringBuilder sb = new StringBuilder();
+		Formatter formatters = new Formatter(sbs);
 		Formatter formatter = new Formatter(sb);
+
+		Sender sender = node.getSender();
+		String senderIP = (sender == null) ? "" : "" + sender.getIp().getHostAddress() + ":" + sender.getPort();
+		String senderColor = (sender == null) ? colorNotOk : colorOk;
+
+		Long nodeId = node.getId();
+		String nodeIP = node.getMainIp().getHostAddress().toString();
 
 		PositionUpdateMsg nodePU = node.getPositionUpdateMsg();
 		PositionUpdate nodePUMsg = (nodePU == null) ? null : nodePU.getPositionUpdateMsg();
-		Sender sender = node.getSender();
 
-		/* write node definition */
-		// FIXME no magic numbers, add them to WireFormatConstants
-		if ((nodePUMsg == null) || (nodePUMsg.getPositionUpdateNodeIdType() == 4)
-				|| (nodePUMsg.getPositionUpdateNodeIdType() == 6)) {
+		String nodeSimpleColor = (nodePUMsg == null) ? colorNotOkSimple : colorOkSimple;
+		String nodeColor = (nodePUMsg == null) ? colorNotOk : colorOk;
+
+		String nodeName = getNodeNameForDot(node);
+
+		formatters.format(gvNodeTemplateSimple, nodeName, nodeSimpleColor);
+		if (useIPNodeNameInDot(nodePUMsg)) {
 			/* use IP variant */
-			formatter.format(gvNodeTemplateIp, node.getId(), (nodePUMsg == null) ? colorNotOk : colorOk, node.getMainIp()
-					.getHostAddress(), (sender == null) ? colorNotOk : colorOk, (sender == null) ? "" : ""
-					+ sender.getIp().getHostAddress() + ":" + sender.getPort());
+			formatter.format(gvNodeTemplateIp, nodeId, nodeColor, nodeName, senderColor, senderIP);
 		} else {
 			/* use named variant */
-			formatter.format(gvNodeTemplate, node.getId(), colorOk, nodePUMsg.getPositionUpdateNodeId(), colorOk, node
-					.getMainIp().getHostAddress(), (sender == null) ? colorNotOk : colorOk, (sender == null) ? "" : ""
-					+ sender.getIp().getHostAddress() + ":" + sender.getPort());
+			formatter.format(gvNodeTemplate, nodeId, nodeColor, nodeName, colorOk, nodeIP, senderColor, senderIP);
 		}
 
 		/* now write graph */
 		ClusterLeaderMsg nodeCL = node.getClusterLeaderMsg();
 		if (nodeCL != null) {
-			formatter.format("%s -> %s\n\n", node.getId(), nodeCL.getClusterLeaderNode().getId());
+			formatters.format("\"%s\" -> \"%s\"\n\n", nodeName, getNodeNameForDot(nodeCL.getClusterLeaderNode()));
+			formatter.format("%s -> %s\n\n", nodeId, nodeCL.getClusterLeaderNode().getId());
 		}
 
+		gvoss.write(sbs.toString().getBytes());
 		gvos.write(sb.toString().getBytes());
 	}
 
@@ -216,11 +271,13 @@ public class DatabaseLogger {
 
 		this.logger.debug("Writing graphviz file");
 
+		this.gvschannel.position(0);
 		this.gvchannel.position(0);
+		this.gvoss.write("digraph G {\n".getBytes());
 		this.gvos.write("digraph G {\n".getBytes());
 		try {
 			for (Node node : allNodes) {
-				writeGraphvizNode(this.gvos, node);
+				writeGraphvizNode(this.gvoss, this.gvos, node);
 			}
 		} catch (Exception e) {
 			this.logger.error("Error while generating the graphviz file", e);
@@ -228,11 +285,14 @@ public class DatabaseLogger {
 			this.gvos.write("}\n".getBytes());
 		}
 
+		this.gvoss.flush();
 		this.gvos.flush();
+		this.gvschannel.truncate(this.gvschannel.position());
 		this.gvchannel.truncate(this.gvchannel.position());
 
 		if (this.generateSVG) {
 			this.logger.debug("Generating SVG file");
+			Runtime.getRuntime().exec("fdp -Tsvg " + this.graphvizSimpleFile + " -o " + this.svgSimpleFile);
 			Runtime.getRuntime().exec("fdp -Tsvg " + this.graphvizFile + " -o " + this.svgFile);
 		}
 	}
@@ -265,6 +325,8 @@ public class DatabaseLogger {
 	private TimerTask task = null;
 	private FileOutputStream fos = null;
 	private FileChannel channel = null;
+	private FileOutputStream gvoss = null;
+	private FileChannel gvschannel = null;
 	private FileOutputStream gvos = null;
 	private FileChannel gvchannel = null;
 	private static final byte[] eol = "\n".getBytes();
@@ -278,6 +340,8 @@ public class DatabaseLogger {
 		this.channel = this.fos.getChannel();
 
 		if (this.generateGraphviz) {
+			this.gvoss = new FileOutputStream(this.graphvizSimpleFile, false);
+			this.gvschannel = this.gvoss.getChannel();
 			this.gvos = new FileOutputStream(this.graphvizFile, false);
 			this.gvchannel = this.gvos.getChannel();
 		}
@@ -314,6 +378,14 @@ public class DatabaseLogger {
 				/* ignore */
 			}
 			this.channel = null;
+		}
+		if (this.gvoss != null) {
+			try {
+				this.gvoss.close();
+			} catch (IOException e) {
+				/* ignore */
+			}
+			this.gvoss = null;
 		}
 		if (this.gvos != null) {
 			try {
