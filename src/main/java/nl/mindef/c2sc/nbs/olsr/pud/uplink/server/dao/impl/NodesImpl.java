@@ -32,6 +32,20 @@ public class NodesImpl implements Nodes {
 
 	@Override
 	@Transactional(readOnly = true)
+	public List<Node> getAllNodes() {
+		@SuppressWarnings("unchecked")
+		List<Node> result = this.sessionFactory.getCurrentSession()
+				.createQuery("select node from Node node").list();
+
+		if (result.size() == 0) {
+			return null;
+		}
+
+		return result;
+	}
+
+	@Override
+	@Transactional(readOnly = true)
 	public Node getNode(InetAddress mainIp) {
 		if (mainIp == null) {
 			return null;

@@ -13,6 +13,10 @@
 		<property name="positions" ref="PositionUpdateMsgs" />
 		<property name="relayServers" ref="RelayServers" />
 		<property name="updateIntervalMs" value="${database.logger.updateintervalms}" />
+		<property name="generateGraphviz" value="${database.logger.graphviz}" />
+		<property name="graphvizFile" value="${database.logger.graphvizFile}" />
+		<property name="generateSVG" value="${database.logger.svg}" />
+		<property name="svgFile" value="${database.logger.svgFile}" />
 	</bean>
 
 </beans>

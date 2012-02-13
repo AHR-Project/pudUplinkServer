@@ -15,6 +15,13 @@ import org.apache.log4j.Logger;
  */
 public interface Nodes {
 	/**
+	 * Get all nodes.<br/>
+	 * 
+	 * @return a list of all nodes, or null when not found
+	 */
+	public List<Node> getAllNodes();
+
+	/**
 	 * Get a node.<br/>
 	 * <br/>
 	 * Only the node itself is retrieved, no linked objects (non-eager fetching) <br/>

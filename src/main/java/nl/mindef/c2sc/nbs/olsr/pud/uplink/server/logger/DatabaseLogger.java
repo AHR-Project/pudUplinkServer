@@ -3,7 +3,12 @@ package nl.mindef.c2sc.nbs.olsr.pud.uplink.server.logger;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.nio.channels.FileChannel;
+import java.util.Formatter;
+import java.util.FormatterClosedException;
+import java.util.IllegalFormatException;
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -12,9 +17,14 @@ import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.Nodes;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.PositionUpdateMsgs;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.RelayServers;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.Senders;
+import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.domainmodel.ClusterLeaderMsg;
+import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.domainmodel.Node;
+import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.domainmodel.PositionUpdateMsg;
+import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.domainmodel.Sender;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import org.olsr.plugin.pud.PositionUpdate;
 import org.springframework.beans.factory.annotation.Required;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -43,6 +53,50 @@ public class DatabaseLogger {
 	@Required
 	public void setDatabaseLogFile(String databaseLogFile) {
 		this.databaseLogFile = databaseLogFile;
+	}
+
+	private boolean generateGraphviz = false;
+
+	/**
+	 * @param generateGraphviz
+	 *          the generateGraphviz to set
+	 */
+	@Required
+	public void setGenerateGraphviz(boolean generateGraphviz) {
+		this.generateGraphviz = generateGraphviz;
+	}
+
+	private String graphvizFile = null;
+
+	/**
+	 * @param graphvizFile
+	 *          the graphvizFile to set
+	 */
+	@Required
+	public void setGraphvizFile(String graphvizFile) {
+		this.graphvizFile = graphvizFile;
+	}
+
+	private boolean generateSVG = false;
+
+	/**
+	 * @param generateSVG
+	 *          the generateSVG to set
+	 */
+	@Required
+	public void setGenerateSVG(boolean generateSVG) {
+		this.generateSVG = generateSVG;
+	}
+
+	private String svgFile = null;
+
+	/**
+	 * @param svgFile
+	 *          the svgFile to set
+	 */
+	@Required
+	public void setSvgFile(String svgFile) {
+		this.svgFile = svgFile;
 	}
 
 	/** the Node handler */
@@ -107,6 +161,82 @@ public class DatabaseLogger {
 	 * Main
 	 */
 
+	private static final String gvNodeTemplateIp = "  %s [shape=box, margin=0, label=<\n"
+			+ "    <table border=\"0\" cellborder=\"1\" cellspacing=\"2\" cellpadding=\"4\">\n"
+			+ "      <tr><td bgcolor=\"%s\">%s</td></tr>\n" + "      <tr><td bgcolor=\"%s\">%s</td></tr>\n"
+			+ "    </table>>];\n";
+
+	private static final String gvNodeTemplate = "  %s [shape=box, margin=0, label=<\n"
+			+ "    <table border=\"0\" cellborder=\"1\" cellspacing=\"2\" cellpadding=\"4\">\n"
+			+ "      <tr><td bgcolor=\"%s\">%s</td></tr>\n" + "      <tr><td bgcolor=\"%s\">%s</td></tr>\n"
+			+ "      <tr><td bgcolor=\"%s\">%s</td></tr>\n" + "    </table>>];\n";
+
+	private static final String colorOk = "white";
+	private static final String colorNotOk = "red";
+
+	private static void writeGraphvizNode(OutputStream gvos, Node node) throws IllegalFormatException,
+			FormatterClosedException, IOException {
+		StringBuilder sb = new StringBuilder();
+		Formatter formatter = new Formatter(sb);
+
+		PositionUpdateMsg nodePU = node.getPositionUpdateMsg();
+		PositionUpdate nodePUMsg = (nodePU == null) ? null : nodePU.getPositionUpdateMsg();
+		Sender sender = node.getSender();
+
+		/* write node definition */
+		// FIXME no magic numbers, add them to WireFormatConstants
+		if ((nodePUMsg == null) || (nodePUMsg.getPositionUpdateNodeIdType() == 4)
+				|| (nodePUMsg.getPositionUpdateNodeIdType() == 6)) {
+			/* use IP variant */
+			formatter.format(gvNodeTemplateIp, node.getId(), (nodePUMsg == null) ? colorNotOk : colorOk, node.getMainIp()
+					.getHostAddress(), (sender == null) ? colorNotOk : colorOk, (sender == null) ? "" : ""
+					+ sender.getIp().getHostAddress() + ":" + sender.getPort());
+		} else {
+			/* use named variant */
+			formatter.format(gvNodeTemplate, node.getId(), colorOk, nodePUMsg.getPositionUpdateNodeId(), colorOk, node
+					.getMainIp().getHostAddress(), (sender == null) ? colorNotOk : colorOk, (sender == null) ? "" : ""
+					+ sender.getIp().getHostAddress() + ":" + sender.getPort());
+		}
+
+		/* now write graph */
+		ClusterLeaderMsg nodeCL = node.getClusterLeaderMsg();
+		if (nodeCL != null) {
+			formatter.format("%s -> %s\n\n", node.getId(), nodeCL.getClusterLeaderNode().getId());
+		}
+
+		gvos.write(sb.toString().getBytes());
+	}
+
+	private void generateGraphviz() throws IOException {
+		List<Node> allNodes = this.nodes.getAllNodes();
+
+		if (allNodes == null) {
+			return;
+		}
+
+		this.logger.debug("Writing graphviz file");
+
+		this.gvchannel.position(0);
+		this.gvos.write("digraph G {\n".getBytes());
+		try {
+			for (Node node : allNodes) {
+				writeGraphvizNode(this.gvos, node);
+			}
+		} catch (Exception e) {
+			this.logger.error("Error while generating the graphviz file", e);
+		} finally {
+			this.gvos.write("}\n".getBytes());
+		}
+
+		this.gvos.flush();
+		this.gvchannel.truncate(this.gvchannel.position());
+
+		if (this.generateSVG) {
+			this.logger.debug("Generating SVG file");
+			Runtime.getRuntime().exec("fdp -Tsvg " + this.graphvizFile + " -o " + this.svgFile);
+		}
+	}
+
 	@Transactional(readOnly = true)
 	public void logit() throws IOException {
 		this.channel.position(0);
@@ -125,12 +255,18 @@ public class DatabaseLogger {
 
 		this.channel.truncate(this.channel.position());
 		this.fos.flush();
+
+		if (this.generateGraphviz) {
+			generateGraphviz();
+		}
 	}
 
 	private Timer timer = null;
 	private TimerTask task = null;
 	private FileOutputStream fos = null;
 	private FileChannel channel = null;
+	private FileOutputStream gvos = null;
+	private FileChannel gvchannel = null;
 	private static final byte[] eol = "\n".getBytes();
 
 	public void init() throws FileNotFoundException {
@@ -140,6 +276,11 @@ public class DatabaseLogger {
 
 		this.fos = new FileOutputStream(this.databaseLogFile, false);
 		this.channel = this.fos.getChannel();
+
+		if (this.generateGraphviz) {
+			this.gvos = new FileOutputStream(this.graphvizFile, false);
+			this.gvchannel = this.gvos.getChannel();
+		}
 
 		this.timer = new Timer(this.getClass().getSimpleName() + "-Timer");
 		this.task = new TimerTask() {
@@ -173,6 +314,14 @@ public class DatabaseLogger {
 				/* ignore */
 			}
 			this.channel = null;
+		}
+		if (this.gvos != null) {
+			try {
+				this.gvos.close();
+			} catch (IOException e) {
+				/* ignore */
+			}
+			this.gvos = null;
 		}
 		if (this.fos != null) {
 			try {

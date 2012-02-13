@@ -1,4 +1,5 @@
 /dist/
 /target/
-/relayserver.log
-/relayserver_db.log
+/*.dot
+/*.log
+/*.svg
