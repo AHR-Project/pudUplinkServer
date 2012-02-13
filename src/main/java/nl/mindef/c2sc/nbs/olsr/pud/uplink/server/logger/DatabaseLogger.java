@@ -55,37 +55,37 @@ public class DatabaseLogger {
 		this.databaseLogFile = databaseLogFile;
 	}
 
-	private boolean generateGraphviz = false;
+	private boolean generateDot = false;
 
 	/**
-	 * @param generateGraphviz
-	 *          the generateGraphviz to set
+	 * @param generateDot
+	 *          the generateDot to set
 	 */
 	@Required
-	public void setGenerateGraphviz(boolean generateGraphviz) {
-		this.generateGraphviz = generateGraphviz;
+	public void setGenerateDot(boolean generateDot) {
+		this.generateDot = generateDot;
 	}
 
-	private String graphvizSimpleFile = null;
+	private String dotSimpleFile = null;
 
 	/**
-	 * @param graphvizSimpleFile
-	 *          the graphvizFile to set
+	 * @param dotSimpleFile
+	 *          the dotFullFile to set
 	 */
 	@Required
-	public void setGraphvizSimpleFile(String graphvizSimpleFile) {
-		this.graphvizSimpleFile = graphvizSimpleFile;
+	public void setDotSimpleFile(String dotSimpleFile) {
+		this.dotSimpleFile = dotSimpleFile;
 	}
 
-	private String graphvizFile = null;
+	private String dotFullFile = null;
 
 	/**
-	 * @param graphvizFile
-	 *          the graphvizFile to set
+	 * @param dotFullFile
+	 *          the dotFullFile to set
 	 */
 	@Required
-	public void setGraphvizFile(String graphvizFile) {
-		this.graphvizFile = graphvizFile;
+	public void setDotFullFile(String dotFullFile) {
+		this.dotFullFile = dotFullFile;
 	}
 
 	private boolean generateSVG = false;
@@ -110,15 +110,15 @@ public class DatabaseLogger {
 		this.svgSimpleFile = svgSimpleFile;
 	}
 
-	private String svgFile = null;
+	private String svgFullFile = null;
 
 	/**
-	 * @param svgFile
-	 *          the svgFile to set
+	 * @param svgFullFile
+	 *          the svgFullFile to set
 	 */
 	@Required
-	public void setSvgFile(String svgFile) {
-		this.svgFile = svgFile;
+	public void setSvgFullFile(String svgFullFile) {
+		this.svgFullFile = svgFullFile;
 	}
 
 	/** the Node handler */
@@ -183,22 +183,22 @@ public class DatabaseLogger {
 	 * Main
 	 */
 
-	private static final String gvNodeTemplateSimple = "  \"%s\" [color=%s]\n";
+	private static final String dotNodeTemplateSimple = "  \"%s\" [color=%s]\n";
 
-	private static final String gvNodeTemplateIp = "  %s [shape=box, margin=0, label=<\n"
+	private static final String dotNodeTemplateFullIp = "  %s [shape=box, margin=0, label=<\n"
 			+ "    <table border=\"0\" cellborder=\"1\" cellspacing=\"2\" cellpadding=\"4\">\n"
 			+ "      <tr><td bgcolor=\"%s\">%s</td></tr>\n" + "      <tr><td bgcolor=\"%s\">%s</td></tr>\n"
 			+ "    </table>>];\n";
 
-	private static final String gvNodeTemplate = "  %s [shape=box, margin=0, label=<\n"
+	private static final String dotNodeTemplateFull = "  %s [shape=box, margin=0, label=<\n"
 			+ "    <table border=\"0\" cellborder=\"1\" cellspacing=\"2\" cellpadding=\"4\">\n"
 			+ "      <tr><td bgcolor=\"%s\">%s</td></tr>\n" + "      <tr><td bgcolor=\"%s\">%s</td></tr>\n"
 			+ "      <tr><td bgcolor=\"%s\">%s</td></tr>\n" + "    </table>>];\n";
 
-	private static final String colorOkSimple = "black";
-	private static final String colorNotOkSimple = "red";
-	private static final String colorOk = "white";
-	private static final String colorNotOk = "red";
+	private static final String colorSimpleOk = "black";
+	private static final String colorSimpleNotOk = "red";
+	private static final String colorFullOk = "white";
+	private static final String colorFullNotOk = "red";
 
 	private static boolean useIPNodeNameInDot(PositionUpdate nodePUMsg) {
 		// FIXME no magic numbers, add them to WireFormatConstants
@@ -220,16 +220,16 @@ public class DatabaseLogger {
 		return nodePUMsg.getPositionUpdateNodeId();
 	}
 
-	private static void writeGraphvizNode(OutputStream gvoss, OutputStream gvos, Node node)
-			throws IllegalFormatException, FormatterClosedException, IOException {
-		StringBuilder sbs = new StringBuilder();
-		StringBuilder sb = new StringBuilder();
-		Formatter formatters = new Formatter(sbs);
-		Formatter formatter = new Formatter(sb);
+	private static void writeDotNode(OutputStream gvoss, OutputStream gvos, Node node) throws IllegalFormatException,
+			FormatterClosedException, IOException {
+		StringBuilder sbSimple = new StringBuilder();
+		StringBuilder sbFull = new StringBuilder();
+		Formatter formatterSimple = new Formatter(sbSimple);
+		Formatter formatterFull = new Formatter(sbFull);
 
 		Sender sender = node.getSender();
 		String senderIP = (sender == null) ? "" : "" + sender.getIp().getHostAddress() + ":" + sender.getPort();
-		String senderColor = (sender == null) ? colorNotOk : colorOk;
+		String senderColor = (sender == null) ? colorFullNotOk : colorFullOk;
 
 		Long nodeId = node.getId();
 		String nodeIP = node.getMainIp().getHostAddress().toString();
@@ -237,29 +237,30 @@ public class DatabaseLogger {
 		PositionUpdateMsg nodePU = node.getPositionUpdateMsg();
 		PositionUpdate nodePUMsg = (nodePU == null) ? null : nodePU.getPositionUpdateMsg();
 
-		String nodeSimpleColor = (nodePUMsg == null) ? colorNotOkSimple : colorOkSimple;
-		String nodeColor = (nodePUMsg == null) ? colorNotOk : colorOk;
+		String nodeSimpleColor = (nodePUMsg == null) ? colorSimpleNotOk : colorSimpleOk;
+		String nodeColor = (nodePUMsg == null) ? colorFullNotOk : colorFullOk;
 
 		String nodeName = getNodeNameForDot(node);
 
-		formatters.format(gvNodeTemplateSimple, nodeName, nodeSimpleColor);
+		formatterSimple.format(dotNodeTemplateSimple, nodeName, nodeSimpleColor);
 		if (useIPNodeNameInDot(nodePUMsg)) {
 			/* use IP variant */
-			formatter.format(gvNodeTemplateIp, nodeId, nodeColor, nodeName, senderColor, senderIP);
+			formatterFull.format(dotNodeTemplateFullIp, nodeId, nodeColor, nodeName, senderColor, senderIP);
 		} else {
 			/* use named variant */
-			formatter.format(gvNodeTemplate, nodeId, nodeColor, nodeName, colorOk, nodeIP, senderColor, senderIP);
+			formatterFull
+					.format(dotNodeTemplateFull, nodeId, nodeColor, nodeName, colorFullOk, nodeIP, senderColor, senderIP);
 		}
 
 		/* now write graph */
 		ClusterLeaderMsg nodeCL = node.getClusterLeaderMsg();
 		if (nodeCL != null) {
-			formatters.format("\"%s\" -> \"%s\"\n\n", nodeName, getNodeNameForDot(nodeCL.getClusterLeaderNode()));
-			formatter.format("%s -> %s\n\n", nodeId, nodeCL.getClusterLeaderNode().getId());
+			formatterSimple.format("\"%s\" -> \"%s\"\n\n", nodeName, getNodeNameForDot(nodeCL.getClusterLeaderNode()));
+			formatterFull.format("%s -> %s\n\n", nodeId, nodeCL.getClusterLeaderNode().getId());
 		}
 
-		gvoss.write(sbs.toString().getBytes());
-		gvos.write(sb.toString().getBytes());
+		gvoss.write(sbSimple.toString().getBytes());
+		gvos.write(sbFull.toString().getBytes());
 	}
 
 	private void generateGraphviz() throws IOException {
@@ -271,64 +272,64 @@ public class DatabaseLogger {
 
 		this.logger.debug("Writing graphviz file");
 
-		this.gvschannel.position(0);
-		this.gvchannel.position(0);
-		this.gvoss.write("digraph G {\n".getBytes());
-		this.gvos.write("digraph G {\n".getBytes());
+		this.dotSimpleFileOSChannel.position(0);
+		this.dotFullFileOSChannel.position(0);
+		this.dotSimpleFileOS.write("digraph G {\n".getBytes());
+		this.dotFullFileOS.write("digraph G {\n".getBytes());
 		try {
 			for (Node node : allNodes) {
-				writeGraphvizNode(this.gvoss, this.gvos, node);
+				writeDotNode(this.dotSimpleFileOS, this.dotFullFileOS, node);
 			}
 		} catch (Exception e) {
 			this.logger.error("Error while generating the graphviz file", e);
 		} finally {
-			this.gvos.write("}\n".getBytes());
+			this.dotFullFileOS.write("}\n".getBytes());
 		}
 
-		this.gvoss.flush();
-		this.gvos.flush();
-		this.gvschannel.truncate(this.gvschannel.position());
-		this.gvchannel.truncate(this.gvchannel.position());
+		this.dotSimpleFileOS.flush();
+		this.dotFullFileOS.flush();
+		this.dotSimpleFileOSChannel.truncate(this.dotSimpleFileOSChannel.position());
+		this.dotFullFileOSChannel.truncate(this.dotFullFileOSChannel.position());
 
 		if (this.generateSVG) {
 			this.logger.debug("Generating SVG file");
-			Runtime.getRuntime().exec("fdp -Tsvg " + this.graphvizSimpleFile + " -o " + this.svgSimpleFile);
-			Runtime.getRuntime().exec("fdp -Tsvg " + this.graphvizFile + " -o " + this.svgFile);
+			Runtime.getRuntime().exec("fdp -Tsvg " + this.dotSimpleFile + " -o " + this.svgSimpleFile);
+			Runtime.getRuntime().exec("fdp -Tsvg " + this.dotFullFile + " -o " + this.svgFullFile);
 		}
 	}
 
 	@Transactional(readOnly = true)
 	public void logit() throws IOException {
-		this.channel.position(0);
+		this.databaseLogFileOSChannel.position(0);
 
 		this.logger.debug("Writing database logfile");
 
-		this.relayServers.print(this.fos);
-		this.fos.write(eol);
-		this.senders.print(this.fos);
-		this.fos.write(eol);
-		this.nodes.print(this.fos);
-		this.fos.write(eol);
-		this.positionUpdateMsgs.print(this.fos);
-		this.fos.write(eol);
-		this.clusterLeaderMsgs.print(this.fos);
+		this.relayServers.print(this.databaseLogFileOS);
+		this.databaseLogFileOS.write(eol);
+		this.senders.print(this.databaseLogFileOS);
+		this.databaseLogFileOS.write(eol);
+		this.nodes.print(this.databaseLogFileOS);
+		this.databaseLogFileOS.write(eol);
+		this.positionUpdateMsgs.print(this.databaseLogFileOS);
+		this.databaseLogFileOS.write(eol);
+		this.clusterLeaderMsgs.print(this.databaseLogFileOS);
 
-		this.channel.truncate(this.channel.position());
-		this.fos.flush();
+		this.databaseLogFileOSChannel.truncate(this.databaseLogFileOSChannel.position());
+		this.databaseLogFileOS.flush();
 
-		if (this.generateGraphviz) {
+		if (this.generateDot) {
 			generateGraphviz();
 		}
 	}
 
 	private Timer timer = null;
 	private TimerTask task = null;
-	private FileOutputStream fos = null;
-	private FileChannel channel = null;
-	private FileOutputStream gvoss = null;
-	private FileChannel gvschannel = null;
-	private FileOutputStream gvos = null;
-	private FileChannel gvchannel = null;
+	private FileOutputStream databaseLogFileOS = null;
+	private FileChannel databaseLogFileOSChannel = null;
+	private FileOutputStream dotSimpleFileOS = null;
+	private FileChannel dotSimpleFileOSChannel = null;
+	private FileOutputStream dotFullFileOS = null;
+	private FileChannel dotFullFileOSChannel = null;
 	private static final byte[] eol = "\n".getBytes();
 
 	public void init() throws FileNotFoundException {
@@ -336,14 +337,14 @@ public class DatabaseLogger {
 			return;
 		}
 
-		this.fos = new FileOutputStream(this.databaseLogFile, false);
-		this.channel = this.fos.getChannel();
+		this.databaseLogFileOS = new FileOutputStream(this.databaseLogFile, false);
+		this.databaseLogFileOSChannel = this.databaseLogFileOS.getChannel();
 
-		if (this.generateGraphviz) {
-			this.gvoss = new FileOutputStream(this.graphvizSimpleFile, false);
-			this.gvschannel = this.gvoss.getChannel();
-			this.gvos = new FileOutputStream(this.graphvizFile, false);
-			this.gvchannel = this.gvos.getChannel();
+		if (this.generateDot) {
+			this.dotSimpleFileOS = new FileOutputStream(this.dotSimpleFile, false);
+			this.dotSimpleFileOSChannel = this.dotSimpleFileOS.getChannel();
+			this.dotFullFileOS = new FileOutputStream(this.dotFullFile, false);
+			this.dotFullFileOSChannel = this.dotFullFileOS.getChannel();
 		}
 
 		this.timer = new Timer(this.getClass().getSimpleName() + "-Timer");
@@ -371,37 +372,37 @@ public class DatabaseLogger {
 			this.timer = null;
 		}
 
-		if (this.channel != null) {
+		if (this.databaseLogFileOSChannel != null) {
 			try {
-				this.channel.close();
+				this.databaseLogFileOSChannel.close();
 			} catch (IOException e) {
 				/* ignore */
 			}
-			this.channel = null;
+			this.databaseLogFileOSChannel = null;
 		}
-		if (this.gvoss != null) {
+		if (this.dotSimpleFileOS != null) {
 			try {
-				this.gvoss.close();
+				this.dotSimpleFileOS.close();
 			} catch (IOException e) {
 				/* ignore */
 			}
-			this.gvoss = null;
+			this.dotSimpleFileOS = null;
 		}
-		if (this.gvos != null) {
+		if (this.dotFullFileOS != null) {
 			try {
-				this.gvos.close();
+				this.dotFullFileOS.close();
 			} catch (IOException e) {
 				/* ignore */
 			}
-			this.gvos = null;
+			this.dotFullFileOS = null;
 		}
-		if (this.fos != null) {
+		if (this.databaseLogFileOS != null) {
 			try {
-				this.fos.close();
+				this.databaseLogFileOS.close();
 			} catch (IOException e) {
 				/* ignore */
 			}
-			this.fos = null;
+			this.databaseLogFileOS = null;
 		}
 	}
 

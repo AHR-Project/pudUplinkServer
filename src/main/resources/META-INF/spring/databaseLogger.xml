@@ -13,12 +13,12 @@
 		<property name="positions" ref="PositionUpdateMsgs" />
 		<property name="relayServers" ref="RelayServers" />
 		<property name="updateIntervalMs" value="${database.logger.updateintervalms}" />
-		<property name="generateGraphviz" value="${database.logger.graphviz}" />
-		<property name="graphvizSimpleFile" value="${database.logger.graphvizSimpleFile}" />
-		<property name="graphvizFile" value="${database.logger.graphvizFile}" />
+		<property name="generateDot" value="${database.logger.graphviz}" />
+		<property name="dotSimpleFile" value="${database.logger.graphvizSimpleFile}" />
+		<property name="dotFullFile" value="${database.logger.graphvizFile}" />
 		<property name="generateSVG" value="${database.logger.svg}" />
 		<property name="svgSimpleFile" value="${database.logger.svgSimpleFile}" />
-		<property name="svgFile" value="${database.logger.svgFile}" />
+		<property name="svgFullFile" value="${database.logger.svgFile}" />
 	</bean>
 
 </beans>
