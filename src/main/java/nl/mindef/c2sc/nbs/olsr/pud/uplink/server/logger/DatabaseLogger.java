@@ -174,7 +174,7 @@ public class DatabaseLogger {
 	 * Main
 	 */
 
-	private static final String dotNodeTemplateSimple = "  \"%s\" [color=%s]\n";
+	private static final String dotNodeTemplateSimple = "  \"%s\" [style=filled,fillcolor=%s]\n";
 
 	private static final String dotNodeTemplateFullIp = "  %s [shape=box, margin=0, label=<\n"
 			+ "    <table border=\"0\" cellborder=\"1\" cellspacing=\"2\" cellpadding=\"4\">\n"
@@ -186,10 +186,10 @@ public class DatabaseLogger {
 			+ "      <tr><td bgcolor=\"%s\">%s</td></tr>\n" + "      <tr><td bgcolor=\"%s\">%s</td></tr>\n"
 			+ "      <tr><td bgcolor=\"%s\">%s</td></tr>\n" + "    </table>>];\n";
 
-	private static final String colorSimpleOk = "black";
+	private static final String colorSimpleOk = "white";
 	private static final String colorSimpleNotOk = "red";
-	private static final String colorFullOk = "white";
-	private static final String colorFullNotOk = "red";
+	private static final String colorFullOk = colorSimpleOk;
+	private static final String colorFullNotOk = colorSimpleNotOk;
 
 	private static boolean useIPNodeNameInDot(PositionUpdate nodePUMsg) {
 		// FIXME no magic numbers, add them to WireFormatConstants
