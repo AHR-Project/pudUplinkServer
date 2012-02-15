@@ -55,17 +55,6 @@ public class DatabaseLogger {
 		this.databaseLogFile = databaseLogFile;
 	}
 
-	private boolean generateDot = false;
-
-	/**
-	 * @param generateDot
-	 *          the generateDot to set
-	 */
-	@Required
-	public void setGenerateDot(boolean generateDot) {
-		this.generateDot = generateDot;
-	}
-
 	private String dotSimpleFile = null;
 
 	/**
@@ -263,14 +252,14 @@ public class DatabaseLogger {
 		gvos.write(sbFull.toString().getBytes());
 	}
 
-	private void generateGraphviz() throws IOException {
+	private void generateDotAndSVG() throws IOException {
 		List<Node> allNodes = this.nodes.getAllNodes();
 
 		if (allNodes == null) {
 			return;
 		}
 
-		this.logger.debug("Writing graphviz file");
+		this.logger.debug("Writing dot file");
 
 		this.dotSimpleFileOSChannel.position(0);
 		this.dotFullFileOSChannel.position(0);
@@ -281,7 +270,7 @@ public class DatabaseLogger {
 				writeDotNode(this.dotSimpleFileOS, this.dotFullFileOS, node);
 			}
 		} catch (Exception e) {
-			this.logger.error("Error while generating the graphviz file", e);
+			this.logger.error("Error while generating the dot file", e);
 		} finally {
 			this.dotFullFileOS.write("}\n".getBytes());
 		}
@@ -291,11 +280,9 @@ public class DatabaseLogger {
 		this.dotSimpleFileOSChannel.truncate(this.dotSimpleFileOSChannel.position());
 		this.dotFullFileOSChannel.truncate(this.dotFullFileOSChannel.position());
 
-		if (this.generateSVG) {
-			this.logger.debug("Generating SVG file");
-			Runtime.getRuntime().exec("fdp -Tsvg " + this.dotSimpleFile + " -o " + this.svgSimpleFile);
-			Runtime.getRuntime().exec("fdp -Tsvg " + this.dotFullFile + " -o " + this.svgFullFile);
-		}
+		this.logger.debug("Generating SVG file");
+		Runtime.getRuntime().exec("fdp -Tsvg " + this.dotSimpleFile + " -o " + this.svgSimpleFile);
+		Runtime.getRuntime().exec("fdp -Tsvg " + this.dotFullFile + " -o " + this.svgFullFile);
 	}
 
 	@Transactional(readOnly = true)
@@ -317,8 +304,8 @@ public class DatabaseLogger {
 		this.databaseLogFileOSChannel.truncate(this.databaseLogFileOSChannel.position());
 		this.databaseLogFileOS.flush();
 
-		if (this.generateDot) {
-			generateGraphviz();
+		if (this.generateSVG) {
+			generateDotAndSVG();
 		}
 	}
 
@@ -340,7 +327,7 @@ public class DatabaseLogger {
 		this.databaseLogFileOS = new FileOutputStream(this.databaseLogFile, false);
 		this.databaseLogFileOSChannel = this.databaseLogFileOS.getChannel();
 
-		if (this.generateDot) {
+		if (this.generateSVG) {
 			this.dotSimpleFileOS = new FileOutputStream(this.dotSimpleFile, false);
 			this.dotSimpleFileOSChannel = this.dotSimpleFileOS.getChannel();
 			this.dotFullFileOS = new FileOutputStream(this.dotFullFile, false);
