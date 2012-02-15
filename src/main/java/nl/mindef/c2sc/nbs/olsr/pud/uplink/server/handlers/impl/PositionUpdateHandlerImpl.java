@@ -99,7 +99,7 @@ public class PositionUpdateHandlerImpl implements PositionUpdateHandler {
 			storedPositionUpdate = new PositionUpdateMsg(originatorNode, puMsg);
 			this.positionUpdateMsgs.savePositionUpdateMsg(storedPositionUpdate);
 		} else {
-			/* check that received timestamp is later than the stored timestamp */
+			/* check that received timestamp not earlier than the stored timestamp */
 			if (storedPositionUpdate.getPositionUpdateMsg() != null) {
 				long storedTimestamp = storedPositionUpdate.getPositionUpdateMsg().getPositionUpdateTime(utcTimestamp,
 						TimeZoneUtil.getTimezoneOffset());
@@ -107,8 +107,9 @@ public class PositionUpdateHandlerImpl implements PositionUpdateHandler {
 				/* get the received timestamp */
 				long receivedTimeStamp = puMsg.getPositionUpdateTime(utcTimestamp, TimeZoneUtil.getTimezoneOffset());
 
-				if (receivedTimeStamp <= storedTimestamp) {
-					/* we have stored a position with a more recent timestamp already, so skip this one */
+				if (receivedTimeStamp < storedTimestamp) {
+					/* we have stored a position with a more recent timestamp already, so skip this one.
+					 * If the timestamp is the same however, then we just process the position update */
 					return false;
 				}
 			}
