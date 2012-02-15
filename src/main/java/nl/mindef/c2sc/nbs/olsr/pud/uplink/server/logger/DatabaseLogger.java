@@ -5,6 +5,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.channels.FileChannel;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Formatter;
 import java.util.FormatterClosedException;
 import java.util.IllegalFormatException;
@@ -195,7 +197,7 @@ public class DatabaseLogger {
 				.getPositionUpdateNodeIdType() == 6));
 	}
 
-	private static String getNodeNameForDot(Node node) {
+	protected static String getNodeNameForDot(Node node) {
 		PositionUpdateMsg nodePU = node.getPositionUpdateMsg();
 		PositionUpdate nodePUMsg = (nodePU == null) ? null : nodePU.getPositionUpdateMsg();
 
@@ -252,6 +254,13 @@ public class DatabaseLogger {
 		gvos.write(sbFull.toString().getBytes());
 	}
 
+	protected class NodeNameComparatorForDot implements Comparator<Node> {
+		@Override
+		public int compare(Node o1, Node o2) {
+			return getNodeNameForDot(o1).compareTo(getNodeNameForDot(o2));
+		}
+	}
+
 	private void generateDotAndSVG() throws IOException {
 		List<Node> allNodes = this.nodes.getAllNodes();
 
@@ -260,6 +269,8 @@ public class DatabaseLogger {
 		}
 
 		this.logger.debug("Writing dot file");
+
+		Collections.sort(allNodes, new NodeNameComparatorForDot());
 
 		this.dotSimpleFileOSChannel.position(0);
 		this.dotFullFileOSChannel.position(0);
