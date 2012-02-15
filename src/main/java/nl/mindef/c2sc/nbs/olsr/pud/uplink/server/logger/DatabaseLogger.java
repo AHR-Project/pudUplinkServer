@@ -361,7 +361,7 @@ public class DatabaseLogger {
 		this.timer.scheduleAtFixedRate(this.task, 0, this.updateIntervalMs);
 	}
 
-	public void destroy() {
+	public void uninit() {
 		if (this.task != null) {
 			this.task.cancel();
 			this.task = null;
