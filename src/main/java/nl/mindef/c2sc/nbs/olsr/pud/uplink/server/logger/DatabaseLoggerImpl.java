@@ -297,6 +297,7 @@ public class DatabaseLoggerImpl implements DatabaseLogger {
 		Runtime.getRuntime().exec("fdp -Tsvg " + this.dotFullFile + " -o " + this.svgFullFile);
 	}
 
+	@Override
 	@Transactional(readOnly = true)
 	public void logit() throws IOException {
 		this.databaseLogFileOSChannel.position(0);
