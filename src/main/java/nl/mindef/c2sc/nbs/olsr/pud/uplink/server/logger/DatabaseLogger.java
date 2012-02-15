@@ -255,8 +255,8 @@ public class DatabaseLogger {
 		/* now write graph */
 		ClusterLeaderMsg nodeCL = node.getClusterLeaderMsg();
 		if (nodeCL != null) {
-			formatterSimple.format("\"%s\" -> \"%s\"\n\n", nodeName, getNodeNameForDot(nodeCL.getClusterLeaderNode()));
-			formatterFull.format("%s -> %s\n\n", nodeId, nodeCL.getClusterLeaderNode().getId());
+			formatterSimple.format("  \"%s\" -> \"%s\"\n\n", nodeName, getNodeNameForDot(nodeCL.getClusterLeaderNode()));
+			formatterFull.format("  %s -> %s\n\n", nodeId, nodeCL.getClusterLeaderNode().getId());
 		}
 
 		gvoss.write(sbSimple.toString().getBytes());
