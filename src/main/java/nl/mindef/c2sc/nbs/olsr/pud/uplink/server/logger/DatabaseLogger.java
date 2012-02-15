@@ -272,6 +272,7 @@ public class DatabaseLogger {
 		} catch (Exception e) {
 			this.logger.error("Error while generating the dot file", e);
 		} finally {
+			this.dotSimpleFileOS.write("}\n".getBytes());
 			this.dotFullFileOS.write("}\n".getBytes());
 		}
 
