@@ -1,4 +1,4 @@
-package nl.mindef.c2sc.nbs.olsr.pud.uplink.server.logger;
+package nl.mindef.c2sc.nbs.olsr.pud.uplink.server.logger.impl;
 
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -23,6 +23,7 @@ import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.domainmodel.ClusterLeaderMs
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.domainmodel.Node;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.domainmodel.PositionUpdateMsg;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.domainmodel.Sender;
+import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.logger.DatabaseLogger;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
