@@ -34,6 +34,7 @@
 
 	<import resource="classpath:META-INF/spring/distributor.xml" />
 	<import resource="classpath:META-INF/spring/relayClusterSender.xml" />
+	<import resource="classpath:META-INF/spring/relayClusterReceiver.xml" />
 
 	<import resource="classpath:META-INF/spring/uplinkReceiver.xml" />
 

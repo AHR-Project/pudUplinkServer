@@ -20,6 +20,7 @@
 		<config>src/main/resources/META-INF/spring/wireFormatChecker.xml</config>
 		<config>src/main/resources/META-INF/spring/distributor.xml</config>
 		<config>src/main/resources/META-INF/spring/relayClusterSender.xml</config>
+		<config>src/main/resources/META-INF/spring/relayClusterReceiver.xml</config>
 		<config>src/main/resources/META-INF/spring/relayServers.xml</config>
 		<config>src/main/resources/META-INF/spring/senders.xml</config>
 		<config>src/main/resources/META-INF/spring/nodes.xml</config>
