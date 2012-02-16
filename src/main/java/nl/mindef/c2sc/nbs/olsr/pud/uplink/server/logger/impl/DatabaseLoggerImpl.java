@@ -162,18 +162,20 @@ public class DatabaseLoggerImpl implements DatabaseLogger {
 	 * Main
 	 */
 
-	private static final String dotNodeTemplateSimple = "  \"%s\" [style=filled,fillcolor=%s]\n";
+	private static final String dotNodeTemplateSimple = "\n  \"%s\" [shape=%s,style=filled,fillcolor=%s]\n";
 
-	private static final String dotNodeTemplateFullIp = "  %s [shape=box, margin=0, label=<\n"
+	private static final String dotNodeTemplateFullIp = "\n  %s [shape=box, margin=0, label=<\n"
 			+ "    <table border=\"0\" cellborder=\"1\" cellspacing=\"2\" cellpadding=\"4\">\n"
 			+ "      <tr><td bgcolor=\"%s\">%s</td></tr>\n" + "      <tr><td bgcolor=\"%s\">%s</td></tr>\n"
 			+ "    </table>>];\n";
 
-	private static final String dotNodeTemplateFull = "  %s [shape=box, margin=0, label=<\n"
+	private static final String dotNodeTemplateFull = "\n  %s [shape=box, margin=0, label=<\n"
 			+ "    <table border=\"0\" cellborder=\"1\" cellspacing=\"2\" cellpadding=\"4\">\n"
 			+ "      <tr><td bgcolor=\"%s\">%s</td></tr>\n" + "      <tr><td bgcolor=\"%s\">%s</td></tr>\n"
 			+ "      <tr><td bgcolor=\"%s\">%s</td></tr>\n" + "    </table>>];\n";
 
+	private static final String shapeNormal = "ellipse";
+	private static final String shapeClusterLeader = "box";
 	private static final String colorSimpleOk = "white";
 	private static final String colorSimpleNotOk = "red";
 	private static final String colorFullOk = colorSimpleOk;
@@ -218,10 +220,11 @@ public class DatabaseLoggerImpl implements DatabaseLogger {
 
 		String nodeSimpleColor = (nodePUMsg == null) ? colorSimpleNotOk : colorSimpleOk;
 		String nodeColor = (nodePUMsg == null) ? colorFullNotOk : colorFullOk;
+		String nodeShape = node.getClusterNodes().isEmpty() ? shapeNormal : shapeClusterLeader;
 
 		String nodeName = getNodeNameForDot(node);
 
-		formatterSimple.format(dotNodeTemplateSimple, nodeName, nodeSimpleColor);
+		formatterSimple.format(dotNodeTemplateSimple, nodeName, nodeShape, nodeSimpleColor);
 		if (useIPNodeNameInDot(nodePUMsg)) {
 			/* use IP variant */
 			formatterFull.format(dotNodeTemplateFullIp, nodeId, nodeColor, nodeName, senderColor, senderIP);
@@ -234,8 +237,8 @@ public class DatabaseLoggerImpl implements DatabaseLogger {
 		/* now write graph */
 		ClusterLeaderMsg nodeCL = node.getClusterLeaderMsg();
 		if (nodeCL != null) {
-			formatterSimple.format("  \"%s\" -> \"%s\"\n\n", nodeName, getNodeNameForDot(nodeCL.getClusterLeaderNode()));
-			formatterFull.format("  %s -> %s\n\n", nodeId, nodeCL.getClusterLeaderNode().getId());
+			formatterSimple.format("  \"%s\" -> \"%s\"\n", nodeName, getNodeNameForDot(nodeCL.getClusterLeaderNode()));
+			formatterFull.format("  %s -> %s\n", nodeId, nodeCL.getClusterLeaderNode().getId());
 		}
 
 		gvoss.write(sbSimple.toString().getBytes());
