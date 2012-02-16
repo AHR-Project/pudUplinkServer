@@ -10,6 +10,7 @@
 			<set>
 				<ref bean="UplinkReceiver" />
 				<ref bean="Distributor" />
+				<ref bean="ExpiryNodesTimer"/>
 			</set>
 		</property>
 		<property name="signal" value="INT" />
