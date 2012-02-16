@@ -8,6 +8,7 @@
 		init-method="init" destroy-method="destroy">
 		<property name="handlers">
 			<set>
+				<ref bean="DatabaseLoggerTimer"/>
 				<ref bean="UplinkReceiver" />
 				<ref bean="Distributor" />
 				<ref bean="ExpiryNodesTimer"/>

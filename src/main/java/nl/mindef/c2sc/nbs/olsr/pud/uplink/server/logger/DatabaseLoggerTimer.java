@@ -3,10 +3,12 @@ package nl.mindef.c2sc.nbs.olsr.pud.uplink.server.logger;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.signals.StopHandlerConsumer;
+
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Required;
 
-public class DatabaseLoggerTimer {
+public class DatabaseLoggerTimer implements StopHandlerConsumer {
 	private Logger logger = Logger.getLogger(this.getClass().getName());
 
 	private DatabaseLogger databaseLogger;
@@ -81,6 +83,14 @@ public class DatabaseLoggerTimer {
 	}
 
 	public void uninit() {
+		if (this.timer != null) {
+			this.timer.cancel();
+			this.timer = null;
+		}
+	}
+
+	@Override
+	public void signalStop() {
 		if (this.timer != null) {
 			this.timer.cancel();
 			this.timer = null;
