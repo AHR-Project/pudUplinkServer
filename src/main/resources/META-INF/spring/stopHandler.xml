@@ -9,9 +9,9 @@
 		<property name="handlers">
 			<set>
 				<ref bean="DatabaseLoggerTimer"/>
-				<ref bean="UplinkReceiver" />
 				<ref bean="Distributor" />
 				<ref bean="ExpiryNodesTimer"/>
+				<ref bean="UplinkReceiver" />
 			</set>
 		</property>
 		<property name="signal" value="INT" />
