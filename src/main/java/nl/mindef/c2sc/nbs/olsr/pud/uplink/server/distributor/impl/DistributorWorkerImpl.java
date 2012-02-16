@@ -3,7 +3,6 @@ package nl.mindef.c2sc.nbs.olsr.pud.uplink.server.distributor.impl;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
-import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.util.LinkedList;
 import java.util.List;
@@ -14,7 +13,6 @@ import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.PositionUpdateMsgs;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.RelayServers;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.domainmodel.Node;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.domainmodel.PositionUpdateMsg;
-import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.domainmodel.RelayServer;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.domainmodel.Sender;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.util.TxChecker;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.distributor.DistributorWorker;
@@ -191,66 +189,6 @@ public class DistributorWorkerImpl implements DistributorWorker {
 			if (this.logger.isDebugEnabled()) {
 				this.logger.debug("*** Have to distribute <" + this.lastDistributionTime + ", " + currentTime + "]");
 			}
-
-			/*
-			 * Distribute to other relay servers
-			 */
-
-			if (this.logger.isDebugEnabled()) {
-				this.logger.debug("*** relay servers");
-			}
-
-			List<RelayServer> otherRelayServers = this.relayServers.getOtherRelayServers();
-			if ((otherRelayServers != null) && (otherRelayServers.size() > 0)) {
-				List<PositionUpdateMsg> p4ds = this.positions.getPositionUpdateMsgForDistribution(this.lastDistributionTime,
-						currentTime, null);
-				if (this.logger.isDebugEnabled()) {
-					StringBuilder s = new StringBuilder();
-					s.append("p4ds(" + p4ds.size() + ")=");
-					for (PositionUpdateMsg p4d : p4ds) {
-						s.append(" " + p4d.getId());
-					}
-					this.logger.debug(s.toString());
-				}
-
-				List<DatagramPacket> packets = positionUpdateMsgsToPackets(p4ds);
-				if ((packets != null) && (packets.size() > 0)) {
-					StringBuilder s = new StringBuilder();
-					for (RelayServer otherRelayServer : otherRelayServers) {
-						InetAddress otherRelayServerIp = otherRelayServer.getIp();
-						int otherRelayServerPort = otherRelayServer.getPort().intValue();
-
-						if (this.logger.isDebugEnabled()) {
-							s.setLength(0);
-							s.append("tx " + packets.size() + " packet(s) to " + otherRelayServerIp.getHostAddress() + ":"
-									+ otherRelayServerPort + ", sizes=");
-						}
-						for (DatagramPacket packet : packets) {
-							if (this.logger.isDebugEnabled()) {
-								s.append(" " + packet.getLength());
-							}
-							packet.setAddress(otherRelayServerIp);
-							packet.setPort(otherRelayServerPort);
-							try {
-								this.sock.send(packet);
-							} catch (IOException e) {
-								if (this.logger.isDebugEnabled()) {
-									s.append(" ERROR: " + e.getLocalizedMessage());
-								}
-								this.logger.error("Could not send to relay server " + otherRelayServerIp + ":" + otherRelayServerPort
-										+ " : " + e.getLocalizedMessage());
-							}
-						}
-						if (this.logger.isDebugEnabled()) {
-							this.logger.debug(s.toString());
-						}
-					}
-				}
-			}
-
-			/*
-			 * Cluster Leaders
-			 */
 
 			List<List<Node>> clusters = this.nodes.getClusters(this.relayServers.getMe());
 			if (clusters != null) {

@@ -33,6 +33,7 @@
 	<import resource="classpath:META-INF/spring/wireFormatChecker.xml"/>
 
 	<import resource="classpath:META-INF/spring/distributor.xml" />
+	<import resource="classpath:META-INF/spring/relayClusterSender.xml" />
 
 	<import resource="classpath:META-INF/spring/uplinkReceiver.xml" />
 

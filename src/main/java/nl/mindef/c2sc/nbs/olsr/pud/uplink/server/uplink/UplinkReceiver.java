@@ -10,6 +10,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.cluster.RelayClusterSender;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.RelayServers;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.domainmodel.RelayServer;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.expiry.ExpireNodesTimer;
@@ -60,6 +61,17 @@ public class UplinkReceiver extends Thread implements StopHandlerConsumer {
 	@Required
 	public final void setDistributor(Distributor distributor) {
 		this.distributor = distributor;
+	}
+
+	private RelayClusterSender relayClusterSender;
+
+	/**
+	 * @param relayClusterSender
+	 *          the relayClusterSender to set
+	 */
+	@Required
+	public final void setRelayClusterSender(RelayClusterSender relayClusterSender) {
+		this.relayClusterSender = relayClusterSender;
 	}
 
 	private ExpireNodesTimer expireNodesTimer;
@@ -187,6 +199,7 @@ public class UplinkReceiver extends Thread implements StopHandlerConsumer {
 	@Override
 	public void run() {
 		initRelayServers();
+		RelayServer me = this.relayServers.getMe();
 
 		this.databaseLoggerTimer.init();
 		this.expireNodesTimer.init();
@@ -198,9 +211,10 @@ public class UplinkReceiver extends Thread implements StopHandlerConsumer {
 			try {
 				this.sock.receive(packet);
 				try {
-					if (this.packetHandler.processPacket(this.relayServers.getMe(), packet)) {
-						this.databaseLogger.log(this.logger, Level.DEBUG);
+					if (this.packetHandler.processPacket(me, packet)) {
+						this.relayClusterSender.addPacket(me, packet);
 						this.distributor.signalUpdate();
+						this.databaseLogger.log(this.logger, Level.DEBUG);
 					}
 				} catch (Throwable e) {
 					this.logger.error(e);

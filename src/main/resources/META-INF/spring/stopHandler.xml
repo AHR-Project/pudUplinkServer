@@ -9,6 +9,7 @@
 		<property name="handlers">
 			<set>
 				<ref bean="TimerStopper" />
+				<ref bean="RelayClusterSender"/>
 				<ref bean="UplinkReceiver" />
 			</set>
 		</property>

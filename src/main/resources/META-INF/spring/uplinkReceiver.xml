@@ -12,6 +12,7 @@
 		<property name="distributor" ref="Distributor" />
 		<property name="expireNodesTimer" ref="ExpiryNodesTimer" />
 		<property name="packetHandler" ref="PacketHandler" />
+		<property name="relayClusterSender" ref="RelayClusterSender" />
 		<property name="relayServers" ref="RelayServers" />
 		<property name="uplinkUdpPort" value="${uplink.listener.udp.port}" />
 	</bean>
