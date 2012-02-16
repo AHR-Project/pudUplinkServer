@@ -2,7 +2,6 @@ package nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.net.InetAddress;
 
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.domainmodel.ClusterLeaderMsg;
 
@@ -13,15 +12,6 @@ import org.apache.log4j.Logger;
  * The ClusterLeaderMsg DAO
  */
 public interface ClusterLeaderMsgs {
-	/**
-	 * Retrieve the ClusterLeaderMsg as sent by an OLSRd node
-	 * 
-	 * @param mainIp
-	 *          the main IP address of the OLSR stack of an OLSRd node
-	 * @return the ClusterLeaderMsg, or null when the OLSRd node is not found
-	 */
-	public ClusterLeaderMsg getClusterLeaderMsg(InetAddress mainIp);
-
 	/**
 	 * Save a ClusterLeaderMsg into the database
 	 * 
