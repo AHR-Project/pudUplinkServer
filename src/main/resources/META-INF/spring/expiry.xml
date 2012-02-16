@@ -14,7 +14,7 @@
 
 	<bean id="ExpiryNodesTimer"
 		class="nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.expiry.ExpireNodesTimer"
-		init-method="init" destroy-method="uninit">
+		destroy-method="uninit">
 		<property name="expireNodes" ref="ExpiryNodes" />
 		<property name="interval" value="${node.expiry.interval}" />
 	</bean>

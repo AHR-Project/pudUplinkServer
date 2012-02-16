@@ -68,8 +68,6 @@ public class ExpireNodesTimer {
 	 * Main
 	 */
 
-	// FIXME timer must only start when init cycle is complete
-
 	/** the timer from which the expiry task runs */
 	private Timer timer = null;
 
@@ -79,7 +77,7 @@ public class ExpireNodesTimer {
 		}
 
 		this.timer = new Timer(this.getClass().getSimpleName());
-		this.timer.scheduleAtFixedRate(new ExpiryTimerTask(this.logger, this.expireNodes), this.interval, this.interval);
+		this.timer.scheduleAtFixedRate(new ExpiryTimerTask(this.logger, this.expireNodes), 0, this.interval);
 	}
 
 	public void uninit() {

@@ -12,6 +12,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.RelayServers;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.domainmodel.RelayServer;
+import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.expiry.ExpireNodesTimer;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.distributor.Distributor;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.handlers.PacketHandler;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.logger.DatabaseLogger;
@@ -59,6 +60,16 @@ public class UplinkReceiver extends Thread implements StopHandlerConsumer {
 	@Required
 	public final void setDistributor(Distributor distributor) {
 		this.distributor = distributor;
+	}
+
+	private ExpireNodesTimer expireNodesTimer;
+
+	/**
+	 * @param expireNodesTimer the expireNodesTimer to set
+	 */
+	@Required
+	public final void setExpireNodesTimer(ExpireNodesTimer expireNodesTimer) {
+		this.expireNodesTimer = expireNodesTimer;
 	}
 
 	private DatabaseLoggerTimer databaseLoggerTimer;
@@ -175,6 +186,7 @@ public class UplinkReceiver extends Thread implements StopHandlerConsumer {
 	@Override
 	public void run() {
 		this.databaseLoggerTimer.init();
+		this.expireNodesTimer.init();
 
 		initRelayServers();
 

@@ -10,6 +10,7 @@
 		<property name="databaseLogger" ref="DatabaseLogger" />
 		<property name="databaseLoggerTimer" ref="DatabaseLoggerTimer" />
 		<property name="distributor" ref="Distributor" />
+		<property name="expireNodesTimer" ref="ExpiryNodesTimer" />
 		<property name="packetHandler" ref="PacketHandler" />
 		<property name="relayServers" ref="RelayServers" />
 		<property name="uplinkUdpPort" value="${uplink.listener.udp.port}" />
