@@ -65,7 +65,8 @@ public class UplinkReceiver extends Thread implements StopHandlerConsumer {
 	private ExpireNodesTimer expireNodesTimer;
 
 	/**
-	 * @param expireNodesTimer the expireNodesTimer to set
+	 * @param expireNodesTimer
+	 *          the expireNodesTimer to set
 	 */
 	@Required
 	public final void setExpireNodesTimer(ExpireNodesTimer expireNodesTimer) {

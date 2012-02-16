@@ -108,8 +108,10 @@ public class PositionUpdateHandlerImpl implements PositionUpdateHandler {
 				long receivedTimeStamp = puMsg.getPositionUpdateTime(utcTimestamp, TimeZoneUtil.getTimezoneOffset());
 
 				if (receivedTimeStamp < storedTimestamp) {
-					/* we have stored a position with a more recent timestamp already, so skip this one.
-					 * If the timestamp is the same however, then we just process the position update */
+					/*
+					 * we have stored a position with a more recent timestamp already, so skip this one. If the timestamp is the
+					 * same however, then we just process the position update
+					 */
 					return false;
 				}
 			}

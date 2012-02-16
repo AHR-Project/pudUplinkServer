@@ -8,6 +8,8 @@ import org.apache.log4j.Logger;
 
 public interface DatabaseLogger {
 	public void init() throws FileNotFoundException;
+
 	public void log(Logger log, Level level);
+
 	public void logit() throws IOException;
 }

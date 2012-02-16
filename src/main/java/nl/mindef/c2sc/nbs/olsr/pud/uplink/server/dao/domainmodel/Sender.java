@@ -16,8 +16,7 @@ import javax.persistence.OneToMany;
 import javax.validation.constraints.NotNull;
 
 /**
- * Represents a sender node that sends PositionUpdate and ClusterLeader messages (from an OLSRd node) to the
- * RelayServer
+ * Represents a sender node that sends PositionUpdate and ClusterLeader messages (from an OLSRd node) to the RelayServer
  */
 @Entity
 public class Sender implements Serializable {

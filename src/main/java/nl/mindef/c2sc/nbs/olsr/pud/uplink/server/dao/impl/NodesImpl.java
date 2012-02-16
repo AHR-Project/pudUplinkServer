@@ -34,8 +34,7 @@ public class NodesImpl implements Nodes {
 	@Transactional(readOnly = true)
 	public List<Node> getAllNodes() {
 		@SuppressWarnings("unchecked")
-		List<Node> result = this.sessionFactory.getCurrentSession()
-				.createQuery("select node from Node node").list();
+		List<Node> result = this.sessionFactory.getCurrentSession().createQuery("select node from Node node").list();
 
 		if (result.size() == 0) {
 			return null;
@@ -68,14 +67,11 @@ public class NodesImpl implements Nodes {
 	@Transactional(readOnly = true)
 	public List<Node> getClusterLeaders() {
 		@SuppressWarnings("unchecked")
-		List<Node> result = this.sessionFactory
-				.getCurrentSession()
-				.createQuery(
-						/* get nodes and their senders (eagerly fetched) */
-						"select node from Node node left join node.sender where"
-								/* node has cluster nodes */
-								+ " node.clusterNodes is not empty"
-								+ " order by node.mainIp").list();
+		List<Node> result = this.sessionFactory.getCurrentSession().createQuery(
+		/* get nodes and their senders (eagerly fetched) */
+		"select node from Node node left join node.sender where"
+		/* node has cluster nodes */
+		+ " node.clusterNodes is not empty" + " order by node.mainIp").list();
 		if (result.size() == 0) {
 			return null;
 		}
