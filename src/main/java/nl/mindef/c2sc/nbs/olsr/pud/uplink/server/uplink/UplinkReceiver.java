@@ -1,6 +1,5 @@
 package nl.mindef.c2sc.nbs.olsr.pud.uplink.server.uplink;
 
-import java.io.FileNotFoundException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
@@ -16,6 +15,7 @@ import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.domainmodel.RelayServer;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.distributor.Distributor;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.handlers.PacketHandler;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.logger.DatabaseLogger;
+import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.logger.DatabaseLoggerTimer;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.signals.StopHandlerConsumer;
 
 import org.apache.log4j.Level;
@@ -59,6 +59,17 @@ public class UplinkReceiver extends Thread implements StopHandlerConsumer {
 	@Required
 	public final void setDistributor(Distributor distributor) {
 		this.distributor = distributor;
+	}
+
+	private DatabaseLoggerTimer databaseLoggerTimer;
+
+	/**
+	 * @param databaseLoggerTimer
+	 *          the databaseLoggerTimer to set
+	 */
+	@Required
+	public final void setDatabaseLoggerTimer(DatabaseLoggerTimer databaseLoggerTimer) {
+		this.databaseLoggerTimer = databaseLoggerTimer;
 	}
 
 	private DatabaseLogger databaseLogger;
@@ -163,11 +174,7 @@ public class UplinkReceiver extends Thread implements StopHandlerConsumer {
 	 */
 	@Override
 	public void run() {
-		try {
-			this.databaseLogger.init();
-		} catch (FileNotFoundException e) {
-			this.logger.warn("Could not open or create database log file, database logging will not be performed", e);
-		}
+		this.databaseLoggerTimer.init();
 
 		initRelayServers();
 

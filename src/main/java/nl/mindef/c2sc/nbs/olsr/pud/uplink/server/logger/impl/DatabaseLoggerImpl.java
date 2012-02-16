@@ -11,8 +11,6 @@ import java.util.Formatter;
 import java.util.FormatterClosedException;
 import java.util.IllegalFormatException;
 import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
 
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.ClusterLeaderMsgs;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.Nodes;
@@ -35,17 +33,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Repository
 public class DatabaseLoggerImpl implements DatabaseLogger {
 	protected Logger logger = Logger.getLogger(this.getClass().getName());
-
-	private int updateIntervalMs = 0;
-
-	/**
-	 * @param updateIntervalMs
-	 *          the updateIntervalMs to set
-	 */
-	@Required
-	public void setUpdateIntervalMs(int updateIntervalMs) {
-		this.updateIntervalMs = updateIntervalMs;
-	}
 
 	private String databaseLogFile = null;
 
@@ -323,8 +310,6 @@ public class DatabaseLoggerImpl implements DatabaseLogger {
 		}
 	}
 
-	private Timer timer = null;
-	private TimerTask task = null;
 	private FileOutputStream databaseLogFileOS = null;
 	private FileChannel databaseLogFileOSChannel = null;
 	private FileOutputStream dotSimpleFileOS = null;
@@ -335,10 +320,6 @@ public class DatabaseLoggerImpl implements DatabaseLogger {
 
 	@Override
 	public void init() throws FileNotFoundException {
-		if (this.updateIntervalMs <= 0) {
-			return;
-		}
-
 		this.databaseLogFileOS = new FileOutputStream(this.databaseLogFile, false);
 		this.databaseLogFileOSChannel = this.databaseLogFileOS.getChannel();
 
@@ -348,32 +329,9 @@ public class DatabaseLoggerImpl implements DatabaseLogger {
 			this.dotFullFileOS = new FileOutputStream(this.dotFullFile, false);
 			this.dotFullFileOSChannel = this.dotFullFileOS.getChannel();
 		}
-
-		this.timer = new Timer(this.getClass().getSimpleName() + "-Timer");
-		this.task = new TimerTask() {
-			@Override
-			public void run() {
-				try {
-					logit();
-				} catch (Throwable e) {
-					DatabaseLoggerImpl.this.logger.error("error during database logging", e);
-				}
-			}
-		};
-
-		this.timer.scheduleAtFixedRate(this.task, 0, this.updateIntervalMs);
 	}
 
 	public void uninit() {
-		if (this.task != null) {
-			this.task.cancel();
-			this.task = null;
-		}
-		if (this.timer != null) {
-			this.timer.cancel();
-			this.timer = null;
-		}
-
 		if (this.databaseLogFileOSChannel != null) {
 			try {
 				this.databaseLogFileOSChannel.close();

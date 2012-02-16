@@ -8,6 +8,7 @@
 		init-method="init" destroy-method="uninit">
 		<property name="configuredRelayServers" value="${relaycluster.servers}" />
 		<property name="databaseLogger" ref="DatabaseLogger" />
+		<property name="databaseLoggerTimer" ref="DatabaseLoggerTimer" />
 		<property name="distributor" ref="Distributor" />
 		<property name="packetHandler" ref="PacketHandler" />
 		<property name="relayServers" ref="RelayServers" />

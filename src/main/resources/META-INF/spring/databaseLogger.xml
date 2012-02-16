@@ -5,19 +5,25 @@
 
 	<bean id="DatabaseLogger"
 		class="nl.mindef.c2sc.nbs.olsr.pud.uplink.server.logger.impl.DatabaseLoggerImpl"
-		destroy-method="uninit">
+		init-method="init" destroy-method="uninit">
 		<property name="clusterLeaderMsgs" ref="ClusterLeaderMsgs" />
 		<property name="databaseLogFile" value="${database.logger.filename}" />
 		<property name="senders" ref="Senders" />
 		<property name="nodes" ref="Nodes" />
 		<property name="positions" ref="PositionUpdateMsgs" />
 		<property name="relayServers" ref="RelayServers" />
-		<property name="updateIntervalMs" value="${database.logger.updateintervalms}" />
 		<property name="generateSVG" value="${database.logger.generate.svg}" />
 		<property name="dotSimpleFile" value="${database.logger.dotSimpleFile}" />
 		<property name="dotFullFile" value="${database.logger.dotFile}" />
 		<property name="svgSimpleFile" value="${database.logger.svgSimpleFile}" />
 		<property name="svgFullFile" value="${database.logger.svgFile}" />
+	</bean>
+
+	<bean id="DatabaseLoggerTimer"
+		class="nl.mindef.c2sc.nbs.olsr.pud.uplink.server.logger.DatabaseLoggerTimer"
+		destroy-method="uninit">
+		<property name="databaseLogger" ref="DatabaseLogger" />
+		<property name="interval" value="${database.logger.updateintervalms}" />
 	</bean>
 
 </beans>
