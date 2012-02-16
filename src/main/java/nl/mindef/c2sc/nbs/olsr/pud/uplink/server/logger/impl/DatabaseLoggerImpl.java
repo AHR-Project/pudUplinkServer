@@ -162,14 +162,14 @@ public class DatabaseLoggerImpl implements DatabaseLogger {
 	 * Main
 	 */
 
-	private static final String dotNodeTemplateSimple = "\n  \"%s\" [shape=%s,style=filled,fillcolor=%s]\n";
+	private static final String dotNodeTemplateSimple = "\n%s\"%s\" [shape=%s,style=filled,fillcolor=%s]\n";
 
-	private static final String dotNodeTemplateFullIp = "\n  %s [shape=box, margin=0, label=<\n"
+	private static final String dotNodeTemplateFullIp = "\n%s%s [shape=box, margin=0, label=<\n"
 			+ "    <table border=\"0\" cellborder=\"1\" cellspacing=\"2\" cellpadding=\"4\">\n"
 			+ "      <tr><td bgcolor=\"%s\">%s</td></tr>\n" + "      <tr><td bgcolor=\"%s\">%s</td></tr>\n"
 			+ "    </table>>];\n";
 
-	private static final String dotNodeTemplateFull = "\n  %s [shape=box, margin=0, label=<\n"
+	private static final String dotNodeTemplateFull = "\n%s%s [shape=box, margin=0, label=<\n"
 			+ "    <table border=\"0\" cellborder=\"1\" cellspacing=\"2\" cellpadding=\"4\">\n"
 			+ "      <tr><td bgcolor=\"%s\">%s</td></tr>\n" + "      <tr><td bgcolor=\"%s\">%s</td></tr>\n"
 			+ "      <tr><td bgcolor=\"%s\">%s</td></tr>\n" + "    </table>>];\n";
@@ -201,8 +201,8 @@ public class DatabaseLoggerImpl implements DatabaseLogger {
 		return nodePUMsg.getPositionUpdateNodeId();
 	}
 
-	private static void writeDotNode(OutputStream gvoss, OutputStream gvos, Node node) throws IllegalFormatException,
-			FormatterClosedException, IOException {
+	private static void writeDotNode(OutputStream gvoss, OutputStream gvos, Node node, String indent)
+			throws IllegalFormatException, FormatterClosedException, IOException {
 		StringBuilder sbSimple = new StringBuilder();
 		StringBuilder sbFull = new StringBuilder();
 		Formatter formatterSimple = new Formatter(sbSimple);
@@ -224,21 +224,21 @@ public class DatabaseLoggerImpl implements DatabaseLogger {
 
 		String nodeName = getNodeNameForDot(node);
 
-		formatterSimple.format(dotNodeTemplateSimple, nodeName, nodeShape, nodeSimpleColor);
+		formatterSimple.format(dotNodeTemplateSimple, indent, nodeName, nodeShape, nodeSimpleColor);
 		if (useIPNodeNameInDot(nodePUMsg)) {
 			/* use IP variant */
-			formatterFull.format(dotNodeTemplateFullIp, nodeId, nodeColor, nodeName, senderColor, senderIP);
+			formatterFull.format(dotNodeTemplateFullIp, indent, nodeId, nodeColor, nodeName, senderColor, senderIP);
 		} else {
 			/* use named variant */
-			formatterFull
-					.format(dotNodeTemplateFull, nodeId, nodeColor, nodeName, colorFullOk, nodeIP, senderColor, senderIP);
+			formatterFull.format(dotNodeTemplateFull, indent, nodeId, nodeColor, nodeName, colorFullOk, nodeIP, senderColor,
+					senderIP);
 		}
 
 		/* now write graph */
 		ClusterLeaderMsg nodeCL = node.getClusterLeaderMsg();
 		if (nodeCL != null) {
-			formatterSimple.format("  \"%s\" -> \"%s\"\n", nodeName, getNodeNameForDot(nodeCL.getClusterLeaderNode()));
-			formatterFull.format("  %s -> %s\n", nodeId, nodeCL.getClusterLeaderNode().getId());
+			formatterSimple.format("%s\"%s\" -> \"%s\"\n", indent, nodeName, getNodeNameForDot(nodeCL.getClusterLeaderNode()));
+			formatterFull.format("%s%s -> %s\n", indent, nodeId, nodeCL.getClusterLeaderNode().getId());
 		}
 
 		gvoss.write(sbSimple.toString().getBytes());
@@ -269,7 +269,7 @@ public class DatabaseLoggerImpl implements DatabaseLogger {
 		this.dotFullFileOS.write("digraph G {\n".getBytes());
 		try {
 			for (Node node : allNodes) {
-				writeDotNode(this.dotSimpleFileOS, this.dotFullFileOS, node);
+				writeDotNode(this.dotSimpleFileOS, this.dotFullFileOS, node, "  ");
 			}
 		} catch (Exception e) {
 			this.logger.error("Error while generating the dot file", e);
