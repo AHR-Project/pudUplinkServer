@@ -64,7 +64,7 @@ public class RelayServersImpl implements RelayServers {
 
 		if (result.size() == 0) {
 			RelayServer rs = new RelayServer(ip, Integer.valueOf(port));
-			addRelayServer(rs);
+			addRelayServer(rs); /* we are already in a transaction, so ok */
 			return rs;
 		}
 
@@ -76,6 +76,7 @@ public class RelayServersImpl implements RelayServers {
 	@Override
 	@Transactional(readOnly = true)
 	public List<RelayServer> getOtherRelayServers() {
+		/* getMe() usage: we are already in a transaction, so ok */
 		@SuppressWarnings("unchecked")
 		List<RelayServer> result = this.sessionFactory.getCurrentSession()
 				.createQuery("select rs from RelayServer rs where rs.id != :id").setLong("id", getMe().getId().longValue())
@@ -117,7 +118,7 @@ public class RelayServersImpl implements RelayServers {
 
 		if (result.size() == 0) {
 			RelayServer me = new RelayServer(myIp, this.uplinkUdpPort);
-			addRelayServer(me);
+			addRelayServer(me); /* we are already in a transaction, so ok */
 			return me;
 		}
 
