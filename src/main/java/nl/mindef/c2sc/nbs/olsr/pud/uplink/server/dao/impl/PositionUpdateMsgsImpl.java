@@ -2,7 +2,6 @@ package nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.impl;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.net.InetAddress;
 import java.util.List;
 
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.PositionUpdateMsgs;
@@ -29,27 +28,6 @@ public class PositionUpdateMsgsImpl implements PositionUpdateMsgs {
 	@Required
 	public final void setSessionFactory(SessionFactory sessionFactory) {
 		this.sessionFactory = sessionFactory;
-	}
-
-	@Override
-	@Transactional(readOnly = true)
-	public PositionUpdateMsg getPositionUpdateMsg(InetAddress mainIp) {
-		if (mainIp == null) {
-			return null;
-		}
-
-		@SuppressWarnings("unchecked")
-		List<PositionUpdateMsg> result = this.sessionFactory.getCurrentSession()
-				.createQuery("select pu from PositionUpdateMsg pu where pu.node.mainIp = :ip").setParameter("ip", mainIp)
-				.list();
-
-		if (result.size() == 0) {
-			return null;
-		}
-
-		assert (result.size() == 1);
-
-		return result.get(0);
 	}
 
 	@Override

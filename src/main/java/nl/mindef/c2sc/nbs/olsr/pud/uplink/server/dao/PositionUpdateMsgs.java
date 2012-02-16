@@ -2,7 +2,6 @@ package nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.net.InetAddress;
 import java.util.List;
 
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.domainmodel.Node;
@@ -15,15 +14,6 @@ import org.apache.log4j.Logger;
  * The PositionUpdateMsg DAO
  */
 public interface PositionUpdateMsgs {
-	/**
-	 * Retrieve the PositionUpdateMsg as sent by an OLSRd node
-	 * 
-	 * @param mainIp
-	 *          the main IP address of the OLSR stack of an OLSRd node
-	 * @return the PositionUpdateMsg, or null when the OLSRd node is not found
-	 */
-	public PositionUpdateMsg getPositionUpdateMsg(InetAddress mainIp);
-
 	/**
 	 * Retrieve the PositionUpdateMsg objects that must be distributed to the given cluster leader. A PositionUpdateMsg
 	 * must be distributed if its reception time is later than startTime and at latest endTime.
