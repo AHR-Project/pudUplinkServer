@@ -4,14 +4,19 @@
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
 	<bean id="ExpiryNodes"
-		class="nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.expiry.ExpireNodes"
-		init-method="init" destroy-method="destroy">
+		class="nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.expiry.impl.ExpireNodesImpl">
 		<property name="clusterLeaderMsgs" ref="ClusterLeaderMsgs" />
-		<property name="senders" ref="Senders" />
-		<property name="interval" value="${node.expiry.interval}" />
 		<property name="nodes" ref="Nodes" />
 		<property name="positions" ref="PositionUpdateMsgs" />
+		<property name="senders" ref="Senders" />
 		<property name="validityTimeMultiplier" value="${node.expiry.multiplier}" />
+	</bean>
+
+	<bean id="ExpiryNodesTimer"
+		class="nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.expiry.ExpireNodesTimer"
+		init-method="init" destroy-method="uninit">
+		<property name="expireNodes" ref="ExpiryNodes" />
+		<property name="interval" value="${node.expiry.interval}" />
 	</bean>
 
 </beans>
