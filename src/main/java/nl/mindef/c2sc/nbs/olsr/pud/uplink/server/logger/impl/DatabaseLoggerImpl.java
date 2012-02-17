@@ -237,7 +237,7 @@ public class DatabaseLoggerImpl implements DatabaseLogger {
 		gvos.write(sbFull.toString().getBytes());
 	}
 
-	protected class NodeNameComparatorForDot implements Comparator<Node> {
+	protected class NodeNameComparatorOnNameOrIp implements Comparator<Node> {
 		@Override
 		public int compare(Node o1, Node o2) {
 			return getNodeNameOrIp(o1).compareTo(getNodeNameOrIp(o2));
@@ -253,7 +253,7 @@ public class DatabaseLoggerImpl implements DatabaseLogger {
 
 		this.logger.debug("Writing dot file");
 
-		Collections.sort(allNodes, new NodeNameComparatorForDot());
+		Collections.sort(allNodes, new NodeNameComparatorOnNameOrIp());
 
 		this.dotSimpleFileOSChannel.position(0);
 		this.dotFullFileOSChannel.position(0);
