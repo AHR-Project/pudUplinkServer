@@ -10,7 +10,10 @@ import java.util.Comparator;
 import java.util.Formatter;
 import java.util.FormatterClosedException;
 import java.util.IllegalFormatException;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.ClusterLeaderMsgs;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.Nodes;
@@ -65,6 +68,17 @@ public class DatabaseLoggerImpl implements DatabaseLogger {
 	@Required
 	public void setDotFullFile(String dotFullFile) {
 		this.dotFullFile = dotFullFile;
+	}
+
+	private boolean detectDuplicateNames = true;
+
+	/**
+	 * @param detectDuplicateNames
+	 *          the detectDuplicateNames to set
+	 */
+	@Required
+	public final void setDetectDuplicateNames(boolean detectDuplicateNames) {
+		this.detectDuplicateNames = detectDuplicateNames;
 	}
 
 	private boolean generateSVG = false;
@@ -244,16 +258,88 @@ public class DatabaseLoggerImpl implements DatabaseLogger {
 		}
 	}
 
+	private static void addNode2NameMap(Map<String, List<Node>> nodeName2Nodes, Node node) {
+		assert (nodeName2Nodes != null);
+		assert (node != null);
+
+		String nodeName = getNodeNameOrIp(node);
+		List<Node> mapping = nodeName2Nodes.get(nodeName);
+		if (mapping == null) {
+			mapping = new LinkedList<Node>();
+			mapping.add(node);
+			nodeName2Nodes.put(nodeName, mapping);
+		} else {
+			if (!mapping.contains(node)) {
+				mapping.add(node);
+			}
+		}
+	}
+
+	private void warnOnDuplicateNames(Map<String, List<Node>> nodeName2Nodes) {
+		if (nodeName2Nodes == null) {
+			return;
+		}
+
+		for (Map.Entry<String, List<Node>> entry : nodeName2Nodes.entrySet()) {
+			List<Node> mapping = entry.getValue();
+			if (mapping.size() <= 1) {
+				continue;
+			}
+
+			StringBuilder sb = new StringBuilder();
+			sb.append("\nDetected multiple nodes with name \"" + entry.getKey() + "\":\n");
+			for (Node node : mapping) {
+				sb.append("  ");
+				sb.append(node.getMainIp().getHostAddress().toString());
+				Sender sender = node.getSender();
+				if (sender != null) {
+					sb.append(", received from ");
+					sb.append(sender.getIp().getHostAddress().toString());
+					sb.append(":");
+					sb.append(sender.getPort());
+				}
+				sb.append("\n");
+			}
+			this.logger.warn(sb.toString());
+		}
+	}
+
+	private void checkDuplicateNames() {
+		List<Node> allNodes = this.nodes.getAllNodes();
+		if ((allNodes == null) || (allNodes.size() <= 1)) {
+			return;
+		}
+
+		this.logger.debug("Checking for duplicate node names");
+
+		Collections.sort(allNodes, new NodeNameComparatorOnNameOrIp());
+
+		try {
+			Map<String, List<Node>> nodeName2Nodes = new TreeMap<String, List<Node>>();
+			for (Node node : allNodes) {
+				addNode2NameMap(nodeName2Nodes, node);
+			}
+			warnOnDuplicateNames(nodeName2Nodes);
+		} catch (Exception e) {
+			this.logger.error("Error while checking for duplicate names", e);
+		}
+	}
+
 	private void generateDotAndSVG() throws IOException {
 		List<Node> allNodes = this.nodes.getAllNodes();
-
 		if (allNodes == null) {
 			return;
 		}
 
-		this.logger.debug("Writing dot file");
+		this.logger.debug("Creating SVG files");
 
 		Collections.sort(allNodes, new NodeNameComparatorOnNameOrIp());
+
+		Map<String, List<Node>> nodeName2Nodes = null;
+		if (this.detectDuplicateNames) {
+			nodeName2Nodes = new TreeMap<String, List<Node>>();
+			this.logger.debug("  and also checking for duplicate node names");
+		}
 
 		this.dotSimpleFileOSChannel.position(0);
 		this.dotFullFileOSChannel.position(0);
@@ -262,6 +348,9 @@ public class DatabaseLoggerImpl implements DatabaseLogger {
 		try {
 			for (Node node : allNodes) {
 				writeDotNode(this.dotSimpleFileOS, this.dotFullFileOS, node, "  ");
+				if (this.detectDuplicateNames) {
+					addNode2NameMap(nodeName2Nodes, node);
+				}
 			}
 		} catch (Exception e) {
 			this.logger.error("Error while generating the dot file", e);
@@ -274,6 +363,8 @@ public class DatabaseLoggerImpl implements DatabaseLogger {
 		this.dotFullFileOS.flush();
 		this.dotSimpleFileOSChannel.truncate(this.dotSimpleFileOSChannel.position());
 		this.dotFullFileOSChannel.truncate(this.dotFullFileOSChannel.position());
+
+		warnOnDuplicateNames(nodeName2Nodes);
 
 		this.logger.debug("Generating SVG file");
 		Runtime.getRuntime().exec("fdp -Tsvg " + this.dotSimpleFile + " -o " + this.svgSimpleFile);
@@ -302,6 +393,8 @@ public class DatabaseLoggerImpl implements DatabaseLogger {
 
 		if (this.generateSVG) {
 			generateDotAndSVG();
+		} else if (this.detectDuplicateNames) {
+			checkDuplicateNames();
 		}
 	}
 
