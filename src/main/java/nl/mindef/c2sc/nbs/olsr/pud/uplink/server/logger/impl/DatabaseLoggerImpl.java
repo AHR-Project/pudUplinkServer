@@ -25,6 +25,8 @@ import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.domainmodel.Node;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.domainmodel.PositionUpdateMsg;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.domainmodel.Sender;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.logger.DatabaseLogger;
+import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.reportonce.ReportOnce;
+import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.reportonce.ReportSubject;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -172,6 +174,17 @@ public class DatabaseLoggerImpl implements DatabaseLogger {
 		this.senders = senders;
 	}
 
+	private ReportOnce reportOnce;
+
+	/**
+	 * @param reportOnce
+	 *          the reportOnce to set
+	 */
+	@Required
+	public final void setReportOnce(ReportOnce reportOnce) {
+		this.reportOnce = reportOnce;
+	}
+
 	/*
 	 * Main
 	 */
@@ -283,6 +296,10 @@ public class DatabaseLoggerImpl implements DatabaseLogger {
 		for (Map.Entry<String, List<Node>> entry : nodeName2Nodes.entrySet()) {
 			List<Node> mapping = entry.getValue();
 			if (mapping.size() <= 1) {
+				continue;
+			}
+
+			if (!this.reportOnce.add(ReportSubject.DUPLICATE_NODE_NAME, entry.getKey())) {
 				continue;
 			}
 

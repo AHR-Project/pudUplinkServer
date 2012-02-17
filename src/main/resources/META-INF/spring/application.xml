@@ -23,6 +23,7 @@
 	<import resource="classpath:META-INF/spring/relayServers.xml" />
 	<import resource="classpath:META-INF/spring/expiry.xml" />
 	<import resource="classpath:META-INF/spring/databaseLogger.xml" />
+	<import resource="classpath:META-INF/spring/reportOnce.xml"/>
 
 	<import resource="classpath:META-INF/spring/clusterLeaderHandler.xml" />
 	<import resource="classpath:META-INF/spring/positionUpdateHandler.xml" />

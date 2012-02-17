@@ -18,6 +18,7 @@
 		<property name="svgSimpleFile" value="${database.logger.svgSimpleFile}" />
 		<property name="svgFullFile" value="${database.logger.svgFile}" />
 		<property name="detectDuplicateNames" value="${database.logger.detect.duplicate.names}" />
+		<property name="reportOnce" ref="ReportOnce" />
 	</bean>
 
 	<bean id="DatabaseLoggerTimer"

@@ -3,9 +3,7 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
-	<bean id="WireFormatChecker"
-		class="nl.mindef.c2sc.nbs.olsr.pud.uplink.server.handlers.impl.WireFormatCheckerImpl">
-		<property name="reportOnce" ref="ReportOnce" />
-	</bean>
+	<bean id="ReportOnce"
+		class="nl.mindef.c2sc.nbs.olsr.pud.uplink.server.reportonce.impl.ReportOnceImpl" />
 
 </beans>

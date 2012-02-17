@@ -24,6 +24,7 @@
 		<config>src/main/resources/META-INF/spring/clusterLeaderMsgs.xml</config>
 		<config>src/main/resources/META-INF/spring/expiry.xml</config>
 		<config>src/main/resources/META-INF/spring/databaseLogger.xml</config>
+		<config>src/main/resources/META-INF/spring/reportOnce.xml</config>
 		<config>src/main/resources/META-INF/spring/myIPAddresses.xml</config>
 		<config>src/main/resources/META-INF/spring/jmx.xml</config>
 		<config>src/main/resources/META-INF/spring/faker.xml</config>
