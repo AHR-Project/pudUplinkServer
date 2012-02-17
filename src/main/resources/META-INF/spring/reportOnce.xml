@@ -6,4 +6,12 @@
 	<bean id="ReportOnce"
 		class="nl.mindef.c2sc.nbs.olsr.pud.uplink.server.reportonce.impl.ReportOnceImpl" />
 
+	<bean id="ReportOnceTimer"
+		class="nl.mindef.c2sc.nbs.olsr.pud.uplink.server.reportonce.ReportOnceTimer"
+		init-method="init" destroy-method="uninit">
+		<property name="intervalWireFormat" value="${report.once.interval.wireformat}" />
+		<property name="intervalDuplicateNames" value="${report.once.interval.duplicate.names}" />
+		<property name="reportOnce" ref="ReportOnce" />
+	</bean>
+
 </beans>
