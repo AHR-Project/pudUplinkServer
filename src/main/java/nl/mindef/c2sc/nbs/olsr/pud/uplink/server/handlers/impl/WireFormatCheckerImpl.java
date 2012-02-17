@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.domainmodel.Sender;
+import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.handlers.WireFormatChecker;
 
 import org.apache.log4j.Logger;
 import org.olsr.plugin.pud.ClusterLeader;

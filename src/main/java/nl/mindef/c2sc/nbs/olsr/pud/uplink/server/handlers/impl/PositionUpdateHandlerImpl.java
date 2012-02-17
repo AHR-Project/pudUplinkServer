@@ -9,6 +9,7 @@ import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.domainmodel.Node;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.domainmodel.PositionUpdateMsg;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.domainmodel.Sender;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.handlers.PositionUpdateHandler;
+import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.handlers.WireFormatChecker;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.util.TimeZoneUtil;
 
 import org.olsr.plugin.pud.PositionUpdate;

@@ -9,6 +9,7 @@ import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.domainmodel.ClusterLeaderMs
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.domainmodel.Node;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.domainmodel.Sender;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.handlers.ClusterLeaderHandler;
+import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.handlers.WireFormatChecker;
 
 import org.olsr.plugin.pud.ClusterLeader;
 import org.springframework.beans.factory.annotation.Required;
