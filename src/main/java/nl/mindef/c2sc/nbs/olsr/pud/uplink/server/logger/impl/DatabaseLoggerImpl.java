@@ -181,24 +181,15 @@ public class DatabaseLoggerImpl implements DatabaseLogger {
 	private static final String colorFullOk = colorSimpleOk;
 	private static final String colorFullNotOk = colorSimpleNotOk;
 
-	private static boolean useIPNodeNameInDot(PositionUpdate nodePUMsg) {
-		// FIXME no magic numbers, add them to WireFormatConstants
-		return ((nodePUMsg == null) || (nodePUMsg.getPositionUpdateNodeIdType() == 4) || (nodePUMsg
-				.getPositionUpdateNodeIdType() == 6));
-	}
-
-	protected static String getNodeNameForDot(Node node) {
-		PositionUpdateMsg nodePU = node.getPositionUpdateMsg();
-		PositionUpdate nodePUMsg = (nodePU == null) ? null : nodePU.getPositionUpdateMsg();
-
-		if (useIPNodeNameInDot(nodePUMsg)) {
+	protected static String getNodeNameOrIp(Node node) {
+		PositionUpdateMsg puMsg = node.getPositionUpdateMsg();
+		if (puMsg == null) {
 			/* use IP variant */
 			return node.getMainIp().getHostAddress().toString();
 		}
 
 		/* use named variant */
-		assert (nodePUMsg != null);
-		return nodePUMsg.getPositionUpdateNodeId();
+		return puMsg.getPositionUpdateMsg().getPositionUpdateNodeId();
 	}
 
 	private static void writeDotNode(OutputStream gvoss, OutputStream gvos, Node node, String indent)
@@ -222,10 +213,11 @@ public class DatabaseLoggerImpl implements DatabaseLogger {
 		String nodeColor = (nodePUMsg == null) ? colorFullNotOk : colorFullOk;
 		String nodeShape = node.getClusterNodes().isEmpty() ? shapeNormal : shapeClusterLeader;
 
-		String nodeName = getNodeNameForDot(node);
+		String nodeName = getNodeNameOrIp(node);
 
 		formatterSimple.format(dotNodeTemplateSimple, indent, nodeName, nodeShape, nodeSimpleColor);
-		if (useIPNodeNameInDot(nodePUMsg)) {
+		if ((nodePUMsg == null) || (nodePUMsg.getPositionUpdateNodeIdType() == 4)
+				|| (nodePUMsg.getPositionUpdateNodeIdType() == 6)) {
 			/* use IP variant */
 			formatterFull.format(dotNodeTemplateFullIp, indent, nodeId, nodeColor, nodeName, senderColor, senderIP);
 		} else {
@@ -237,7 +229,7 @@ public class DatabaseLoggerImpl implements DatabaseLogger {
 		/* now write graph */
 		ClusterLeaderMsg nodeCL = node.getClusterLeaderMsg();
 		if (nodeCL != null) {
-			formatterSimple.format("%s\"%s\" -> \"%s\"\n", indent, nodeName, getNodeNameForDot(nodeCL.getClusterLeaderNode()));
+			formatterSimple.format("%s\"%s\" -> \"%s\"\n", indent, nodeName, getNodeNameOrIp(nodeCL.getClusterLeaderNode()));
 			formatterFull.format("%s%s -> %s\n", indent, nodeId, nodeCL.getClusterLeaderNode().getId());
 		}
 
@@ -248,7 +240,7 @@ public class DatabaseLoggerImpl implements DatabaseLogger {
 	protected class NodeNameComparatorForDot implements Comparator<Node> {
 		@Override
 		public int compare(Node o1, Node o2) {
-			return getNodeNameForDot(o1).compareTo(getNodeNameForDot(o2));
+			return getNodeNameOrIp(o1).compareTo(getNodeNameOrIp(o2));
 		}
 	}
 
