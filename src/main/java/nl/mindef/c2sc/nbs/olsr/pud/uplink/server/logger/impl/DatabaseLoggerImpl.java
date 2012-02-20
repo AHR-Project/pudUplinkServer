@@ -189,7 +189,7 @@ public class DatabaseLoggerImpl implements DatabaseLogger {
 	 * Main
 	 */
 
-	private static final String dotNodeTemplateSimple = "\n%s\"%s\" [shape=%s,style=filled,fillcolor=%s]\n";
+	private static final String dotNodeTemplateSimple = "\n%s%s [shape=%s,style=filled,fillcolor=%s,label=\"%s\"]\n";
 
 	private static final String dotNodeTemplateFullIp = "\n%s%s [shape=box, margin=0, label=<\n"
 			+ "    <table border=\"0\" cellborder=\"1\" cellspacing=\"2\" cellpadding=\"4\">\n"
@@ -242,7 +242,7 @@ public class DatabaseLoggerImpl implements DatabaseLogger {
 
 		String nodeName = getNodeNameOrIp(node);
 
-		formatterSimple.format(dotNodeTemplateSimple, indent, nodeName, nodeShape, nodeSimpleColor);
+		formatterSimple.format(dotNodeTemplateSimple, indent, nodeId, nodeShape, nodeSimpleColor, nodeName);
 		if ((nodePUMsg == null) || (nodePUMsg.getPositionUpdateNodeIdType() == 4)
 				|| (nodePUMsg.getPositionUpdateNodeIdType() == 6)) {
 			/* use IP variant */
@@ -256,7 +256,7 @@ public class DatabaseLoggerImpl implements DatabaseLogger {
 		/* now write graph */
 		ClusterLeaderMsg nodeCL = node.getClusterLeaderMsg();
 		if (nodeCL != null) {
-			formatterSimple.format("%s\"%s\" -> \"%s\"\n", indent, nodeName, getNodeNameOrIp(nodeCL.getClusterLeaderNode()));
+			formatterSimple.format("%s%s -> %s\n", indent, nodeId, nodeCL.getClusterLeaderNode().getId());
 			formatterFull.format("%s%s -> %s\n", indent, nodeId, nodeCL.getClusterLeaderNode().getId());
 		}
 
