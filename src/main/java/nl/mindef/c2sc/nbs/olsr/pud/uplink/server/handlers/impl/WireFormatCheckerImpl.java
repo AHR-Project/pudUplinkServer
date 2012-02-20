@@ -49,7 +49,7 @@ public class WireFormatCheckerImpl implements WireFormatChecker {
 		}
 
 		if (this.reportOnce.add(ReportSubject.SENDER_WIRE_FORMAT, senderReport)) {
-			this.logger.error("Received uplink message version " + wireFormatVersion + " (expected version "
+			this.logger.warn("Received uplink message version " + wireFormatVersion + " (expected version "
 					+ WireFormatConstants.VERSION + ") from " + senderReport + ", node will be ignored");
 		}
 		return false;
