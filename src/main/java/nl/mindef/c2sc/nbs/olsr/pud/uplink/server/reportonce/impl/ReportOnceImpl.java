@@ -55,7 +55,11 @@ public class ReportOnceImpl implements ReportOnce {
 	public void flush(ReportSubject reportSubject) {
 		this.lock.lock();
 		try {
-			this.subject2Reports.remove(reportSubject);
+			if (reportSubject == null) {
+				this.subject2Reports.clear();
+			} else {
+				this.subject2Reports.remove(reportSubject);
+			}
 		} finally {
 			this.lock.unlock();
 		}

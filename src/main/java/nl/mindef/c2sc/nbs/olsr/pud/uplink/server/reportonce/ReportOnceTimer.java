@@ -113,13 +113,11 @@ public class ReportOnceTimer implements StopHandlerConsumer {
 			this.timer.cancel();
 			this.timer = null;
 		}
+		this.reportOnce.flush(null);
 	}
 
 	@Override
 	public void signalStop() {
-		if (this.timer != null) {
-			this.timer.cancel();
-			this.timer = null;
-		}
+		uninit();
 	}
 }
