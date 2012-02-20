@@ -299,25 +299,23 @@ public class DatabaseLoggerImpl implements DatabaseLogger {
 				continue;
 			}
 
-			if (!this.reportOnce.add(ReportSubject.DUPLICATE_NODE_NAME, entry.getKey())) {
-				continue;
-			}
-
-			StringBuilder sb = new StringBuilder();
-			sb.append("\nDetected multiple nodes with name \"" + entry.getKey() + "\":\n");
-			for (Node node : mapping) {
-				sb.append("  ");
-				sb.append(node.getMainIp().getHostAddress().toString());
-				Sender sender = node.getSender();
-				if (sender != null) {
-					sb.append(", received from ");
-					sb.append(sender.getIp().getHostAddress().toString());
-					sb.append(":");
-					sb.append(sender.getPort());
+			if (this.reportOnce.add(ReportSubject.DUPLICATE_NODE_NAME, entry.getKey())) {
+				StringBuilder sb = new StringBuilder();
+				sb.append("\nDetected multiple nodes with name \"" + entry.getKey() + "\":\n");
+				for (Node node : mapping) {
+					sb.append("  ");
+					sb.append(node.getMainIp().getHostAddress().toString());
+					Sender sender = node.getSender();
+					if (sender != null) {
+						sb.append(", received from ");
+						sb.append(sender.getIp().getHostAddress().toString());
+						sb.append(":");
+						sb.append(sender.getPort());
+					}
+					sb.append("\n");
 				}
-				sb.append("\n");
+				this.logger.warn(sb.toString());
 			}
-			this.logger.warn(sb.toString());
 		}
 	}
 
