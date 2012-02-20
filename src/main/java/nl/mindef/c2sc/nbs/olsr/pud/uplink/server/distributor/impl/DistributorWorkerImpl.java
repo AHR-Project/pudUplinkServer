@@ -250,12 +250,19 @@ public class DistributorWorkerImpl implements DistributorWorker {
 							continue;
 						}
 
-						clusterLeaderSender = substituteClusterLeader.getSender();
 						if (this.logger.isDebugEnabled()) {
 							this.logger.info("Cluster leader " + clusterLeaderMainIp.getHostAddress()
-									+ " has no sender: selected sender " + clusterLeaderSender.getIp().getHostAddress() + ":"
-									+ clusterLeaderSender.getPort() + " of substitute cluster leader "
+									+ " has no sender: selected substitute cluster leader "
 									+ substituteClusterLeader.getMainIp().getHostAddress());
+						}
+
+						clusterLeaderSender = substituteClusterLeader.getSender();
+						if (clusterLeaderSender == null) {
+							if (this.logger.isDebugEnabled()) {
+								this.logger.info("Substiture cluster leader " + substituteClusterLeader.getMainIp().getHostAddress()
+										+ " has no sender: skipping the cluster.");
+							}
+							continue;
 						}
 					}
 
