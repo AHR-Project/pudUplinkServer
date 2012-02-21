@@ -264,6 +264,13 @@ public class DatabaseLoggerImpl implements DatabaseLogger {
 		gvos.write(sbFull.toString().getBytes());
 	}
 
+	protected class NodeNameComparatorOnIp implements Comparator<Node> {
+		@Override
+		public int compare(Node o1, Node o2) {
+			return o1.getMainIp().getHostAddress().toString().compareTo(o2.getMainIp().getHostAddress().toString());
+		}
+	}
+
 	protected class NodeNameComparatorOnNameOrIp implements Comparator<Node> {
 		@Override
 		public int compare(Node o1, Node o2) {
@@ -348,7 +355,7 @@ public class DatabaseLoggerImpl implements DatabaseLogger {
 
 		this.logger.debug("Creating SVG files");
 
-		Collections.sort(allNodes, new NodeNameComparatorOnNameOrIp());
+		Collections.sort(allNodes, new NodeNameComparatorOnIp());
 
 		Map<String, List<Node>> nodeName2Nodes = null;
 		if (this.detectDuplicateNames) {
