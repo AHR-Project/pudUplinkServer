@@ -306,10 +306,14 @@ public class DatabaseLoggerImpl implements DatabaseLogger {
 				continue;
 			}
 
-			if (this.reportOnce.add(ReportSubject.DUPLICATE_NODE_NAME, entry.getKey())) {
-				StringBuilder sb = new StringBuilder();
-				sb.append("\nDetected multiple nodes with name \"" + entry.getKey() + "\":\n");
-				for (Node node : mapping) {
+			Collections.sort(mapping, new NodeNameComparatorOnIp());
+
+			boolean warn = false;
+			StringBuilder sb = new StringBuilder();
+			for (Node node : mapping) {
+				if (this.reportOnce.add(ReportSubject.DUPLICATE_NODE_NAME, entry.getKey(), node.getMainIp().getHostAddress()
+						.toString())) {
+					warn = true;
 					sb.append("  ");
 					sb.append(node.getMainIp().getHostAddress().toString());
 					Sender sender = node.getSender();
@@ -321,6 +325,9 @@ public class DatabaseLoggerImpl implements DatabaseLogger {
 					}
 					sb.append("\n");
 				}
+			}
+			if (warn) {
+				sb.insert(0, "\nDetected node(s) using existing name \"" + entry.getKey() + "\":\n");
 				this.logger.warn(sb.toString());
 			}
 		}

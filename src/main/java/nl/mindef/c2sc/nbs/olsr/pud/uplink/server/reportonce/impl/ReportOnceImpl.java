@@ -11,37 +11,58 @@ import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.reportonce.ReportSubject;
 
 public class ReportOnceImpl implements ReportOnce {
 	private ReentrantLock lock = new ReentrantLock();
-	private Map<ReportSubject, Set<String>> subject2Reports = new TreeMap<ReportSubject, Set<String>>();
+	private Map<ReportSubject, Map<String, Set<String>>> subject2Reports = new TreeMap<ReportSubject, Map<String, Set<String>>>();
 
 	@Override
-	public boolean add(ReportSubject reportSubject, String report) {
+	public boolean add(ReportSubject reportSubject, String key, String report) {
+		assert (key != null);
+		assert (report != null);
+
 		this.lock.lock();
 		try {
-			Set<String> reports = this.subject2Reports.get(reportSubject);
-			if (reports == null) {
-				reports = new TreeSet<String>();
-				this.subject2Reports.put(reportSubject, reports);
+			Map<String, Set<String>> subjectReports = this.subject2Reports.get(reportSubject);
+			if (subjectReports == null) {
+				subjectReports = new TreeMap<String, Set<String>>();
+				this.subject2Reports.put(reportSubject, subjectReports);
 			}
 
-			return reports.add(report);
+			Set<String> keyReports = subjectReports.get(key);
+			if (keyReports == null) {
+				keyReports = new TreeSet<String>();
+				subjectReports.put(key, keyReports);
+			}
+
+			return keyReports.add(report);
 		} finally {
 			this.lock.unlock();
 		}
 	}
 
 	@Override
-	public boolean remove(ReportSubject reportSubject, String report) {
+	public boolean remove(ReportSubject reportSubject, String key, String report) {
+		assert (key != null);
+		assert (report != null);
+
 		boolean wasRemoved = false;
 		this.lock.lock();
 		try {
-			Set<String> reports = this.subject2Reports.get(reportSubject);
-			if (reports == null) {
+			Map<String, Set<String>> subjectReports = this.subject2Reports.get(reportSubject);
+			if (subjectReports == null) {
 				return false;
 			}
 
-			wasRemoved = reports.remove(report);
+			Set<String> keyReports = subjectReports.get(key);
+			if (keyReports == null) {
+				return false;
+			}
 
-			if (reports.size() == 0) {
+			wasRemoved = keyReports.remove(report);
+
+			if (keyReports.size() == 0) {
+				subjectReports.remove(key);
+			}
+
+			if (subjectReports.size() == 0) {
 				this.subject2Reports.remove(reportSubject);
 			}
 		} finally {
@@ -52,12 +73,27 @@ public class ReportOnceImpl implements ReportOnce {
 	}
 
 	@Override
-	public void flush(ReportSubject reportSubject) {
+	public void flush(ReportSubject reportSubject, String key) {
 		this.lock.lock();
 		try {
 			if (reportSubject == null) {
 				this.subject2Reports.clear();
-			} else {
+				return;
+			}
+			
+			if (key == null) {
+				this.subject2Reports.remove(reportSubject);
+				return;
+			}
+
+			Map<String, Set<String>> subjectReports = this.subject2Reports.get(reportSubject);
+			if (subjectReports == null) {
+				return;
+			}
+
+			subjectReports.remove(key);
+
+			if (subjectReports.size() == 0) {
 				this.subject2Reports.remove(reportSubject);
 			}
 		} finally {

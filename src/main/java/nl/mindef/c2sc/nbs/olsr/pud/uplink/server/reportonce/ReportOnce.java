@@ -8,28 +8,34 @@ public interface ReportOnce {
 	 * 
 	 * @param reportSubject
 	 *          the report subject
+	 * @param key
+	 *          the key of the report
 	 * @param report
 	 *          the report
 	 * @return true when the report was added (not yet reported)
 	 */
-	public boolean add(ReportSubject reportSubject, String report);
+	public boolean add(ReportSubject reportSubject, String key, String report);
 
 	/**
 	 * Remove a report from a subject
 	 * 
 	 * @param reportSubject
 	 *          the report subject
+	 * @param key
+	 *          the key of the report
 	 * @param report
 	 *          the report
 	 * @return true when the report was removed (previously reported)
 	 */
-	public boolean remove(ReportSubject reportSubject, String report);
+	public boolean remove(ReportSubject reportSubject, String key, String report);
 
 	/**
 	 * Flush the subject (remove all reports)
 	 * 
 	 * @param reportSubject
-	 *          the subject
+	 *          the subject. when null will flush every report for all subjects.
+	 * @param key
+	 *          the key of the report. when null will flush every report for the indicated subject.
 	 */
-	public void flush(ReportSubject reportSubject);
+	public void flush(ReportSubject reportSubject, String key);
 }

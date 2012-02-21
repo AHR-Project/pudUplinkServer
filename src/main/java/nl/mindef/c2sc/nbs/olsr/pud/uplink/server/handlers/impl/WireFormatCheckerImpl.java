@@ -41,14 +41,14 @@ public class WireFormatCheckerImpl implements WireFormatChecker {
 		String senderReport = sender.getIp().getHostAddress() + ":" + sender.getPort().toString();
 
 		if (wireFormatVersion == WireFormatConstants.VERSION) {
-			if (this.reportOnce.remove(ReportSubject.SENDER_WIRE_FORMAT, senderReport)) {
+			if (this.reportOnce.remove(ReportSubject.SENDER_WIRE_FORMAT, senderReport, senderReport)) {
 				this.logger.error("Received correct version of uplink message from " + senderReport
 						+ ", node will no longer be ignored");
 			}
 			return true;
 		}
 
-		if (this.reportOnce.add(ReportSubject.SENDER_WIRE_FORMAT, senderReport)) {
+		if (this.reportOnce.add(ReportSubject.SENDER_WIRE_FORMAT, senderReport, senderReport)) {
 			this.logger.warn("Received uplink message version " + wireFormatVersion + " (expected version "
 					+ WireFormatConstants.VERSION + ") from " + senderReport + ", node will be ignored");
 		}

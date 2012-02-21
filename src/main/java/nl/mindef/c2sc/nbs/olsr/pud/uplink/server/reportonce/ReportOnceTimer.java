@@ -76,7 +76,7 @@ public class ReportOnceTimer implements StopHandlerConsumer {
 		@Override
 		public void run() {
 			try {
-				this.reportOnce.flush(this.reportSubject);
+				this.reportOnce.flush(this.reportSubject, null);
 			} catch (Throwable e) {
 				this.logger.error("error report-once flushing of subject " + this.reportSubject, e);
 			}
@@ -113,7 +113,7 @@ public class ReportOnceTimer implements StopHandlerConsumer {
 			this.timer.cancel();
 			this.timer = null;
 		}
-		this.reportOnce.flush(null);
+		this.reportOnce.flush(null, null);
 	}
 
 	@Override
