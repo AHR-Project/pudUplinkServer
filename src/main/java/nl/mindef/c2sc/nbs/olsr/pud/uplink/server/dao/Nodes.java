@@ -6,6 +6,7 @@ import java.net.InetAddress;
 import java.util.List;
 
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.domainmodel.Node;
+import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.domainmodel.RelayServer;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -20,6 +21,19 @@ public interface Nodes {
 	 * @return a list of all nodes, or null when not found
 	 */
 	public List<Node> getAllNodes();
+
+	/**
+	 * Get all clusters
+	 * 
+	 * @param relayServer
+	 *          if not null, then limit the clusters returned to those nodes that are seen by the specified RelayServer.
+	 * 
+	 * @return a list of clusters. Each cluster is a sorted list of nodes: sorted first on the number of cluster nodes
+	 *         (cluster leaders first), sorted second on the reception time of the cluster leader message (recently seen
+	 *         nodes first), sorted third on the mainIP of the node (final discriminator). When there are no clusters,
+	 *         then null is returned.
+	 */
+	public List<List<Node>> getClusters(RelayServer relayServer);
 
 	/**
 	 * Get a node.<br/>

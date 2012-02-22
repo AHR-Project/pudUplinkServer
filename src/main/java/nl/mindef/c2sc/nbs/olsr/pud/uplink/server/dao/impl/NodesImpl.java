@@ -3,10 +3,17 @@ package nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.impl;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.InetAddress;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.Nodes;
+import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.domainmodel.ClusterLeaderMsg;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.domainmodel.Node;
+import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.domainmodel.RelayServer;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -41,6 +48,139 @@ public class NodesImpl implements Nodes {
 		}
 
 		return result;
+	}
+
+	private void addToCluster(List<Node> allNodes, Set<Node> clusterLeaders, List<Node> cluster, Node node, boolean up) {
+		assert (allNodes != null);
+		assert (cluster != null);
+		assert (node != null);
+		assert (!cluster.contains(node));
+
+		cluster.add(node);
+		allNodes.remove(node);
+
+		/* search down */
+		Set<ClusterLeaderMsg> clusterNodeMsgs = node.getClusterNodes();
+		if (clusterNodeMsgs.size() > 0) {
+			clusterLeaders.add(node);
+
+			for (ClusterLeaderMsg clusterNodeMsg : clusterNodeMsgs) {
+				Node clusterNode = clusterNodeMsg.getNode();
+				if ((node != clusterNode) && !cluster.contains(clusterNode)) {
+					addToCluster(allNodes, clusterLeaders, cluster, clusterNode, false);
+				}
+			}
+		}
+
+		/* search up */
+		if (up) {
+			ClusterLeaderMsg clusterLeaderMsg = node.getClusterLeaderMsg();
+			if (clusterLeaderMsg != null) {
+				Node clusterLeaderNode = clusterLeaderMsg.getClusterLeaderNode();
+				if ((node != clusterLeaderNode) && !clusterLeaders.contains(clusterLeaderNode)) {
+					addToCluster(allNodes, clusterLeaders, cluster, clusterLeaderNode, true);
+				}
+			}
+		}
+	}
+
+	protected class NodeComparatorOnClusterNodes_ReceptionTime_MainIP implements Comparator<Node> {
+		private int compareInetAddresses(InetAddress ip1, InetAddress ip2) {
+			byte[] ip1a = ip1.getAddress();
+			byte[] ip2a = ip2.getAddress();
+
+			/* IPv4 before IPv6 */
+			if (ip1a.length < ip2a.length) {
+				return -1;
+			}
+			if (ip1a.length > ip2a.length) {
+				return 1;
+			}
+
+			/* 2 IPs of the same type, so we have to compare each byte */
+			for (int i = 0; i < ip1a.length; i++) {
+				int b1 = ip1a[i] & 0xff;
+				int b2 = ip2a[i] & 0xff;
+				if (b1 == b2) {
+					continue;
+				}
+
+				if (b1 < b2) {
+					return -1;
+				}
+
+				return 1;
+			}
+
+			return 0;
+		}
+
+		@Override
+		public int compare(Node o1, Node o2) {
+			/* first sort on the number of cluster nodes (cluster leaders first) */
+			int o1ClusterNodesCount = o1.getClusterNodes().size();
+			int o2ClusterNodesCount = o2.getClusterNodes().size();
+			if (o1ClusterNodesCount > o2ClusterNodesCount) {
+				return -1;
+			}
+			if (o1ClusterNodesCount < o2ClusterNodesCount) {
+				return 1;
+			}
+
+			/* then sort on the reception time of the cluster leader message (recently seen nodes first) */
+			ClusterLeaderMsg o1ClMsg = o1.getClusterLeaderMsg();
+			ClusterLeaderMsg o2ClMsg = o2.getClusterLeaderMsg();
+			long o1ReceptionTime = (o1ClMsg == null) ? 0 : o1ClMsg.getReceptionTime();
+			long o2ReceptionTime = (o2ClMsg == null) ? 0 : o2ClMsg.getReceptionTime();
+			if (o1ReceptionTime > o2ReceptionTime) {
+				return -1;
+			}
+			if (o1ReceptionTime < o2ReceptionTime) {
+				return 1;
+			}
+
+			/* as a final discriminator sort on the mainIP of the node */
+			return compareInetAddresses(o1.getMainIp(), o2.getMainIp());
+		}
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	@SuppressWarnings("unchecked")
+	public List<List<Node>> getClusters(RelayServer relayServer) {
+		List<Node> allNodes = null;
+		if (relayServer == null) {
+			allNodes = this.sessionFactory.getCurrentSession()
+					.createQuery("select node from Node node order by size(node.clusterNodes) desc").list();
+		} else {
+			allNodes = this.sessionFactory
+					.getCurrentSession()
+					.createQuery(
+							"select node from Node node where node.sender is not null and node.sender.relayServer.id = :rsId "
+									+ "order by size(node.clusterNodes) desc").setLong("rsId", relayServer.getId().longValue()).list();
+		}
+
+		if (allNodes.size() == 0) {
+			return null;
+		}
+
+		List<List<Node>> clusters = new LinkedList<List<Node>>();
+
+		while (!allNodes.isEmpty()) {
+			LinkedList<Node> cluster = new LinkedList<Node>();
+			Set<Node> clusterLeaders = new HashSet<Node>();
+			addToCluster(allNodes, clusterLeaders, cluster, allNodes.get(0), true);
+			if (cluster.size() > 0) {
+				Collections.sort(cluster, new NodeComparatorOnClusterNodes_ReceptionTime_MainIP());
+				clusters.add(cluster);
+			}
+		}
+
+		if (clusters.size() > 0) {
+			return clusters;
+		}
+
+		return null;
 	}
 
 	@Override
