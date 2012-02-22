@@ -333,36 +333,30 @@ public class DatabaseLoggerImpl implements DatabaseLogger {
 		}
 	}
 
-	private void checkDuplicateNames() {
-		List<Node> allNodes = this.nodes.getAllNodes();
-		if ((allNodes == null) || (allNodes.size() <= 1)) {
-			return;
-		}
+	private void checkDuplicateNames(List<List<Node>> clusters) {
+		assert (clusters != null);
 
 		this.logger.debug("Checking for duplicate node names");
 
-		Collections.sort(allNodes, new NodeNameComparatorOnNameOrIp());
-
 		try {
 			Map<String, List<Node>> nodeName2Nodes = new TreeMap<String, List<Node>>();
-			for (Node node : allNodes) {
-				addNode2NameMap(nodeName2Nodes, node);
+
+			for (List<Node> cluster : clusters) {
+				for (Node clusterNode : cluster) {
+					addNode2NameMap(nodeName2Nodes, clusterNode);
+				}
 			}
+
 			warnOnDuplicateNames(nodeName2Nodes);
 		} catch (Exception e) {
 			this.logger.error("Error while checking for duplicate names", e);
 		}
 	}
 
-	private void generateDotAndSVG() throws IOException {
-		List<Node> allNodes = this.nodes.getAllNodes();
-		if (allNodes == null) {
-			return;
-		}
+	private void generateDotAndSVG(List<List<Node>> clusters) throws IOException {
+		assert (clusters != null);
 
 		this.logger.debug("Creating SVG files");
-
-		Collections.sort(allNodes, new NodeNameComparatorOnIp());
 
 		Map<String, List<Node>> nodeName2Nodes = null;
 		if (this.detectDuplicateNames) {
@@ -372,13 +366,15 @@ public class DatabaseLoggerImpl implements DatabaseLogger {
 
 		this.dotSimpleFileOSChannel.position(0);
 		this.dotFullFileOSChannel.position(0);
-		this.dotSimpleFileOS.write("digraph G {\n".getBytes());
-		this.dotFullFileOS.write("digraph G {\n".getBytes());
+		this.dotSimpleFileOS.write("digraph SmartGatewayMap {\n".getBytes());
+		this.dotFullFileOS.write("digraph SmartGatewayMap {\n".getBytes());
 		try {
-			for (Node node : allNodes) {
-				writeDotNode(this.dotSimpleFileOS, this.dotFullFileOS, node, "  ");
-				if (this.detectDuplicateNames) {
-					addNode2NameMap(nodeName2Nodes, node);
+			for (List<Node> cluster : clusters) {
+				for (Node node : cluster) {
+					writeDotNode(this.dotSimpleFileOS, this.dotFullFileOS, node, "  ");
+					if (this.detectDuplicateNames) {
+						addNode2NameMap(nodeName2Nodes, node);
+					}
 				}
 			}
 		} catch (Exception e) {
@@ -420,10 +416,15 @@ public class DatabaseLoggerImpl implements DatabaseLogger {
 		this.databaseLogFileOSChannel.truncate(this.databaseLogFileOSChannel.position());
 		this.databaseLogFileOS.flush();
 
-		if (this.generateSVG) {
-			generateDotAndSVG();
-		} else if (this.detectDuplicateNames) {
-			checkDuplicateNames();
+		if (this.generateSVG || this.detectDuplicateNames) {
+			List<List<Node>> clusters = this.nodes.getClusters(null);
+			if (clusters != null) {
+				if (this.generateSVG) {
+					generateDotAndSVG(clusters);
+				} else if (this.detectDuplicateNames) {
+					checkDuplicateNames(clusters);
+				}
+			}
 		}
 	}
 

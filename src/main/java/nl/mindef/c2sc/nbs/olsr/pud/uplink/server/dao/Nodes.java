@@ -16,13 +16,6 @@ import org.apache.log4j.Logger;
  */
 public interface Nodes {
 	/**
-	 * Get all nodes.<br/>
-	 * 
-	 * @return a list of all nodes, or null when not found
-	 */
-	public List<Node> getAllNodes();
-
-	/**
 	 * Get all clusters
 	 * 
 	 * @param relayServer

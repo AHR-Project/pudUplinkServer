@@ -37,19 +37,6 @@ public class NodesImpl implements Nodes {
 		this.sessionFactory = sessionFactory;
 	}
 
-	@Override
-	@Transactional(readOnly = true)
-	public List<Node> getAllNodes() {
-		@SuppressWarnings("unchecked")
-		List<Node> result = this.sessionFactory.getCurrentSession().createQuery("select node from Node node").list();
-
-		if (result.size() == 0) {
-			return null;
-		}
-
-		return result;
-	}
-
 	private void addToCluster(List<Node> allNodes, Set<Node> clusterLeaders, List<Node> cluster, Node node, boolean up) {
 		assert (allNodes != null);
 		assert (cluster != null);
