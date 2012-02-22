@@ -369,12 +369,22 @@ public class DatabaseLoggerImpl implements DatabaseLogger {
 		this.dotSimpleFileOS.write("digraph SmartGatewayMap {\n".getBytes());
 		this.dotFullFileOS.write("digraph SmartGatewayMap {\n".getBytes());
 		try {
+			int clusterIndex = 1;
 			for (List<Node> cluster : clusters) {
-				for (Node node : cluster) {
-					writeDotNode(this.dotSimpleFileOS, this.dotFullFileOS, node, "  ");
-					if (this.detectDuplicateNames) {
-						addNode2NameMap(nodeName2Nodes, node);
+				String s = ((clusterIndex == 1) ? "" : "\n") + "  subgraph cluster" + clusterIndex++ + " {\n"
+						+ "    style=filled;\n" + "    fillcolor=lightgrey;\n" + "    color=black;\n";
+				this.dotSimpleFileOS.write(s.getBytes());
+				this.dotFullFileOS.write(s.getBytes());
+				try {
+					for (Node node : cluster) {
+						writeDotNode(this.dotSimpleFileOS, this.dotFullFileOS, node, "    ");
+						if (this.detectDuplicateNames) {
+							addNode2NameMap(nodeName2Nodes, node);
+						}
 					}
+				} finally {
+					this.dotSimpleFileOS.write("  }\n".getBytes());
+					this.dotFullFileOS.write("  }\n".getBytes());
 				}
 			}
 		} catch (Exception e) {
