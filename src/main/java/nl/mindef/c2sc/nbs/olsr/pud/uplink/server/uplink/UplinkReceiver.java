@@ -186,10 +186,10 @@ public class UplinkReceiver extends Thread implements StopHandlerConsumer {
 	 */
 	@Override
 	public void run() {
+		initRelayServers();
+
 		this.databaseLoggerTimer.init();
 		this.expireNodesTimer.init();
-
-		initRelayServers();
 
 		byte[] receiveBuffer = new byte[BUFFERSIZE];
 		DatagramPacket packet = new DatagramPacket(receiveBuffer, receiveBuffer.length);
