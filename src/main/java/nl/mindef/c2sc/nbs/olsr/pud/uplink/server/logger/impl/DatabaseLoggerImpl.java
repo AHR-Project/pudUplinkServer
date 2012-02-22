@@ -7,6 +7,7 @@ import java.io.OutputStream;
 import java.nio.channels.FileChannel;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.Formatter;
 import java.util.FormatterClosedException;
 import java.util.IllegalFormatException;
@@ -362,8 +363,10 @@ public class DatabaseLoggerImpl implements DatabaseLogger {
 
 		this.dotSimpleFileOSChannel.position(0);
 		this.dotFullFileOSChannel.position(0);
-		this.dotSimpleFileOS.write("digraph SmartGatewayMap {\n".getBytes());
-		this.dotFullFileOS.write("digraph SmartGatewayMap {\n".getBytes());
+		String header = "digraph SmartGatewayMap {\n" + "  label=\"OLSR SmartGateway Clusters of " + new Date() + "\"\n"
+				+ "  labelloc=t\n" + "  labeljust=l\n";
+		this.dotSimpleFileOS.write(header.getBytes());
+		this.dotFullFileOS.write(header.getBytes());
 		try {
 			if (clusters != null) {
 				if (this.detectDuplicateNames) {
@@ -374,7 +377,7 @@ public class DatabaseLoggerImpl implements DatabaseLogger {
 				int clusterIndex = 1;
 				for (List<Node> cluster : clusters) {
 					String s = ((clusterIndex == 1) ? "" : "\n") + "  subgraph cluster" + clusterIndex++ + " {\n"
-							+ "    style=filled;\n" + "    fillcolor=lightgrey;\n" + "    color=black;\n";
+							+ "    label=\"\";\n" + "    style=filled;\n" + "    fillcolor=lightgrey;\n" + "    color=black;\n";
 					this.dotSimpleFileOS.write(s.getBytes());
 					this.dotFullFileOS.write(s.getBytes());
 					try {
