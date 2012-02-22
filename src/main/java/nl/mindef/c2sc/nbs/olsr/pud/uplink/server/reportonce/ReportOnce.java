@@ -1,8 +1,6 @@
 package nl.mindef.c2sc.nbs.olsr.pud.uplink.server.reportonce;
 
 public interface ReportOnce {
-	static final String SUBJECT_SENDER = "senders";
-
 	/**
 	 * Add a report to a subject
 	 * 
