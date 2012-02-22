@@ -15,13 +15,6 @@ import org.apache.log4j.Logger;
  */
 public interface RelayServers {
 	/**
-	 * Retrieve all RelayServer objects from the database
-	 * 
-	 * @return a list of all RelayServer objects, or null when none found
-	 */
-	public List<RelayServer> getRelayServers();
-
-	/**
 	 * Get the RelayServer with the specified IP address and UDP port, or create a new one and return that one.
 	 * 
 	 * @param ip

@@ -3,7 +3,6 @@ package nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.InetAddress;
-import java.util.List;
 
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.domainmodel.Sender;
 
@@ -14,18 +13,6 @@ import org.apache.log4j.Logger;
  * The Sender DAO
  */
 public interface Senders {
-	/**
-	 * Get a list of senders.<br/>
-	 * <br/>
-	 * Only the senders themselves are retrieved, no linked objects (non-eager fetching)<br/>
-	 * <br/>
-	 * 
-	 * @param ip
-	 *          the IP address of the senders to fetch
-	 * @return a set of senders on the given IP address, or null when none found
-	 */
-	public List<Sender> getSenders(InetAddress ip);
-
 	/**
 	 * Get a sender.<br/>
 	 * <br/>

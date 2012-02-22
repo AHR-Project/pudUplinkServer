@@ -41,20 +41,6 @@ public class RelayServersImpl implements RelayServers {
 	}
 
 	@Override
-	@Transactional(readOnly = true)
-	public List<RelayServer> getRelayServers() {
-		@SuppressWarnings("unchecked")
-		List<RelayServer> result = this.sessionFactory.getCurrentSession().createQuery("select rs from RelayServer rs")
-				.list();
-
-		if (result.size() == 0) {
-			return null;
-		}
-
-		return result;
-	}
-
-	@Override
 	@Transactional
 	public RelayServer getOrAdd(InetAddress ip, int port) {
 		@SuppressWarnings("unchecked")

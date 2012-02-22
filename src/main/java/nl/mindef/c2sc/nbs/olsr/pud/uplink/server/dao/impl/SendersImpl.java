@@ -35,26 +35,6 @@ public class SendersImpl implements Senders {
 
 	@Override
 	@Transactional(readOnly = true)
-	public List<Sender> getSenders(InetAddress ip) {
-		if (ip == null) {
-			return null;
-		}
-
-		@SuppressWarnings("unchecked")
-		List<Sender> result = this.sessionFactory.getCurrentSession()
-				.createQuery("select gw from Sender gw where gw.ip = :ip").setParameter("ip", ip).list();
-
-		if (result.size() == 0) {
-			return null;
-		}
-
-		assert (result.size() == 1);
-
-		return result;
-	}
-
-	@Override
-	@Transactional(readOnly = true)
 	public Sender getSender(InetAddress ip, int port) {
 		if (ip == null) {
 			return null;
