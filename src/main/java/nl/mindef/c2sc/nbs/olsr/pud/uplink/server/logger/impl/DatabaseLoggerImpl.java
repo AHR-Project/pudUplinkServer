@@ -399,11 +399,11 @@ public class DatabaseLoggerImpl implements DatabaseLogger {
 		this.dotSimpleFileOSChannel.truncate(this.dotSimpleFileOSChannel.position());
 		this.dotFullFileOSChannel.truncate(this.dotFullFileOSChannel.position());
 
-		warnOnDuplicateNames(nodeName2Nodes);
-
 		this.logger.debug("Generating SVG file");
 		Runtime.getRuntime().exec("fdp -Tsvg " + this.dotSimpleFile + " -o " + this.svgSimpleFile);
 		Runtime.getRuntime().exec("fdp -Tsvg " + this.dotFullFile + " -o " + this.svgFullFile);
+
+		warnOnDuplicateNames(nodeName2Nodes);
 	}
 
 	@Override
