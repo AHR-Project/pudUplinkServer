@@ -234,103 +234,83 @@ public class DistributorWorkerImpl implements DistributorWorker {
 			 * Cluster Leaders
 			 */
 
-			List<Node> clusterLeaders = this.nodes.getClusterLeaders();
-			if ((clusterLeaders != null) && (clusterLeaders.size() > 0)) {
-				for (Node clusterLeader : clusterLeaders) {
-					InetAddress clusterLeaderMainIp = clusterLeader.getMainIp();
-
-					Sender clusterLeaderSender = clusterLeader.getSender();
-					if (clusterLeaderSender == null) {
-						Node substituteClusterLeader = this.nodes.getSubstituteClusterLeader(clusterLeader);
-						if (substituteClusterLeader == null) {
-							if (this.logger.isDebugEnabled()) {
-								this.logger.info("Cluster leader " + clusterLeaderMainIp.getHostAddress()
-										+ " has no sender and no substitute cluster leader is found: skipped");
-							}
+			List<List<Node>> clusters = this.nodes.getClusters(this.relayServers.getMe());
+			if (clusters != null) {
+				for (List<Node> cluster : clusters) {
+					for (Node clusterLeaderNode : cluster) {
+						Sender clusterLeaderNodeSender = clusterLeaderNode.getSender();
+						if (clusterLeaderNodeSender == null) {
+							this.logger.debug("Cluster leader " + clusterLeaderNode.getMainIp() + " has no sender: skipped");
 							continue;
 						}
 
 						if (this.logger.isDebugEnabled()) {
-							this.logger.info("Cluster leader " + clusterLeaderMainIp.getHostAddress()
-									+ " has no sender: selected substitute cluster leader "
-									+ substituteClusterLeader.getMainIp().getHostAddress());
+							this.logger.debug("*** cluster leader " + clusterLeaderNode.getMainIp().getHostAddress() + " (sender="
+									+ clusterLeaderNodeSender.getIp().getHostAddress() + ":" + clusterLeaderNodeSender.getPort() + ")");
 						}
 
-						clusterLeaderSender = substituteClusterLeader.getSender();
-						if (clusterLeaderSender == null) {
+						if ((this.myIPAddresses.isMe(clusterLeaderNodeSender.getIp()) || this.myIPAddresses.isMe(clusterLeaderNode
+								.getMainIp())) && (clusterLeaderNodeSender.getPort().intValue() == this.uplinkUdpPort)) {
+							/* do not distribute to ourselves */
 							if (this.logger.isDebugEnabled()) {
-								this.logger.info("Substiture cluster leader " + substituteClusterLeader.getMainIp().getHostAddress()
-										+ " has no sender: skipping the cluster.");
+								this.logger.debug("this is me: skipping");
 							}
-							continue;
-						}
-					}
-
-					InetAddress clusterLeaderSenderIp = clusterLeaderSender.getIp();
-					Integer clusterLeaderSenderPort = clusterLeaderSender.getPort();
-
-					if (this.logger.isDebugEnabled()) {
-						this.logger.debug("*** cluster leader " + clusterLeaderMainIp.getHostAddress() + " (sender="
-								+ clusterLeaderSenderIp.getHostAddress() + ":" + clusterLeaderSenderPort + ")");
-					}
-
-					if ((this.myIPAddresses.isMe(clusterLeaderSenderIp) || this.myIPAddresses.isMe(clusterLeaderMainIp))
-							&& (clusterLeaderSenderPort.intValue() == this.uplinkUdpPort)) {
-						/* do not relay to ourselves */
-						if (this.logger.isDebugEnabled()) {
-							this.logger.debug("this is me: skipping");
-						}
-						continue;
-					}
-
-					List<PositionUpdateMsg> p4ds = this.positions.getPositionUpdateMsgForDistribution(this.lastDistributionTime,
-							currentTime, clusterLeader);
-					if ((p4ds == null) || (p4ds.size() == 0)) {
-						if (this.logger.isDebugEnabled()) {
-							this.logger.debug("p4ds EMPTY");
-						}
-						continue;
-					}
-
-					if (this.logger.isDebugEnabled()) {
-						StringBuilder s = new StringBuilder();
-						s.append("p4ds(" + p4ds.size() + ")=");
-						for (PositionUpdateMsg p4d : p4ds) {
-							s.append(" " + p4d.getId());
-						}
-						this.logger.debug(s.toString());
-					}
-
-					List<DatagramPacket> packets = positionUpdateMsgsToPackets(p4ds);
-					if ((packets != null) && (packets.size() > 0)) {
-						StringBuilder s = new StringBuilder();
-						if (this.logger.isDebugEnabled()) {
-							s.setLength(0);
-							s.append("tx " + packets.size() + " packet(s) to " + clusterLeaderMainIp.getHostAddress() + " (sender="
-									+ clusterLeaderSenderIp.getHostAddress() + ":" + clusterLeaderSenderPort + "), sizes=");
+							break;
 						}
 
-						for (DatagramPacket packet : packets) {
+						List<PositionUpdateMsg> p4ds = this.positions.getPositionUpdateMsgForDistribution(
+								this.lastDistributionTime, currentTime, cluster);
+						if ((p4ds == null) || (p4ds.size() == 0)) {
 							if (this.logger.isDebugEnabled()) {
-								s.append(" " + packet.getLength());
+								this.logger.debug("p4ds EMPTY");
 							}
-							packet.setAddress(clusterLeaderSenderIp);
-							packet.setPort(clusterLeaderSenderPort.intValue());
-							try {
-								this.sock.send(packet);
-							} catch (IOException e) {
-								if (this.logger.isDebugEnabled()) {
-									s.append(" ERROR:" + e.getLocalizedMessage());
-									this.logger.debug(s.toString());
-								}
-								this.logger.error("Could not send to cluster leader " + clusterLeaderMainIp + " (sender="
-										+ clusterLeaderSenderIp.getHostAddress() + ":" + clusterLeaderSenderPort + ") : "
-										+ e.getLocalizedMessage());
-							}
+							break;
 						}
+
 						if (this.logger.isDebugEnabled()) {
+							StringBuilder s = new StringBuilder();
+							s.append("p4ds(" + p4ds.size() + ")=");
+							for (PositionUpdateMsg p4d : p4ds) {
+								s.append(" " + p4d.getId());
+							}
 							this.logger.debug(s.toString());
 						}
+
+						List<DatagramPacket> packets = positionUpdateMsgsToPackets(p4ds);
+						if ((packets != null) && (packets.size() > 0)) {
+							StringBuilder s = new StringBuilder();
+							if (this.logger.isDebugEnabled()) {
+								s.setLength(0);
+								s.append("tx " + packets.size() + " packet(s) to " + clusterLeaderNode.getMainIp().getHostAddress()
+										+ " (sender=" + clusterLeaderNodeSender.getIp().getHostAddress() + ":"
+										+ clusterLeaderNodeSender.getPort() + "), sizes=");
+							}
+
+							for (DatagramPacket packet : packets) {
+								if (this.logger.isDebugEnabled()) {
+									s.append(" " + packet.getLength());
+								}
+								packet.setAddress(clusterLeaderNodeSender.getIp());
+								packet.setPort(clusterLeaderNodeSender.getPort().intValue());
+								try {
+									this.sock.send(packet);
+								} catch (IOException e) {
+									if (this.logger.isDebugEnabled()) {
+										s.append(" ERROR:" + e.getLocalizedMessage());
+										this.logger.debug(s.toString());
+									}
+									this.logger.error("Could not send to cluster leader "
+											+ clusterLeaderNode.getMainIp().getHostAddress() + " (sender="
+											+ clusterLeaderNodeSender.getIp().getHostAddress() + ":" + clusterLeaderNodeSender.getPort()
+											+ ") : " + e.getLocalizedMessage());
+								}
+							}
+							if (this.logger.isDebugEnabled()) {
+								this.logger.debug(s.toString());
+							}
+						}
+
+						break;
 					}
 				}
 			}

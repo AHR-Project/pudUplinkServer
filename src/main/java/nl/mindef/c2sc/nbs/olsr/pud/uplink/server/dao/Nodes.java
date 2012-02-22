@@ -63,46 +63,6 @@ public interface Nodes {
 	public boolean removeExpiredNodes();
 
 	/**
-	 * Get a list of all cluster leaders.<br/>
-	 * <br/>
-	 * Only the cluster leader nodes themselves are retrieved along with their senders (eager), no _other_ linked objects
-	 * (non-eager fetching) <br/>
-	 * <br/>
-	 * 
-	 * A cluster leader is:
-	 * <ul>
-	 * <li>a node that points to itself as a cluster leader</li>
-	 * <li>a node that points to another node that does not point to itself as a cluster leader</li>
-	 * </ul>
-	 * When clusterLeadersIncludesTransitionalNodes is true, then a cluster leader also is:
-	 * <ul>
-	 * <li>a node of which the cluster leader does not point to itself</li>
-	 * </ul>
-	 * 
-	 * 
-	 * @return a list of all cluster leader nodes, or null when not found
-	 */
-	public List<Node> getClusterLeaders();
-
-	/**
-	 * Get a substitute cluster leader for a given cluster leader.<br/>
-	 * <br/>
-	 * Only the substitute cluster leader node is retrieved along with its sender (eager), no _other_ linked objects
-	 * (non-eager fetching)<br/>
-	 * <br/>
-	 * The substitute cluster leader is:
-	 * <ul>
-	 * <li>a node that is in the same cluster as the cluster leader, but is not the cluster leader itself</li>
-	 * <li>a node that has a valid Sender</li>
-	 * </ul>
-	 * 
-	 * @param clusterLeader
-	 *          the cluster leader for which a substitute is sought
-	 * @return the substitute cluster leader, or null when not found
-	 */
-	public Node getSubstituteClusterLeader(Node clusterLeader);
-
-	/**
 	 * Log the printout of the Node objects
 	 * 
 	 * @param logger

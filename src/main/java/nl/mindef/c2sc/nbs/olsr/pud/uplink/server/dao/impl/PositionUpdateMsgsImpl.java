@@ -2,6 +2,7 @@ package nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.impl;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.LinkedList;
 import java.util.List;
 
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.PositionUpdateMsgs;
@@ -32,23 +33,39 @@ public class PositionUpdateMsgsImpl implements PositionUpdateMsgs {
 
 	@Override
 	@Transactional(readOnly = true)
-	public List<PositionUpdateMsg> getPositionUpdateMsgForDistribution(long startTime, long endTime, Node clusterLeader) {
+	@SuppressWarnings("unchecked")
+	public List<PositionUpdateMsg> getPositionUpdateMsgForDistribution(long startTime, long endTime, List<Node> cluster) {
 		if (startTime >= endTime) {
 			return null;
 		}
 
-		@SuppressWarnings("unchecked")
-		List<PositionUpdateMsg> result = this.sessionFactory
-				.getCurrentSession()
-				.createQuery(
-						"select pu from PositionUpdateMsg pu where"
-								/* receptionTime in <startTime, endTime] */
-								+ " pu.receptionTime > :startTime and pu.receptionTime <= :endTime"
-								/* the cluster leader of the node is not the specified cluster leader */
-								+ ((clusterLeader == null) ? "" : " and pu.node.clusterLeaderMsg is not null"
-										+ " and pu.node.clusterLeaderMsg.clusterLeaderNode.id != :clId")).setLong("startTime", startTime)
-				.setLong("endTime", endTime)
-				.setLong("clId", ((clusterLeader == null) ? -1 : clusterLeader.getId().longValue())).list();
+		List<PositionUpdateMsg> result;
+		if (cluster == null) {
+			result = this.sessionFactory.getCurrentSession().createQuery("select pu from PositionUpdateMsg pu where"
+			/* receptionTime in <startTime, endTime] */
+			+ " pu.receptionTime > :startTime and pu.receptionTime <= :endTime").setLong("startTime", startTime)
+					.setLong("endTime", endTime).list();
+		} else {
+			List<Long> clusterLeaderIds = new LinkedList<Long>();
+			for (Node clusterNode : cluster) {
+				if (clusterNode.getClusterNodes().size() == 0) {
+					break;
+				}
+				clusterLeaderIds.add(clusterNode.getId());
+			}
+
+			result = this.sessionFactory
+					.getCurrentSession()
+					.createQuery(
+							"select pu from PositionUpdateMsg pu where"
+							/* receptionTime in <startTime, endTime] */
+							+ " pu.receptionTime > :startTime and pu.receptionTime <= :endTime"
+							/* the cluster leader of the position update node is not one of the cluster leaders */
+							+ " and pu.node.clusterLeaderMsg is not null"
+									+ " and pu.node.clusterLeaderMsg.clusterLeaderNode.id not in (:cluster)")
+					.setLong("startTime", startTime).setLong("endTime", endTime).setParameterList("cluster", clusterLeaderIds)
+					.list();
+		}
 
 		if (result.size() == 0) {
 			return null;

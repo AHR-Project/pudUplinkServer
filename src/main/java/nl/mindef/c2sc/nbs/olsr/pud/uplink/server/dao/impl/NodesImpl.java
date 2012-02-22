@@ -204,49 +204,6 @@ public class NodesImpl implements Nodes {
 	}
 
 	@Override
-	@Transactional(readOnly = true)
-	public List<Node> getClusterLeaders() {
-		@SuppressWarnings("unchecked")
-		List<Node> result = this.sessionFactory.getCurrentSession().createQuery(
-		/* get nodes and their senders (eagerly fetched) */
-		"select node from Node node left join node.sender where"
-		/* node has cluster nodes */
-		+ " node.clusterNodes is not empty" + " order by node.mainIp").list();
-		if (result.size() == 0) {
-			return null;
-		}
-
-		return result;
-	}
-
-	@Override
-	@Transactional(readOnly = true)
-	public Node getSubstituteClusterLeader(Node clusterLeader) {
-		assert (clusterLeader != null);
-		long clId = clusterLeader.getId().longValue();
-
-		@SuppressWarnings("unchecked")
-		List<Node> result = this.sessionFactory
-				.getCurrentSession()
-				.createQuery(
-						/* get nodes and their senders (eagerly fetched) */
-						"select node from Node node left join node.sender where"
-						/* node is not the cluster leader itself and node points to the cluster leader */
-						+ " node.id != :clId"
-								+ " and node.clusterLeaderMsg is not null and node.clusterLeaderMsg.clusterLeaderNode.id = :clId"
-								/* node has a valid sender (a sender always has a valid IP address and a valid port) */
-								+ " and node.sender is not null "
-								/* keep the node with the most recently received cluster leader message on top of the list */
-								+ "order by node.clusterLeaderMsg.receptionTime desc").setLong("clId", clId).list();
-
-		if (result.size() == 0) {
-			return null;
-		}
-
-		return result.get(0);
-	}
-
-	@Override
 	@Transactional
 	public void saveNode(Node node) {
 		this.sessionFactory.getCurrentSession().saveOrUpdate(node);
