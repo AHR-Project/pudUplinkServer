@@ -272,13 +272,6 @@ public class DatabaseLoggerImpl implements DatabaseLogger {
 		}
 	}
 
-	protected class NodeNameComparatorOnNameOrIp implements Comparator<Node> {
-		@Override
-		public int compare(Node o1, Node o2) {
-			return getNodeNameOrIp(o1).compareTo(getNodeNameOrIp(o2));
-		}
-	}
-
 	private static void addNode2NameMap(Map<String, List<Node>> nodeName2Nodes, Node node) {
 		assert (nodeName2Nodes != null);
 		assert (node != null);
