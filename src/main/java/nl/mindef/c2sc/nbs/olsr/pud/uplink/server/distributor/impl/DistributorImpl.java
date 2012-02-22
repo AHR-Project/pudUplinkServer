@@ -53,7 +53,7 @@ public class DistributorImpl implements Distributor, StopHandlerConsumer {
 		 * @param signaledUpdates
 		 *          the updates counter
 		 */
-		public DistributionTimerTask(Logger logger, DistributorWorker distributorWorker, AtomicInteger signaledUpdates) {
+		protected DistributionTimerTask(Logger logger, DistributorWorker distributorWorker, AtomicInteger signaledUpdates) {
 			super();
 			this.logger = logger;
 			this.distributorWorker = distributorWorker;
