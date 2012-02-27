@@ -11,6 +11,7 @@
 		<property name="packetMaxSize" value="${distribution.packet.max.size}" />
 		<property name="positions" ref="PositionUpdateMsgs" />
 		<property name="relayServers" ref="RelayServers" />
+		<property name="txChecker" ref="TxChecker" />
 		<property name="uplinkUdpPort" value="${uplink.listener.udp.port}" />
 	</bean>
 

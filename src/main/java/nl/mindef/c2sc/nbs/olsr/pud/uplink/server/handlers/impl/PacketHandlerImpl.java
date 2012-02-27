@@ -7,6 +7,7 @@ import java.util.Arrays;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.Senders;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.domainmodel.RelayServer;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.domainmodel.Sender;
+import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.util.TxChecker;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.handlers.ClusterLeaderHandler;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.handlers.PacketHandler;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.handlers.PositionUpdateHandler;
@@ -88,9 +89,26 @@ public class PacketHandlerImpl implements PacketHandler {
 	 * end fake
 	 */
 
+	private TxChecker txChecker;
+
+	/**
+	 * @param txChecker
+	 *          the txChecker to set
+	 */
+	@Required
+	public final void setTxChecker(TxChecker txChecker) {
+		this.txChecker = txChecker;
+	}
+
 	@Override
 	@Transactional
 	public boolean processPacket(RelayServer relayServer, DatagramPacket packet) {
+		try {
+			this.txChecker.checkInTx("PacketHandler::processPacket");
+		} catch (Throwable e) {
+			e.printStackTrace();
+		}
+
 		long utcTimestamp = System.currentTimeMillis();
 		boolean updated = false;
 

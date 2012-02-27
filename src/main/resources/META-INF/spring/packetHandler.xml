@@ -9,6 +9,7 @@
 		<property name="faker" ref="Faker" />
 		<property name="senders" ref="Senders" />
 		<property name="positionUpdateHandler" ref="PositionUpdateHandler" />
+		<property name="txChecker" ref="TxChecker" />
 		<property name="useFaker" value="${faker.use}" />
 	</bean>
 

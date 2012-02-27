@@ -14,6 +14,7 @@ import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.Nodes;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.domainmodel.ClusterLeaderMsg;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.domainmodel.Node;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.domainmodel.RelayServer;
+import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.util.TxChecker;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -35,6 +36,17 @@ public class NodesImpl implements Nodes {
 	@Required
 	public final void setSessionFactory(SessionFactory sessionFactory) {
 		this.sessionFactory = sessionFactory;
+	}
+
+	private TxChecker txChecker;
+
+	/**
+	 * @param txChecker
+	 *          the txChecker to set
+	 */
+	@Required
+	public final void setTxChecker(TxChecker txChecker) {
+		this.txChecker = txChecker;
 	}
 
 	private void addToCluster(List<Node> allNodes, Set<Node> clusterLeaders, List<Node> cluster, Node node, boolean up) {
@@ -135,6 +147,12 @@ public class NodesImpl implements Nodes {
 	@Transactional(readOnly = true)
 	@SuppressWarnings("unchecked")
 	public List<List<Node>> getClusters(RelayServer relayServer) {
+		try {
+			this.txChecker.checkInTx("Nodes::getClusters");
+		} catch (Throwable e) {
+			e.printStackTrace();
+		}
+
 		List<Node> allNodes = null;
 		if (relayServer == null) {
 			allNodes = this.sessionFactory.getCurrentSession()
@@ -173,6 +191,12 @@ public class NodesImpl implements Nodes {
 	@Override
 	@Transactional(readOnly = true)
 	public Node getNode(InetAddress mainIp) {
+		try {
+			this.txChecker.checkInTx("Nodes::getNode");
+		} catch (Throwable e) {
+			e.printStackTrace();
+		}
+
 		if (mainIp == null) {
 			return null;
 		}
@@ -193,12 +217,24 @@ public class NodesImpl implements Nodes {
 	@Override
 	@Transactional
 	public void saveNode(Node node) {
+		try {
+			this.txChecker.checkInTx("Nodes::saveNode");
+		} catch (Throwable e) {
+			e.printStackTrace();
+		}
+
 		this.sessionFactory.getCurrentSession().saveOrUpdate(node);
 	}
 
 	@Override
 	@Transactional
 	public boolean removeExpiredNodes() {
+		try {
+			this.txChecker.checkInTx("Nodes::removeExpiredNodes");
+		} catch (Throwable e) {
+			e.printStackTrace();
+		}
+
 		@SuppressWarnings("unchecked")
 		List<Node> result = this.sessionFactory
 				.getCurrentSession()
@@ -238,6 +274,12 @@ public class NodesImpl implements Nodes {
 	@Override
 	@Transactional(readOnly = true)
 	public void log(Logger log, Level level) {
+		try {
+			this.txChecker.checkInTx("Nodes::log");
+		} catch (Throwable e) {
+			e.printStackTrace();
+		}
+
 		if (log.isEnabledFor(level)) {
 			log.log(level, getNodesDump());
 		}
@@ -246,6 +288,12 @@ public class NodesImpl implements Nodes {
 	@Override
 	@Transactional(readOnly = true)
 	public void print(OutputStream out) throws IOException {
+		try {
+			this.txChecker.checkInTx("Nodes::print");
+		} catch (Throwable e) {
+			e.printStackTrace();
+		}
+
 		String s = getNodesDump();
 		out.write(s.getBytes(), 0, s.length());
 	}

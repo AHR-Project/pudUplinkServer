@@ -7,6 +7,7 @@ import java.util.List;
 
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.RelayServers;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.domainmodel.RelayServer;
+import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.util.TxChecker;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -40,9 +41,26 @@ public class RelayServersImpl implements RelayServers {
 		this.uplinkUdpPort = uplinkUdpPort;
 	}
 
+	private TxChecker txChecker;
+
+	/**
+	 * @param txChecker
+	 *          the txChecker to set
+	 */
+	@Required
+	public final void setTxChecker(TxChecker txChecker) {
+		this.txChecker = txChecker;
+	}
+
 	@Override
 	@Transactional
 	public RelayServer getOrAdd(InetAddress ip, int port) {
+		try {
+			this.txChecker.checkInTx("RelayServers::getOrAdd");
+		} catch (Throwable e) {
+			e.printStackTrace();
+		}
+
 		@SuppressWarnings("unchecked")
 		List<RelayServer> result = this.sessionFactory.getCurrentSession()
 				.createQuery("select rs from RelayServer rs where rs.ip = :ip and rs.port = :port").setParameter("ip", ip)
@@ -62,6 +80,12 @@ public class RelayServersImpl implements RelayServers {
 	@Override
 	@Transactional(readOnly = true)
 	public List<RelayServer> getOtherRelayServers() {
+		try {
+			this.txChecker.checkInTx("RelayServers::getOtherRelayServers");
+		} catch (Throwable e) {
+			e.printStackTrace();
+		}
+
 		/* getMe() usage: we are already in a transaction, so ok */
 		@SuppressWarnings("unchecked")
 		List<RelayServer> result = this.sessionFactory.getCurrentSession()
@@ -78,6 +102,12 @@ public class RelayServersImpl implements RelayServers {
 	@Override
 	@Transactional
 	public void addRelayServer(RelayServer relayServer) {
+		try {
+			this.txChecker.checkInTx("RelayServers::addRelayServer");
+		} catch (Throwable e) {
+			e.printStackTrace();
+		}
+
 		this.sessionFactory.getCurrentSession().saveOrUpdate(relayServer);
 	}
 
@@ -97,6 +127,12 @@ public class RelayServersImpl implements RelayServers {
 	@Override
 	@Transactional
 	public RelayServer getMe() {
+		try {
+			this.txChecker.checkInTx("RelayServers::getMe");
+		} catch (Throwable e) {
+			e.printStackTrace();
+		}
+
 		@SuppressWarnings("unchecked")
 		List<RelayServer> result = this.sessionFactory.getCurrentSession()
 				.createQuery("select rs from RelayServer rs where rs.ip = :ip and rs.port = :port").setParameter("ip", myIp)
@@ -126,6 +162,12 @@ public class RelayServersImpl implements RelayServers {
 	@Override
 	@Transactional(readOnly = true)
 	public void log(Logger logger, Level level) {
+		try {
+			this.txChecker.checkInTx("RelayServers::log");
+		} catch (Throwable e) {
+			e.printStackTrace();
+		}
+
 		if (logger.isEnabledFor(level)) {
 			logger.log(level, getRelayServersDump());
 		}
@@ -134,6 +176,12 @@ public class RelayServersImpl implements RelayServers {
 	@Override
 	@Transactional(readOnly = true)
 	public void print(OutputStream out) throws IOException {
+		try {
+			this.txChecker.checkInTx("RelayServers::print");
+		} catch (Throwable e) {
+			e.printStackTrace();
+		}
+
 		String s = getRelayServersDump();
 		out.write(s.getBytes(), 0, s.length());
 	}

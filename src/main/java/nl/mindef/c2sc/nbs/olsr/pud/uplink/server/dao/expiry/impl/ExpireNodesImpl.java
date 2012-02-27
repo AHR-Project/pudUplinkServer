@@ -5,6 +5,7 @@ import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.Nodes;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.PositionUpdateMsgs;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.Senders;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.expiry.ExpireNodes;
+import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.util.TxChecker;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Required;
@@ -78,9 +79,26 @@ public class ExpireNodesImpl implements ExpireNodes {
 		this.senders = senders;
 	}
 
+	private TxChecker txChecker;
+
+	/**
+	 * @param txChecker
+	 *          the txChecker to set
+	 */
+	@Required
+	public final void setTxChecker(TxChecker txChecker) {
+		this.txChecker = txChecker;
+	}
+
 	@Override
 	@Transactional
 	public void expire() {
+		try {
+			this.txChecker.checkInTx("ExpireNodes::expire");
+		} catch (Throwable e) {
+			e.printStackTrace();
+		}
+
 		if (this.logger.isDebugEnabled()) {
 			this.logger.debug("************************** expiry");
 		}

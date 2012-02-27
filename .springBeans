@@ -11,6 +11,7 @@
 		<config>src/main/resources/META-INF/spring/application-context.xml</config>
 		<config>src/main/resources/META-INF/spring/stopHandler.xml</config>
 		<config>src/main/resources/META-INF/spring/hibernate.xml</config>
+		<config>src/main/resources/META-INF/spring/txChecker.xml</config>
 		<config>src/main/resources/META-INF/spring/uplinkReceiver.xml</config>
 		<config>src/main/resources/META-INF/spring/packetHandler.xml</config>
 		<config>src/main/resources/META-INF/spring/positionUpdateHandler.xml</config>

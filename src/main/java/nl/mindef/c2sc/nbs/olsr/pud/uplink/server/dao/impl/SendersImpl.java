@@ -10,6 +10,7 @@ import java.util.List;
 
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.Senders;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.domainmodel.Sender;
+import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.util.TxChecker;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -33,9 +34,26 @@ public class SendersImpl implements Senders {
 		this.sessionFactory = sessionFactory;
 	}
 
+	private TxChecker txChecker;
+
+	/**
+	 * @param txChecker
+	 *          the txChecker to set
+	 */
+	@Required
+	public final void setTxChecker(TxChecker txChecker) {
+		this.txChecker = txChecker;
+	}
+
 	@Override
 	@Transactional(readOnly = true)
 	public Sender getSender(InetAddress ip, int port) {
+		try {
+			this.txChecker.checkInTx("Senders::getSender");
+		} catch (Throwable e) {
+			e.printStackTrace();
+		}
+
 		if (ip == null) {
 			return null;
 		}
@@ -57,12 +75,24 @@ public class SendersImpl implements Senders {
 	@Override
 	@Transactional
 	public void saveSender(Sender sender) {
+		try {
+			this.txChecker.checkInTx("Senders::saveSender");
+		} catch (Throwable e) {
+			e.printStackTrace();
+		}
+
 		this.sessionFactory.getCurrentSession().saveOrUpdate(sender);
 	}
 
 	@Override
 	@Transactional
 	public boolean removeExpiredSenders() {
+		try {
+			this.txChecker.checkInTx("Senders::removeExpiredSenders");
+		} catch (Throwable e) {
+			e.printStackTrace();
+		}
+
 		@SuppressWarnings("unchecked")
 		List<Sender> result = this.sessionFactory.getCurrentSession()
 				.createQuery("select sender from Sender sender where size(nodes) = 0").list();
@@ -99,6 +129,12 @@ public class SendersImpl implements Senders {
 	@Override
 	@Transactional(readOnly = true)
 	public void log(Logger log, Level level) {
+		try {
+			this.txChecker.checkInTx("Senders::log");
+		} catch (Throwable e) {
+			e.printStackTrace();
+		}
+
 		if (log.isEnabledFor(level)) {
 			log.log(level, getSendersDump());
 		}
@@ -107,6 +143,12 @@ public class SendersImpl implements Senders {
 	@Override
 	@Transactional(readOnly = true)
 	public void print(OutputStream out) throws IOException {
+		try {
+			this.txChecker.checkInTx("Senders::print");
+		} catch (Throwable e) {
+			e.printStackTrace();
+		}
+
 		String s = getSendersDump();
 		out.write(s.getBytes(), 0, s.length());
 	}

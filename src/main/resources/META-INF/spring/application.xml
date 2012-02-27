@@ -16,6 +16,7 @@
 	<import resource="classpath:META-INF/spring/stopHandler.xml" />
 
 	<import resource="classpath:META-INF/spring/hibernate.xml" />
+	<import resource="classpath:META-INF/spring/txChecker.xml" />
 	<import resource="classpath:META-INF/spring/senders.xml" />
 	<import resource="classpath:META-INF/spring/nodes.xml" />
 	<import resource="classpath:META-INF/spring/positionUpdateMsgs.xml" />

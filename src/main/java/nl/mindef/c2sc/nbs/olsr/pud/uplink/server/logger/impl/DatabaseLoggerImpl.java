@@ -25,6 +25,7 @@ import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.domainmodel.ClusterLeaderMs
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.domainmodel.Node;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.domainmodel.PositionUpdateMsg;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.domainmodel.Sender;
+import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.util.TxChecker;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.logger.DatabaseLogger;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.reportonce.ReportOnce;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.reportonce.ReportSubject;
@@ -184,6 +185,17 @@ public class DatabaseLoggerImpl implements DatabaseLogger {
 	@Required
 	public final void setReportOnce(ReportOnce reportOnce) {
 		this.reportOnce = reportOnce;
+	}
+
+	private TxChecker txChecker;
+
+	/**
+	 * @param txChecker
+	 *          the txChecker to set
+	 */
+	@Required
+	public final void setTxChecker(TxChecker txChecker) {
+		this.txChecker = txChecker;
 	}
 
 	/*
@@ -408,6 +420,12 @@ public class DatabaseLoggerImpl implements DatabaseLogger {
 	@Override
 	@Transactional(readOnly = true)
 	public void logit() throws IOException {
+		try {
+			this.txChecker.checkInTx("DatabaseLogger::logit");
+		} catch (Throwable e) {
+			e.printStackTrace();
+		}
+
 		this.databaseLogFileOSChannel.position(0);
 
 		this.logger.debug("Writing database logfile");
@@ -494,6 +512,12 @@ public class DatabaseLoggerImpl implements DatabaseLogger {
 	@Override
 	@Transactional(readOnly = true)
 	public void log(Logger log, Level level) {
+		try {
+			this.txChecker.checkInTx("DatabaseLogger::log");
+		} catch (Throwable e) {
+			e.printStackTrace();
+		}
+
 		try {
 			this.relayServers.log(log, level);
 			this.senders.log(log, level);

@@ -3,9 +3,9 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
-	<bean id="ClusterLeaderMsgs" class="nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.impl.ClusterLeaderMsgsImpl">
+	<bean id="TxChecker"
+		class="nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.util.TxChecker">
 		<property name="sessionFactory" ref="sessionFactory" />
-		<property name="txChecker" ref="TxChecker" />
 	</bean>
 
 </beans>

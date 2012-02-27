@@ -8,6 +8,7 @@ import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.Senders;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.domainmodel.ClusterLeaderMsg;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.domainmodel.Node;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.domainmodel.Sender;
+import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.util.TxChecker;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.handlers.ClusterLeaderHandler;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.handlers.WireFormatChecker;
 
@@ -65,9 +66,26 @@ public class ClusterLeaderHandlerImpl implements ClusterLeaderHandler {
 		this.wireFormatChecker = wireFormatChecker;
 	}
 
+	private TxChecker txChecker;
+
+	/**
+	 * @param txChecker
+	 *          the txChecker to set
+	 */
+	@Required
+	public final void setTxChecker(TxChecker txChecker) {
+		this.txChecker = txChecker;
+	}
+
 	@Override
 	@Transactional
 	public boolean handleClusterLeaderMessage(Sender sender, long utcTimestamp, ClusterLeader clMsg) {
+		try {
+			this.txChecker.checkInTx("ClusterLeaderHandler::handleClusterLeaderMessage");
+		} catch (Throwable e) {
+			e.printStackTrace();
+		}
+
 		assert (clMsg != null);
 		assert (sender != null);
 

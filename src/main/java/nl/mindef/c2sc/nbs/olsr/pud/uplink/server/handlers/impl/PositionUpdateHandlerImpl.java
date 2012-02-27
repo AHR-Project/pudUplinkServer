@@ -8,6 +8,7 @@ import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.Senders;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.domainmodel.Node;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.domainmodel.PositionUpdateMsg;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.domainmodel.Sender;
+import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.util.TxChecker;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.handlers.PositionUpdateHandler;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.handlers.WireFormatChecker;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.util.TimeZoneUtil;
@@ -66,9 +67,26 @@ public class PositionUpdateHandlerImpl implements PositionUpdateHandler {
 		this.wireFormatChecker = wireFormatChecker;
 	}
 
+	private TxChecker txChecker;
+
+	/**
+	 * @param txChecker
+	 *          the txChecker to set
+	 */
+	@Required
+	public final void setTxChecker(TxChecker txChecker) {
+		this.txChecker = txChecker;
+	}
+
 	@Override
 	@Transactional
 	public boolean handlePositionMessage(Sender sender, long utcTimestamp, PositionUpdate puMsg) {
+		try {
+			this.txChecker.checkInTx("PositionUpdateHandler::handlePositionMessage");
+		} catch (Throwable e) {
+			e.printStackTrace();
+		}
+
 		assert (puMsg != null);
 		assert (sender != null);
 

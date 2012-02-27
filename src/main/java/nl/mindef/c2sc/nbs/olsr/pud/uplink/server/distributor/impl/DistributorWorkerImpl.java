@@ -16,6 +16,7 @@ import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.domainmodel.Node;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.domainmodel.PositionUpdateMsg;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.domainmodel.RelayServer;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.domainmodel.Sender;
+import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.util.TxChecker;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.distributor.DistributorWorker;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.util.MyIPAddresses;
 
@@ -97,6 +98,17 @@ public class DistributorWorkerImpl implements DistributorWorker {
 		this.relayServers = relayServers;
 	}
 
+	private TxChecker txChecker;
+
+	/**
+	 * @param txChecker
+	 *          the txChecker to set
+	 */
+	@Required
+	public final void setTxChecker(TxChecker txChecker) {
+		this.txChecker = txChecker;
+	}
+
 	public void init() throws IOException {
 		this.sock = new DatagramSocket(null);
 		this.sock.setReuseAddress(true);
@@ -167,6 +179,12 @@ public class DistributorWorkerImpl implements DistributorWorker {
 	@Override
 	@Transactional(readOnly = true)
 	public void distribute(AtomicInteger signaledUpdates) {
+		try {
+			this.txChecker.checkInTx("DistributorWorker::distribute");
+		} catch (Throwable e) {
+			e.printStackTrace();
+		}
+
 		while (signaledUpdates.getAndSet(0) > 0) {
 			long currentTime = System.currentTimeMillis();
 

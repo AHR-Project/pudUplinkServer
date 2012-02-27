@@ -8,6 +8,7 @@
 		<property name="senders" ref="Senders" />
 		<property name="nodes" ref="Nodes" />
 		<property name="positions" ref="PositionUpdateMsgs" />
+		<property name="txChecker" ref="TxChecker" />
 		<property name="wireFormatChecker" ref="WireFormatChecker" />
 	</bean>
 

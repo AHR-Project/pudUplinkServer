@@ -6,6 +6,7 @@
 	<bean id="Senders"
 		class="nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.impl.SendersImpl">
 		<property name="sessionFactory" ref="sessionFactory" />
+		<property name="txChecker" ref="TxChecker" />
 	</bean>
 
 </beans>
