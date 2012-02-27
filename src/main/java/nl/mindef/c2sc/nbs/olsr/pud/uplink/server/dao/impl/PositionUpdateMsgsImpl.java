@@ -47,12 +47,15 @@ public class PositionUpdateMsgsImpl implements PositionUpdateMsgs {
 					.setLong("endTime", endTime).list();
 		} else {
 			List<Long> clusterLeaderIds = new LinkedList<Long>();
+			boolean first = true;
 			for (Node clusterNode : cluster) {
-				if (clusterNode.getClusterNodes().size() == 0) {
+				if (!first && (clusterNode.getClusterNodes().size() == 0)) {
 					break;
 				}
 				clusterLeaderIds.add(clusterNode.getId());
+				first = false;
 			}
+			assert (clusterLeaderIds.size() > 0);
 
 			result = this.sessionFactory
 					.getCurrentSession()
