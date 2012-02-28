@@ -23,10 +23,10 @@
 	</bean>
 
 	<bean id="DatabaseLoggerTimer"
-		class="nl.mindef.c2sc.nbs.olsr.pud.uplink.server.logger.DatabaseLoggerTimer"
-		destroy-method="uninit">
+		class="nl.mindef.c2sc.nbs.olsr.pud.uplink.server.logger.DatabaseLoggerTimer">
 		<property name="databaseLogger" ref="DatabaseLogger" />
 		<property name="interval" value="${database.logger.updateintervalms}" />
+		<property name="timer" ref="Timer" />
 	</bean>
 
 </beans>

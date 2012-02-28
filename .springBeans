@@ -10,6 +10,7 @@
 		<config>src/main/resources/META-INF/spring/application.xml</config>
 		<config>src/main/resources/META-INF/spring/application-context.xml</config>
 		<config>src/main/resources/META-INF/spring/stopHandler.xml</config>
+		<config>src/main/resources/META-INF/spring/timer.xml</config>
 		<config>src/main/resources/META-INF/spring/hibernate.xml</config>
 		<config>src/main/resources/META-INF/spring/txChecker.xml</config>
 		<config>src/main/resources/META-INF/spring/uplinkReceiver.xml</config>

@@ -3,12 +3,10 @@ package nl.mindef.c2sc.nbs.olsr.pud.uplink.server.reportonce;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.signals.StopHandlerConsumer;
-
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Required;
 
-public class ReportOnceTimer implements StopHandlerConsumer {
+public class ReportOnceTimer {
 	private Logger logger = Logger.getLogger(this.getClass().getName());
 
 	private ReportOnce reportOnce;
@@ -44,6 +42,18 @@ public class ReportOnceTimer implements StopHandlerConsumer {
 	@Required
 	public void setIntervalDuplicateNames(long intervalDuplicateNames) {
 		this.intervalDuplicateNames = intervalDuplicateNames;
+	}
+
+	/** the timer from which the expiry task runs */
+	private Timer timer;
+
+	/**
+	 * @param timer
+	 *          the timer to set
+	 */
+	@Required
+	public final void setTimer(Timer timer) {
+		this.timer = timer;
 	}
 
 	/**
@@ -87,15 +97,10 @@ public class ReportOnceTimer implements StopHandlerConsumer {
 	 * Main
 	 */
 
-	/** the timer from which the expiry task runs */
-	private Timer timer = null;
-
 	public void init() {
 		if ((this.intervalWireFormat <= 0) && (this.intervalDuplicateNames <= 0)) {
 			return;
 		}
-
-		this.timer = new Timer(this.getClass().getSimpleName());
 
 		if (this.intervalWireFormat > 0) {
 			this.timer.scheduleAtFixedRate(
@@ -109,15 +114,6 @@ public class ReportOnceTimer implements StopHandlerConsumer {
 	}
 
 	public void uninit() {
-		if (this.timer != null) {
-			this.timer.cancel();
-			this.timer = null;
-		}
 		this.reportOnce.flush(null, null);
-	}
-
-	@Override
-	public void signalStop() {
-		uninit();
 	}
 }

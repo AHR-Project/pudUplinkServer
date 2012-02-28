@@ -6,12 +6,11 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.distributor.Distributor;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.distributor.DistributorWorker;
-import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.signals.StopHandlerConsumer;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Required;
 
-public class DistributorImpl implements Distributor, StopHandlerConsumer {
+public class DistributorImpl implements Distributor {
 	private Logger logger = Logger.getLogger(this.getClass().getName());
 
 	private DistributorWorker distributorWorker;
@@ -33,6 +32,17 @@ public class DistributorImpl implements Distributor, StopHandlerConsumer {
 	 */
 	public final void setDistributionDelay(long distributionDelay) {
 		this.distributionDelay = distributionDelay;
+	}
+
+	private Timer timer;
+
+	/**
+	 * @param timer
+	 *          the timer to set
+	 */
+	@Required
+	public final void setTimer(Timer timer) {
+		this.timer = timer;
 	}
 
 	protected class DistributionTimerTask extends TimerTask {
@@ -70,23 +80,6 @@ public class DistributorImpl implements Distributor, StopHandlerConsumer {
 		}
 	}
 
-	public void init() {
-		this.timer = new Timer(this.getClass().getSimpleName() + "-Timer");
-	}
-
-	public void uninit() {
-		signalStop();
-	}
-
-	@Override
-	public void signalStop() {
-		if (this.timer != null) {
-			this.timer.cancel();
-			this.timer = null;
-		}
-	}
-
-	private Timer timer = null;
 	private AtomicInteger signaledUpdates = new AtomicInteger(0);
 
 	@Override

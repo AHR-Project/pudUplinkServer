@@ -3,12 +3,10 @@ package nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.expiry;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.signals.StopHandlerConsumer;
-
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Required;
 
-public class ExpireNodesTimer implements StopHandlerConsumer {
+public class ExpireNodesTimer {
 	private Logger logger = Logger.getLogger(this.getClass().getName());
 
 	private ExpireNodes expireNodes;
@@ -32,6 +30,18 @@ public class ExpireNodesTimer implements StopHandlerConsumer {
 	@Required
 	public void setInterval(long interval) {
 		this.interval = interval;
+	}
+
+	/** the timer from which the expiry task runs */
+	private Timer timer;
+
+	/**
+	 * @param timer
+	 *          the timer to set
+	 */
+	@Required
+	public final void setTimer(Timer timer) {
+		this.timer = timer;
 	}
 
 	/**
@@ -70,30 +80,11 @@ public class ExpireNodesTimer implements StopHandlerConsumer {
 	 * Main
 	 */
 
-	/** the timer from which the expiry task runs */
-	private Timer timer = null;
-
 	public void init() {
 		if (this.interval <= 0) {
 			return;
 		}
 
-		this.timer = new Timer(this.getClass().getSimpleName());
 		this.timer.scheduleAtFixedRate(new ExpiryTimerTask(this.logger, this.expireNodes), 0, this.interval);
-	}
-
-	public void uninit() {
-		if (this.timer != null) {
-			this.timer.cancel();
-			this.timer = null;
-		}
-	}
-
-	@Override
-	public void signalStop() {
-		if (this.timer != null) {
-			this.timer.cancel();
-			this.timer = null;
-		}
 	}
 }

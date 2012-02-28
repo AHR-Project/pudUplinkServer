@@ -14,10 +14,10 @@
 	</bean>
 
 	<bean id="ExpiryNodesTimer"
-		class="nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.expiry.ExpireNodesTimer"
-		destroy-method="uninit">
+		class="nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.expiry.ExpireNodesTimer">
 		<property name="expireNodes" ref="ExpiryNodes" />
 		<property name="interval" value="${node.expiry.interval}" />
+		<property name="timer" ref="Timer" />
 	</bean>
 
 </beans>

@@ -12,6 +12,7 @@
 		<property name="intervalWireFormat" value="${report.once.interval.wireformat}" />
 		<property name="intervalDuplicateNames" value="${report.once.interval.duplicate.names}" />
 		<property name="reportOnce" ref="ReportOnce" />
+		<property name="timer" ref="Timer" />
 	</bean>
 
 </beans>
