@@ -13,6 +13,7 @@ import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.PositionUpdateMsgs;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.RelayServers;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.domainmodel.Node;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.domainmodel.PositionUpdateMsg;
+import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.domainmodel.RelayServer;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.domainmodel.Sender;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.util.TxChecker;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.distributor.DistributorWorker;
@@ -190,14 +191,23 @@ public class DistributorWorkerImpl implements DistributorWorker {
 				this.logger.debug("*** Have to distribute <" + this.lastDistributionTime + ", " + currentTime + "]");
 			}
 
-			List<List<Node>> clusters = this.nodes.getClusters(this.relayServers.getMe());
+			RelayServer me = this.relayServers.getMe();
+			List<List<Node>> clusters = this.nodes.getClusters(me);
 			if (clusters != null) {
 				for (List<Node> cluster : clusters) {
 					for (Node clusterLeaderNode : cluster) {
 						Sender clusterLeaderNodeSender = clusterLeaderNode.getSender();
 						if (clusterLeaderNodeSender == null) {
-							this.logger.debug("Cluster leader " + clusterLeaderNode.getMainIp() + " has no sender: skipped");
+							this.logger.debug("Cluster leader " + clusterLeaderNode.getMainIp()
+									+ " has no sender: skipped to choose a different one");
 							continue;
+						}
+
+						RelayServer clusterLeaderNodeRelayServer = clusterLeaderNodeSender.getRelayServer();
+						if (clusterLeaderNodeRelayServer != me) {
+							this.logger.debug("Cluster leader " + clusterLeaderNode.getMainIp()
+									+ " did not report to me: cluster skipped");
+							break;
 						}
 
 						if (this.logger.isDebugEnabled()) {
