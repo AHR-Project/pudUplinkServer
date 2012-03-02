@@ -16,7 +16,8 @@
 	</bean>
 
 	<bean id="Distributor"
-		class="nl.mindef.c2sc.nbs.olsr.pud.uplink.server.distributor.impl.DistributorImpl">
+		class="nl.mindef.c2sc.nbs.olsr.pud.uplink.server.distributor.impl.DistributorImpl"
+		init-method="init">
 		<property name="distributionDelay" value="${distribution.delay}" />
 		<property name="distributorWorker" ref="DistributorWorker" />
 		<property name="timer" ref="Timer" />

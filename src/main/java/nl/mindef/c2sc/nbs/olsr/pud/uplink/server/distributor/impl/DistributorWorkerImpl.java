@@ -6,7 +6,6 @@ import java.net.DatagramSocket;
 import java.net.InetSocketAddress;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.Nodes;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.PositionUpdateMsgs;
@@ -177,111 +176,108 @@ public class DistributorWorkerImpl implements DistributorWorker {
 
 	@Override
 	@Transactional(readOnly = true)
-	public void distribute(AtomicInteger signaledUpdates) {
+	public void distribute() {
 		try {
 			this.txChecker.checkInTx("DistributorWorker::distribute");
 		} catch (Throwable e) {
 			e.printStackTrace();
 		}
 
-		while (signaledUpdates.getAndSet(0) > 0) {
-			long currentTime = System.currentTimeMillis();
+		long currentTime = System.currentTimeMillis();
 
-			if (this.logger.isDebugEnabled()) {
-				this.logger.debug("*** Have to distribute <" + this.lastDistributionTime + ", " + currentTime + "]");
-			}
+		if (this.logger.isDebugEnabled()) {
+			this.logger.debug("*** Have to distribute <" + this.lastDistributionTime + ", " + currentTime + "]");
+		}
 
-			RelayServer me = this.relayServers.getMe();
-			List<List<Node>> clusters = this.nodes.getClusters(me);
-			if (clusters != null) {
-				for (List<Node> cluster : clusters) {
-					for (Node clusterLeaderNode : cluster) {
-						Sender clusterLeaderNodeSender = clusterLeaderNode.getSender();
-						if (clusterLeaderNodeSender == null) {
-							this.logger.debug("Cluster leader " + clusterLeaderNode.getMainIp()
-									+ " has no sender: skipped to choose a different one");
-							continue;
-						}
+		RelayServer me = this.relayServers.getMe();
+		List<List<Node>> clusters = this.nodes.getClusters(me);
+		if (clusters != null) {
+			for (List<Node> cluster : clusters) {
+				for (Node clusterLeaderNode : cluster) {
+					Sender clusterLeaderNodeSender = clusterLeaderNode.getSender();
+					if (clusterLeaderNodeSender == null) {
+						this.logger.debug("Cluster leader " + clusterLeaderNode.getMainIp()
+								+ " has no sender: skipped to choose a different one");
+						continue;
+					}
 
-						RelayServer clusterLeaderNodeRelayServer = clusterLeaderNodeSender.getRelayServer();
-						if (clusterLeaderNodeRelayServer != me) {
-							this.logger.debug("Cluster leader " + clusterLeaderNode.getMainIp()
-									+ " did not report to me: cluster skipped");
-							break;
-						}
-
-						if (this.logger.isDebugEnabled()) {
-							this.logger.debug("*** cluster leader " + clusterLeaderNode.getMainIp().getHostAddress() + " (sender="
-									+ clusterLeaderNodeSender.getIp().getHostAddress() + ":" + clusterLeaderNodeSender.getPort() + ")");
-						}
-
-						if ((this.myIPAddresses.isMe(clusterLeaderNodeSender.getIp()) || this.myIPAddresses.isMe(clusterLeaderNode
-								.getMainIp())) && (clusterLeaderNodeSender.getPort().intValue() == this.uplinkUdpPort)) {
-							/* do not distribute to ourselves */
-							if (this.logger.isDebugEnabled()) {
-								this.logger.debug("this is me: skipping");
-							}
-							break;
-						}
-
-						List<PositionUpdateMsg> p4ds = this.positions.getPositionUpdateMsgForDistribution(
-								this.lastDistributionTime, currentTime, cluster);
-						if ((p4ds == null) || (p4ds.size() == 0)) {
-							if (this.logger.isDebugEnabled()) {
-								this.logger.debug("p4ds EMPTY");
-							}
-							break;
-						}
-
-						if (this.logger.isDebugEnabled()) {
-							StringBuilder s = new StringBuilder();
-							s.append("p4ds(" + p4ds.size() + ")=");
-							for (PositionUpdateMsg p4d : p4ds) {
-								s.append(" " + p4d.getId());
-							}
-							this.logger.debug(s.toString());
-						}
-
-						List<DatagramPacket> packets = positionUpdateMsgsToPackets(p4ds);
-						if ((packets != null) && (packets.size() > 0)) {
-							StringBuilder s = new StringBuilder();
-							if (this.logger.isDebugEnabled()) {
-								s.setLength(0);
-								s.append("tx " + packets.size() + " packet(s) to " + clusterLeaderNode.getMainIp().getHostAddress()
-										+ " (sender=" + clusterLeaderNodeSender.getIp().getHostAddress() + ":"
-										+ clusterLeaderNodeSender.getPort() + "), sizes=");
-							}
-
-							for (DatagramPacket packet : packets) {
-								if (this.logger.isDebugEnabled()) {
-									s.append(" " + packet.getLength());
-								}
-								packet.setAddress(clusterLeaderNodeSender.getIp());
-								packet.setPort(clusterLeaderNodeSender.getPort().intValue());
-								try {
-									this.sock.send(packet);
-								} catch (IOException e) {
-									if (this.logger.isDebugEnabled()) {
-										s.append(" ERROR:" + e.getLocalizedMessage());
-										this.logger.debug(s.toString());
-									}
-									this.logger.error("Could not send to cluster leader "
-											+ clusterLeaderNode.getMainIp().getHostAddress() + " (sender="
-											+ clusterLeaderNodeSender.getIp().getHostAddress() + ":" + clusterLeaderNodeSender.getPort()
-											+ ") : " + e.getLocalizedMessage());
-								}
-							}
-							if (this.logger.isDebugEnabled()) {
-								this.logger.debug(s.toString());
-							}
-						}
-
+					RelayServer clusterLeaderNodeRelayServer = clusterLeaderNodeSender.getRelayServer();
+					if (clusterLeaderNodeRelayServer != me) {
+						this.logger.debug("Cluster leader " + clusterLeaderNode.getMainIp()
+								+ " did not report to me: cluster skipped");
 						break;
 					}
+
+					if (this.logger.isDebugEnabled()) {
+						this.logger.debug("*** cluster leader " + clusterLeaderNode.getMainIp().getHostAddress() + " (sender="
+								+ clusterLeaderNodeSender.getIp().getHostAddress() + ":" + clusterLeaderNodeSender.getPort() + ")");
+					}
+
+					if ((this.myIPAddresses.isMe(clusterLeaderNodeSender.getIp()) || this.myIPAddresses.isMe(clusterLeaderNode
+							.getMainIp())) && (clusterLeaderNodeSender.getPort().intValue() == this.uplinkUdpPort)) {
+						/* do not distribute to ourselves */
+						if (this.logger.isDebugEnabled()) {
+							this.logger.debug("this is me: skipping");
+						}
+						break;
+					}
+
+					List<PositionUpdateMsg> p4ds = this.positions.getPositionUpdateMsgForDistribution(this.lastDistributionTime,
+							currentTime, cluster);
+					if ((p4ds == null) || (p4ds.size() == 0)) {
+						if (this.logger.isDebugEnabled()) {
+							this.logger.debug("p4ds EMPTY");
+						}
+						break;
+					}
+
+					if (this.logger.isDebugEnabled()) {
+						StringBuilder s = new StringBuilder();
+						s.append("p4ds(" + p4ds.size() + ")=");
+						for (PositionUpdateMsg p4d : p4ds) {
+							s.append(" " + p4d.getId());
+						}
+						this.logger.debug(s.toString());
+					}
+
+					List<DatagramPacket> packets = positionUpdateMsgsToPackets(p4ds);
+					if ((packets != null) && (packets.size() > 0)) {
+						StringBuilder s = new StringBuilder();
+						if (this.logger.isDebugEnabled()) {
+							s.setLength(0);
+							s.append("tx " + packets.size() + " packet(s) to " + clusterLeaderNode.getMainIp().getHostAddress()
+									+ " (sender=" + clusterLeaderNodeSender.getIp().getHostAddress() + ":"
+									+ clusterLeaderNodeSender.getPort() + "), sizes=");
+						}
+
+						for (DatagramPacket packet : packets) {
+							if (this.logger.isDebugEnabled()) {
+								s.append(" " + packet.getLength());
+							}
+							packet.setAddress(clusterLeaderNodeSender.getIp());
+							packet.setPort(clusterLeaderNodeSender.getPort().intValue());
+							try {
+								this.sock.send(packet);
+							} catch (IOException e) {
+								if (this.logger.isDebugEnabled()) {
+									s.append(" ERROR:" + e.getLocalizedMessage());
+									this.logger.debug(s.toString());
+								}
+								this.logger.error("Could not send to cluster leader " + clusterLeaderNode.getMainIp().getHostAddress()
+										+ " (sender=" + clusterLeaderNodeSender.getIp().getHostAddress() + ":"
+										+ clusterLeaderNodeSender.getPort() + ") : " + e.getLocalizedMessage());
+							}
+						}
+						if (this.logger.isDebugEnabled()) {
+							this.logger.debug(s.toString());
+						}
+					}
+
+					break;
 				}
 			}
-
-			this.lastDistributionTime = currentTime;
 		}
+
+		this.lastDistributionTime = currentTime;
 	}
 }

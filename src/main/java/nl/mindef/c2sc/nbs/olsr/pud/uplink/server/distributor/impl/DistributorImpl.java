@@ -2,7 +2,7 @@ package nl.mindef.c2sc.nbs.olsr.pud.uplink.server.distributor.impl;
 
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.distributor.Distributor;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.distributor.DistributorWorker;
@@ -53,7 +53,7 @@ public class DistributorImpl implements Distributor {
 		private DistributorWorker distributorWorker;
 
 		@SuppressWarnings("hiding")
-		private AtomicInteger signaledUpdates;
+		private AtomicBoolean signaledUpdates;
 
 		/**
 		 * @param logger
@@ -63,7 +63,7 @@ public class DistributorImpl implements Distributor {
 		 * @param signaledUpdates
 		 *          the updates counter
 		 */
-		protected DistributionTimerTask(Logger logger, DistributorWorker distributorWorker, AtomicInteger signaledUpdates) {
+		protected DistributionTimerTask(Logger logger, DistributorWorker distributorWorker, AtomicBoolean signaledUpdates) {
 			super();
 			this.logger = logger;
 			this.distributorWorker = distributorWorker;
@@ -73,21 +73,25 @@ public class DistributorImpl implements Distributor {
 		@Override
 		public void run() {
 			try {
-				this.distributorWorker.distribute(this.signaledUpdates);
+				if (this.signaledUpdates.getAndSet(false)) {
+					this.distributorWorker.distribute();
+				}
 			} catch (Throwable e) {
 				this.logger.error("error during distribution", e);
 			}
 		}
 	}
 
-	private AtomicInteger signaledUpdates = new AtomicInteger(0);
+	private AtomicBoolean signaledUpdates = new AtomicBoolean(false);
+
+	public void init() {
+		this.timer.scheduleAtFixedRate(
+				new DistributionTimerTask(this.logger, this.distributorWorker, this.signaledUpdates), this.distributionDelay,
+				this.distributionDelay);
+	}
 
 	@Override
 	public void signalUpdate() {
-		int previousSignaledUpdates = this.signaledUpdates.getAndIncrement();
-		if (previousSignaledUpdates <= 0) {
-			this.timer.schedule(new DistributionTimerTask(this.logger, this.distributorWorker, this.signaledUpdates),
-					this.distributionDelay);
-		}
+		this.signaledUpdates.set(true);
 	}
 }
