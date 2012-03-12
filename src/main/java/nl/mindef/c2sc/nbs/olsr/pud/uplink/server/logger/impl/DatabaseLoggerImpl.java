@@ -202,17 +202,17 @@ public class DatabaseLoggerImpl implements DatabaseLogger {
 	 * Main
 	 */
 
-	private static final String dotNodeTemplateSimple = "\n%s%s [shape=%s,style=filled,fillcolor=%s,label=\"%s\"]\n";
+	private static final String dotNodeTemplateSimple = "\n%s%s [shape=%s,style=filled,fillcolor=%s,label=\"%s\"%s]\n";
 
 	private static final String dotNodeTemplateFullIp = "\n%s%s [shape=box, margin=0, label=<\n"
 			+ "    <table border=\"0\" cellborder=\"1\" cellspacing=\"2\" cellpadding=\"4\">\n"
 			+ "      <tr><td bgcolor=\"%s\">%s</td></tr>\n" + "      <tr><td bgcolor=\"%s\">%s</td></tr>\n"
-			+ "    </table>>];\n";
+			+ "    </table>>%s];\n";
 
 	private static final String dotNodeTemplateFull = "\n%s%s [shape=box, margin=0, label=<\n"
 			+ "    <table border=\"0\" cellborder=\"1\" cellspacing=\"2\" cellpadding=\"4\">\n"
 			+ "      <tr><td bgcolor=\"%s\">%s</td></tr>\n" + "      <tr><td bgcolor=\"%s\">%s</td></tr>\n"
-			+ "      <tr><td bgcolor=\"%s\">%s</td></tr>\n" + "    </table>>];\n";
+			+ "      <tr><td bgcolor=\"%s\">%s</td></tr>\n" + "    </table>>%s];\n";
 
 	private static final String shapeNormal = "ellipse";
 	private static final String shapeClusterLeader = "box";
@@ -255,15 +255,16 @@ public class DatabaseLoggerImpl implements DatabaseLogger {
 
 		String nodeName = getNodeNameOrIp(node);
 
-		formatterSimple.format(dotNodeTemplateSimple, indent, nodeId, nodeShape, nodeSimpleColor, nodeName);
+		String url = (sender == null) ? "" : ", URL=\"http://" + sender.getIp().getHostAddress() + "\"";
+		formatterSimple.format(dotNodeTemplateSimple, indent, nodeId, nodeShape, nodeSimpleColor, nodeName, url);
 		if ((nodePUMsg == null) || (nodePUMsg.getPositionUpdateNodeIdType() == 4)
 				|| (nodePUMsg.getPositionUpdateNodeIdType() == 6)) {
 			/* use IP variant */
-			formatterFull.format(dotNodeTemplateFullIp, indent, nodeId, nodeColor, nodeName, senderColor, senderIP);
+			formatterFull.format(dotNodeTemplateFullIp, indent, nodeId, nodeColor, nodeName, senderColor, senderIP, url);
 		} else {
 			/* use named variant */
 			formatterFull.format(dotNodeTemplateFull, indent, nodeId, nodeColor, nodeName, colorFullOk, nodeIP, senderColor,
-					senderIP);
+					senderIP, url);
 		}
 
 		/* now write graph */
