@@ -202,7 +202,7 @@ public class DatabaseLoggerImpl implements DatabaseLogger {
 	 * Main
 	 */
 
-	private static final String dotNodeTemplateSimple = "\n%s%s [shape=%s,style=filled,fillcolor=%s,label=\"%s\"%s]\n";
+	private static final String dotNodeTemplateSimple = "\n%s%s [shape=%s, style=filled, fillcolor=%s, label=\"%s\"%s]\n";
 
 	private static final String dotNodeTemplateFullIp = "\n%s%s [shape=box, margin=0, label=<\n"
 			+ "    <table border=\"0\" cellborder=\"1\" cellspacing=\"2\" cellpadding=\"4\">\n"
