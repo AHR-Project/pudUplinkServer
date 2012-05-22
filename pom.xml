@@ -34,6 +34,8 @@
 		<project.gitsha>${project.build.directory}/gitsha</project.gitsha>
 		<project.startscript>relayserver</project.startscript>
 		<project.sysvscript>ahrrs</project.sysvscript>
+		<project.rs.properties>relayserver.properties</project.rs.properties>
+		<project.log.properties>log4j.properties</project.log.properties>
 
 		<!-- DEBUG settings -->
 		<project.faker.use.boolean>false</project.faker.use.boolean>
@@ -62,6 +64,79 @@
 			</plugin>
 		</plugins>
 	</reporting>
+
+	<profiles>
+		<profile>
+			<id>local</id>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
+		</profile>
+		<profile>
+			<id>ahr</id>
+			<properties>
+				<var.log.dir>/var/log/</var.log.dir>
+				<var.run.dir>/var/run/</var.run.dir>
+			</properties>
+			<build>
+				<pluginManagement>
+					<plugins>
+						<plugin>
+							<groupId>com.google.code.maven-replacer-plugin</groupId>
+							<artifactId>maven-replacer-plugin</artifactId>
+							<version>1.4.1</version>
+							<executions>
+								<execution>
+									<id>replace-log4j-properties</id>
+									<phase>package</phase>
+									<goals>
+										<goal>replace</goal>
+									</goals>
+									<configuration>
+										<file>${project.dist.directory}/${project.configdir}/${project.log.properties}</file>
+										<regex>true</regex>
+										<regexFlags>
+											<regexFlag>MULTILINE</regexFlag>
+										</regexFlags>
+										<replacements>
+											<replacement>
+												<token>=(\s*relayserver[^\.]*\.log)\s*$</token>
+												<value>=${var.log.dir}$1</value>
+											</replacement>
+										</replacements>
+									</configuration>
+								</execution>
+								<execution>
+									<id>replace-relayserver-properties</id>
+									<phase>package</phase>
+									<goals>
+										<goal>replace</goal>
+									</goals>
+									<configuration>
+										<file>${project.dist.directory}/${project.configdir}/${project.rs.properties}</file>
+										<regex>true</regex>
+										<regexFlags>
+											<regexFlag>MULTILINE</regexFlag>
+										</regexFlags>
+										<replacements>
+											<replacement>
+												<token>=(\s*relayserver[^\.]*\.log)\s*$</token>
+												<value>=${var.log.dir}$1</value>
+											</replacement>
+											<replacement>
+												<token>=(\s*relayserver[^\.]*\.(dot|svg))\s*$</token>
+												<value>=${var.run.dir}$1</value>
+											</replacement>
+										</replacements>
+									</configuration>
+								</execution>
+							</executions>
+						</plugin>
+					</plugins>
+				</pluginManagement>
+			</build>
+		</profile>
+	</profiles>
 
 	<build>
 		<pluginManagement>
