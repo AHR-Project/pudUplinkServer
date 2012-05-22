@@ -10,7 +10,7 @@
 ### END INIT INFO
 
 NAME="ahrrs"
-DAEMON=/usr/local/lib/pudUplinkServer/relayserver
+DAEMON=__project.usrlocaldir__relayserver
 PID_FILE=/var/run/$NAME.pid
 test -x $DAEMON || exit 0
 

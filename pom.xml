@@ -23,11 +23,15 @@
 
 		<project.configdir>config</project.configdir>
 		<project.dist.directory>dist</project.dist.directory>
+		<project.etcdir>/etc/init.d/</project.etcdir>
+		<project.usrdir>/usr/lib/</project.usrdir>
 		<project.libdir>libs</project.libdir>
 		<project.scripts.directory>scripts</project.scripts.directory>
 		<project.spring.directory>src/main/resources/META-INF/spring</project.spring.directory>
 		<project.javadoc.directory>doc/javadoc</project.javadoc.directory>
 
+		<project.wireformat.c.dir>${project.basedir}/../nbsolsrd/lib/pud/wireformat/lib</project.wireformat.c.dir>
+		<project.wireformat.c.so>libOlsrdPudWireFormat.so</project.wireformat.c.so>
 		<project.wireformat.dir>${project.basedir}/../nbsolsrd/lib/pud/wireformat-java/lib</project.wireformat.dir>
 		<project.wireformat.so>libOlsrdPudWireFormatJava.so</project.wireformat.so>
 		<project.wireformat.jar>OlsrdPudWireFormatJava.jar</project.wireformat.jar>
@@ -36,6 +40,8 @@
 		<project.sysvscript>ahrrs</project.sysvscript>
 		<project.rs.properties>relayserver.properties</project.rs.properties>
 		<project.log.properties>log4j.properties</project.log.properties>
+		<project.var.log.dir>/var/log/</project.var.log.dir>
+		<project.var.run.dir>/var/run/</project.var.run.dir>
 
 		<!-- DEBUG settings -->
 		<project.faker.use.boolean>false</project.faker.use.boolean>
@@ -71,70 +77,15 @@
 			<activation>
 				<activeByDefault>true</activeByDefault>
 			</activation>
+			<properties>
+				<project.usrlocaldir>/usr/lib/pudUplinkServer/</project.usrlocaldir>
+			</properties>
 		</profile>
 		<profile>
 			<id>ahr</id>
 			<properties>
-				<var.log.dir>/var/log/</var.log.dir>
-				<var.run.dir>/var/run/</var.run.dir>
+				<project.usrlocaldir>/usr/local/lib/pudUplinkServer/</project.usrlocaldir>
 			</properties>
-			<build>
-				<pluginManagement>
-					<plugins>
-						<plugin>
-							<groupId>com.google.code.maven-replacer-plugin</groupId>
-							<artifactId>maven-replacer-plugin</artifactId>
-							<version>1.4.1</version>
-							<executions>
-								<execution>
-									<id>replace-log4j-properties</id>
-									<phase>package</phase>
-									<goals>
-										<goal>replace</goal>
-									</goals>
-									<configuration>
-										<file>${project.dist.directory}/${project.configdir}/${project.log.properties}</file>
-										<regex>true</regex>
-										<regexFlags>
-											<regexFlag>MULTILINE</regexFlag>
-										</regexFlags>
-										<replacements>
-											<replacement>
-												<token>=(\s*relayserver[^\.]*\.log)\s*$</token>
-												<value>=${var.log.dir}$1</value>
-											</replacement>
-										</replacements>
-									</configuration>
-								</execution>
-								<execution>
-									<id>replace-relayserver-properties</id>
-									<phase>package</phase>
-									<goals>
-										<goal>replace</goal>
-									</goals>
-									<configuration>
-										<file>${project.dist.directory}/${project.configdir}/${project.rs.properties}</file>
-										<regex>true</regex>
-										<regexFlags>
-											<regexFlag>MULTILINE</regexFlag>
-										</regexFlags>
-										<replacements>
-											<replacement>
-												<token>=(\s*relayserver[^\.]*\.log)\s*$</token>
-												<value>=${var.log.dir}$1</value>
-											</replacement>
-											<replacement>
-												<token>=(\s*relayserver[^\.]*\.(dot|svg))\s*$</token>
-												<value>=${var.run.dir}$1</value>
-											</replacement>
-										</replacements>
-									</configuration>
-								</execution>
-							</executions>
-						</plugin>
-					</plugins>
-				</pluginManagement>
-			</build>
 		</profile>
 	</profiles>
 
@@ -273,7 +224,7 @@
 						<configuration>
 							<overWriteReleases>true</overWriteReleases>
 							<overWriteSnapshots>true</overWriteSnapshots>
-							<outputDirectory>${project.dist.directory}/${project.libdir}</outputDirectory>
+							<outputDirectory>${project.dist.directory}${project.usrlocaldir}${project.libdir}</outputDirectory>
 						</configuration>
 					</execution>
 				</executions>
@@ -292,7 +243,7 @@
 						</goals>
 						<configuration>
 							<overwrite>true</overwrite>
-							<outputDirectory>${project.dist.directory}</outputDirectory>
+							<outputDirectory>${project.dist.directory}${project.usrlocaldir}</outputDirectory>
 							<resources>
 								<resource>
 									<directory>${project.build.directory}</directory>
@@ -311,10 +262,29 @@
 						</goals>
 						<configuration>
 							<overwrite>true</overwrite>
-							<outputDirectory>${project.dist.directory}/${project.configdir}</outputDirectory>
+							<outputDirectory>${project.dist.directory}${project.usrlocaldir}${project.configdir}</outputDirectory>
 							<resources>
 								<resource>
 									<directory>${project.configdir}</directory>
+								</resource>
+							</resources>
+						</configuration>
+					</execution>
+					<execution>
+						<id>copy-resources-wireformat-c</id>
+						<phase>package</phase>
+						<goals>
+							<goal>copy-resources</goal>
+						</goals>
+						<configuration>
+							<overwrite>true</overwrite>
+							<outputDirectory>${project.dist.directory}${project.usrdir}</outputDirectory>
+							<resources>
+								<resource>
+									<directory>${project.wireformat.c.dir}</directory>
+									<includes>
+										<include>${project.wireformat.c.so}</include>
+									</includes>
 								</resource>
 							</resources>
 						</configuration>
@@ -327,13 +297,32 @@
 						</goals>
 						<configuration>
 							<overwrite>true</overwrite>
-							<outputDirectory>${project.dist.directory}/${project.libdir}</outputDirectory>
+							<outputDirectory>${project.dist.directory}${project.usrlocaldir}${project.libdir}</outputDirectory>
 							<resources>
 								<resource>
 									<directory>${project.wireformat.dir}</directory>
 									<includes>
 										<include>${project.wireformat.so}</include>
 										<include>${project.wireformat.jar}</include>
+									</includes>
+								</resource>
+							</resources>
+						</configuration>
+					</execution>
+					<execution>
+						<id>copy-resources-initd-scripts</id>
+						<phase>package</phase>
+						<goals>
+							<goal>copy-resources</goal>
+						</goals>
+						<configuration>
+							<overwrite>true</overwrite>
+							<outputDirectory>${project.dist.directory}${project.etcdir}</outputDirectory>
+							<resources>
+								<resource>
+									<directory>${project.scripts.directory}/target</directory>
+									<includes>
+										<include>${project.sysvscript}</include>
 									</includes>
 								</resource>
 							</resources>
@@ -347,13 +336,12 @@
 						</goals>
 						<configuration>
 							<overwrite>true</overwrite>
-							<outputDirectory>${project.dist.directory}</outputDirectory>
+							<outputDirectory>${project.dist.directory}${project.usrlocaldir}</outputDirectory>
 							<resources>
 								<resource>
 									<directory>${project.scripts.directory}/target</directory>
 									<includes>
 										<include>${project.startscript}</include>
-										<include>${project.sysvscript}</include>
 									</includes>
 								</resource>
 							</resources>
@@ -387,13 +375,57 @@
 						</configuration>
 					</execution>
 					<execution>
+						<id>replace-log4j-properties</id>
+						<phase>package</phase>
+						<goals>
+							<goal>replace</goal>
+						</goals>
+						<configuration>
+							<file>${project.dist.directory}${project.usrlocaldir}${project.configdir}/${project.log.properties}</file>
+							<regex>true</regex>
+							<regexFlags>
+								<regexFlag>MULTILINE</regexFlag>
+							</regexFlags>
+							<replacements>
+								<replacement>
+									<token>=(\s*relayserver[^\.]*\.log)\s*$</token>
+									<value>=${project.var.log.dir}$1</value>
+								</replacement>
+							</replacements>
+						</configuration>
+					</execution>
+					<execution>
+						<id>replace-relayserver-properties</id>
+						<phase>package</phase>
+						<goals>
+							<goal>replace</goal>
+						</goals>
+						<configuration>
+							<file>${project.dist.directory}${project.usrlocaldir}${project.configdir}/${project.rs.properties}</file>
+							<regex>true</regex>
+							<regexFlags>
+								<regexFlag>MULTILINE</regexFlag>
+							</regexFlags>
+							<replacements>
+								<replacement>
+									<token>=(\s*relayserver[^\.]*\.log)\s*$</token>
+									<value>=${project.var.log.dir}$1</value>
+								</replacement>
+								<replacement>
+									<token>=(\s*relayserver[^\.]*\.(dot|svg))\s*$</token>
+									<value>=${project.var.run.dir}$1</value>
+								</replacement>
+							</replacements>
+						</configuration>
+					</execution>
+					<execution>
 						<id>replace-relayserver-script-vars</id>
 						<phase>package</phase>
 						<goals>
 							<goal>replace</goal>
 						</goals>
 						<configuration>
-							<file>${project.dist.directory}/relayserver</file>
+							<file>${project.dist.directory}${project.usrlocaldir}${project.startscript}</file>
 							<regex>false</regex>
 							<replacements>
 								<replacement>
@@ -403,6 +435,23 @@
 								<replacement>
 									<token>__project.libdir__</token>
 									<value>${project.libdir}</value>
+								</replacement>
+							</replacements>
+						</configuration>
+					</execution>
+					<execution>
+						<id>replace-relayserver-initd-script-vars</id>
+						<phase>package</phase>
+						<goals>
+							<goal>replace</goal>
+						</goals>
+						<configuration>
+							<file>${project.dist.directory}${project.etcdir}${project.sysvscript}</file>
+							<regex>false</regex>
+							<replacements>
+								<replacement>
+									<token>__project.usrlocaldir__</token>
+									<value>${project.usrlocaldir}</value>
 								</replacement>
 							</replacements>
 						</configuration>
@@ -438,9 +487,9 @@
 							<executable>chmod</executable>
 							<arguments>
 								<argument>755</argument>
-								<argument>${project.dist.directory}/${project.startscript}</argument>
-								<argument>${project.dist.directory}/${project.sysvscript}</argument>
-								<argument>${project.dist.directory}/${project.libdir}/${project.wireformat.so}</argument>
+								<argument>${project.dist.directory}${project.usrlocaldir}${project.startscript}</argument>
+								<argument>${project.dist.directory}${project.etcdir}${project.sysvscript}</argument>
+								<argument>${project.dist.directory}${project.usrlocaldir}${project.libdir}/${project.wireformat.so}</argument>
 							</arguments>
 						</configuration>
 					</execution>
