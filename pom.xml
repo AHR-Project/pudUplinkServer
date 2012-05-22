@@ -252,6 +252,7 @@
 						</manifest>
 						<manifestEntries>
 							<Class-Path>${project.configdir}/ ${project.libdir}/${project.wireformat.jar}</Class-Path>
+							<Git-Descriptor>${git.descriptor}</Git-Descriptor>
 							<Git-SHA>${git.sha}</Git-SHA>
 						</manifestEntries>
 					</archive>
