@@ -1,4 +1,3 @@
-#Sun Jan 15 01:03:13 CET 2012
 eclipse.preferences.version=1
 org.eclipse.jdt.core.compiler.doc.comment.support=enabled
 org.eclipse.jdt.core.compiler.problem.annotationSuperInterface=warning
@@ -77,8 +76,8 @@ org.eclipse.jdt.core.compiler.problem.unusedImport=warning
 org.eclipse.jdt.core.compiler.problem.unusedLabel=warning
 org.eclipse.jdt.core.compiler.problem.unusedLocal=warning
 org.eclipse.jdt.core.compiler.problem.unusedObjectAllocation=warning
-org.eclipse.jdt.core.compiler.problem.unusedParameter=ignore
-org.eclipse.jdt.core.compiler.problem.unusedParameterIncludeDocCommentReference=enabled
+org.eclipse.jdt.core.compiler.problem.unusedParameter=warning
+org.eclipse.jdt.core.compiler.problem.unusedParameterIncludeDocCommentReference=disabled
 org.eclipse.jdt.core.compiler.problem.unusedParameterWhenImplementingAbstract=disabled
 org.eclipse.jdt.core.compiler.problem.unusedParameterWhenOverridingConcrete=disabled
 org.eclipse.jdt.core.compiler.problem.unusedPrivateMember=warning
