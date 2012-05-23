@@ -2,7 +2,9 @@
 
 echo "Getting Git SHA into ${1}"
 if [[ ! -d "$(dirname "${1}")" ]]; then
-  mkdir "$(dirname "${1}")"
+  mkdir -p "$(dirname "${1}")"
 fi
-echo "git.sha = $(git rev-list -1 HEAD)" > "${1}"
-echo "git.descriptor = $(git describe --dirty --always)" >> "${1}"
+cat > "${1}" << EOF
+git.sha = $(git rev-list -1 HEAD)
+git.descriptor = $(git describe --dirty --always)
+EOF
