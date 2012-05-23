@@ -159,21 +159,6 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 									</action>
 								</pluginExecution>
 
-								<pluginExecution>
-									<pluginExecutionFilter>
-										<groupId>org.apache.maven.plugins</groupId>
-										<artifactId>maven-clean-plugin</artifactId>
-										<versionRange>[2.4.1,)</versionRange>
-										<goals>
-											<goal>initialize</goal>
-											<goal>clean</goal>
-										</goals>
-									</pluginExecutionFilter>
-									<action>
-										<execute />
-									</action>
-								</pluginExecution>
-
 							</pluginExecutions>
 						</lifecycleMappingMetadata>
 					</configuration>
@@ -199,24 +184,6 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 				<artifactId>maven-clean-plugin</artifactId>
 				<version>2.4.1</version>
 				<executions>
-					<execution>
-						<id>auto-clean</id>
-						<phase>initialize</phase>
-						<goals>
-							<goal>clean</goal>
-						</goals>
-						<configuration>
-							<followSymLinks>false</followSymLinks>
-							<filesets>
-								<fileset>
-									<directory>${basedir}/${project.dist.directory}</directory>
-								</fileset>
-								<fileset>
-									<directory>${basedir}/${project.javadoc.directory}</directory>
-								</fileset>
-							</filesets>
-						</configuration>
-					</execution>
 					<execution>
 						<id>clean-clean</id>
 						<phase>clean</phase>
