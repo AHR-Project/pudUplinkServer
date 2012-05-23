@@ -73,7 +73,7 @@
 
 	<profiles>
 		<profile>
-			<id>local</id>
+			<id>usr</id>
 			<activation>
 				<activeByDefault>true</activeByDefault>
 			</activation>
