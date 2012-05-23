@@ -80,7 +80,7 @@ public class ReportOnceImpl implements ReportOnce {
 				this.subject2Reports.clear();
 				return;
 			}
-			
+
 			if (key == null) {
 				this.subject2Reports.remove(reportSubject);
 				return;

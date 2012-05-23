@@ -15,16 +15,16 @@ import org.apache.log4j.Logger;
  */
 public interface PositionUpdateMsgs {
 	/**
-	 * Retrieve the PositionUpdateMsg objects that must be distributed to the given cluster. A PositionUpdateMsg
-	 * must be distributed if its reception time is later than startTime and at latest endTime.
+	 * Retrieve the PositionUpdateMsg objects that must be distributed to the given cluster. A PositionUpdateMsg must be
+	 * distributed if its reception time is later than startTime and at latest endTime.
 	 * 
 	 * @param startTime
 	 *          the startTime of the reception time window
 	 * @param endTime
 	 *          the endTime of the reception time window
 	 * @param cluster
-	 *          the cluster for which the objects must be retrieved. When null, then just retrieve all objects that
-	 *          must be distributed
+	 *          the cluster for which the objects must be retrieved. When null, then just retrieve all objects that must
+	 *          be distributed
 	 * @return the list of objects that must be distributed, or null when none found
 	 */
 	public List<PositionUpdateMsg> getPositionUpdateMsgForDistribution(long startTime, long endTime, List<Node> cluster);

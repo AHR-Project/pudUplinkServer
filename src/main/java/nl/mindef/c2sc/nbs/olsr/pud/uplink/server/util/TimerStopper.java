@@ -9,9 +9,10 @@ import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.signals.StopHandlerConsumer;
 public class TimerStopper implements StopHandlerConsumer {
 
 	private Timer timer;
-	
+
 	/**
-	 * @param timer the timer to set
+	 * @param timer
+	 *          the timer to set
 	 */
 	@Required
 	public final void setTimer(Timer timer) {
