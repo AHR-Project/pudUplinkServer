@@ -10,7 +10,7 @@
 ### END INIT INFO
 
 NAME="ahrrs"
-DAEMON=__project.usrlocaldir__relayserver
+DAEMON=__project.startscript__
 PID_FILE=/var/run/$NAME.pid
 test -x $DAEMON || exit 0
 

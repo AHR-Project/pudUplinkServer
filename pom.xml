@@ -450,8 +450,8 @@
 							<regex>false</regex>
 							<replacements>
 								<replacement>
-									<token>__project.usrlocaldir__</token>
-									<value>${project.usrlocaldir}</value>
+									<token>__project.startscript__</token>
+									<value>${project.usrlocaldir}${project.startscript}</value>
 								</replacement>
 							</replacements>
 						</configuration>
