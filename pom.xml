@@ -502,8 +502,9 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 							<executable>chmod</executable>
 							<arguments>
 								<argument>755</argument>
-								<argument>${project.dist.directory}${project.usrlocaldir}${project.startscript}</argument>
 								<argument>${project.dist.directory}${project.etcdir}${project.sysvscript}</argument>
+								<argument>${project.dist.directory}${project.usrdir}${project.wireformat.c.so}</argument>
+								<argument>${project.dist.directory}${project.usrlocaldir}${project.startscript}</argument>
 								<argument>${project.dist.directory}${project.usrlocaldir}${project.libdir}/${project.wireformat.so}</argument>
 							</arguments>
 						</configuration>
