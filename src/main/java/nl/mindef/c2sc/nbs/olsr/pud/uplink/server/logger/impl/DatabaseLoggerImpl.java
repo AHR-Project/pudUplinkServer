@@ -22,6 +22,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
 import java.nio.channels.FileChannel;
 import java.util.Collections;
 import java.util.Comparator;
@@ -34,6 +35,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.constants.Constants;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.ClusterLeaderMsgs;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.Nodes;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.PositionUpdateMsgs;
@@ -292,8 +294,8 @@ public class DatabaseLoggerImpl implements DatabaseLogger {
 			formatterFull.format("%s%s -> %s\n", indent, nodeId, nodeCL.getClusterLeaderNode().getId());
 		}
 
-		gvoss.write(sbSimple.toString().getBytes());
-		gvos.write(sbFull.toString().getBytes());
+		gvoss.write(sbSimple.toString().getBytes(Constants.CHARSET_DEFAULT));
+		gvos.write(sbFull.toString().getBytes(Constants.CHARSET_DEFAULT));
 	}
 
 	protected class NodeNameComparatorOnIp implements Comparator<Node> {
@@ -389,8 +391,8 @@ public class DatabaseLoggerImpl implements DatabaseLogger {
 		this.dotFullFileOSChannel.position(0);
 		String header = "digraph SmartGatewayMap {\n" + "  label=\"OLSR SmartGateway Clusters of " + new Date() + "\"\n"
 				+ "  labelloc=t\n" + "  labeljust=l\n";
-		this.dotSimpleFileOS.write(header.getBytes());
-		this.dotFullFileOS.write(header.getBytes());
+		this.dotSimpleFileOS.write(header.getBytes(Constants.CHARSET_DEFAULT));
+		this.dotFullFileOS.write(header.getBytes(Constants.CHARSET_DEFAULT));
 		try {
 			if (clusters != null) {
 				if (this.detectDuplicateNames) {
@@ -402,8 +404,8 @@ public class DatabaseLoggerImpl implements DatabaseLogger {
 				for (List<Node> cluster : clusters) {
 					String s = ((clusterIndex == 1) ? "" : "\n") + "  subgraph cluster" + clusterIndex++ + " {\n"
 							+ "    label=\"\";\n" + "    style=filled;\n" + "    fillcolor=lightgrey;\n" + "    color=black;\n";
-					this.dotSimpleFileOS.write(s.getBytes());
-					this.dotFullFileOS.write(s.getBytes());
+					this.dotSimpleFileOS.write(s.getBytes(Constants.CHARSET_DEFAULT));
+					this.dotFullFileOS.write(s.getBytes(Constants.CHARSET_DEFAULT));
 					try {
 						for (Node node : cluster) {
 							writeDotNode(this.dotSimpleFileOS, this.dotFullFileOS, node, "    ");
@@ -412,16 +414,16 @@ public class DatabaseLoggerImpl implements DatabaseLogger {
 							}
 						}
 					} finally {
-						this.dotSimpleFileOS.write("  }\n".getBytes());
-						this.dotFullFileOS.write("  }\n".getBytes());
+						this.dotSimpleFileOS.write("  }\n".getBytes(Constants.CHARSET_DEFAULT));
+						this.dotFullFileOS.write("  }\n".getBytes(Constants.CHARSET_DEFAULT));
 					}
 				}
 			}
 		} catch (Exception e) {
 			this.logger.error("Error while generating the dot file", e);
 		} finally {
-			this.dotSimpleFileOS.write("}\n".getBytes());
-			this.dotFullFileOS.write("}\n".getBytes());
+			this.dotSimpleFileOS.write("}\n".getBytes(Constants.CHARSET_DEFAULT));
+			this.dotFullFileOS.write("}\n".getBytes(Constants.CHARSET_DEFAULT));
 		}
 
 		this.dotSimpleFileOS.flush();
@@ -478,7 +480,15 @@ public class DatabaseLoggerImpl implements DatabaseLogger {
 	private FileChannel dotSimpleFileOSChannel = null;
 	private FileOutputStream dotFullFileOS = null;
 	private FileChannel dotFullFileOSChannel = null;
-	private static final byte[] eol = "\n".getBytes();
+	private static final byte[] eol;
+
+	static {
+		try {
+			eol = "\n".getBytes(Constants.CHARSET_DEFAULT);
+		} catch (UnsupportedEncodingException e) {
+			throw new ExceptionInInitializerError(e);
+		}
+	}
 
 	@Override
 	public void init() throws FileNotFoundException {

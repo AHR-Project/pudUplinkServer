@@ -23,6 +23,7 @@ import java.io.OutputStream;
 import java.util.LinkedList;
 import java.util.List;
 
+import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.constants.Constants;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.PositionUpdateMsgs;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.domainmodel.Node;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.domainmodel.PositionUpdateMsg;
@@ -196,6 +197,6 @@ public class PositionUpdateMsgsImpl implements PositionUpdateMsgs {
 		}
 
 		String s = getPositionsDump();
-		out.write(s.getBytes(), 0, s.length());
+		out.write(s.getBytes(Constants.CHARSET_DEFAULT), 0, s.length());
 	}
 }

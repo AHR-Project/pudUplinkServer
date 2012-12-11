@@ -23,6 +23,7 @@ import java.io.OutputStream;
 import java.net.InetAddress;
 import java.util.List;
 
+import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.constants.Constants;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.RelayServers;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.domainmodel.RelayServer;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.util.TxChecker;
@@ -201,6 +202,6 @@ public class RelayServersImpl implements RelayServers {
 		}
 
 		String s = getRelayServersDump();
-		out.write(s.getBytes(), 0, s.length());
+		out.write(s.getBytes(Constants.CHARSET_DEFAULT), 0, s.length());
 	}
 }

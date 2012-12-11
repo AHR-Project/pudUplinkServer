@@ -28,6 +28,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.constants.Constants;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.Nodes;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.domainmodel.ClusterLeaderMsg;
 import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.domainmodel.Node;
@@ -313,6 +314,6 @@ public class NodesImpl implements Nodes {
 		}
 
 		String s = getNodesDump();
-		out.write(s.getBytes(), 0, s.length());
+		out.write(s.getBytes(Constants.CHARSET_DEFAULT), 0, s.length());
 	}
 }
