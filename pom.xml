@@ -70,9 +70,9 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 	</issueManagement>
 
 	<scm>
-		<connection>Git</connection>
-		<developerConnection>Ferry Huberts</developerConnection>
-		<url>git://gitnbs/pudUplinkServer</url>
+		<connection>scm:git:git://github.com/AHR-Project/pudUplinkServer.git</connection>
+		<developerConnection>scm:git:git@github.com:AHR-Project/pudUplinkServer.git</developerConnection>
+		<url>https://github.com/AHR-Project/pudUplinkServer</url>
 	</scm>
 
 	<profiles>
