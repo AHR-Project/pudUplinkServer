@@ -1,2 +1,7 @@
 <FindBugsFilter>
+	<Match>
+		<Class name="nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.util.TxChecker" />
+		<Method name="checkInTx" />
+		<Bug pattern="DLS_DEAD_LOCAL_STORE" />
+	</Match>
 </FindBugsFilter>
