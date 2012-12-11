@@ -81,13 +81,6 @@ public class RelayClusterMessage {
 
 	private byte[] data = null;
 
-	/**
-	 * @return the data
-	 */
-	public final byte[] getData() {
-		return this.data;
-	}
-
 	private static final int VERSION = 0x00;
 	private static final int MAGIC = 0xb6;
 	private static final int MAGIC4 = MAGIC & 0xFE;
