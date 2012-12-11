@@ -63,14 +63,11 @@ public class DistributorImpl implements Distributor {
 		this.timer = timer;
 	}
 
-	protected class DistributionTimerTask extends TimerTask {
-		@SuppressWarnings("hiding")
+	protected static class DistributionTimerTask extends TimerTask {
 		private Logger logger;
 
-		@SuppressWarnings("hiding")
 		private DistributorWorker distributorWorker;
 
-		@SuppressWarnings("hiding")
 		private AtomicBoolean signaledUpdates;
 
 		/**

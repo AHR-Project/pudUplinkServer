@@ -77,11 +77,9 @@ public class ReportOnceTimer {
 	/**
 	 * Timer task that does the actual expiry of out-of-date and empty objects
 	 */
-	private class ExpiryTimerTask extends TimerTask {
-		@SuppressWarnings("hiding")
+	private static class ExpiryTimerTask extends TimerTask {
 		private Logger logger;
 
-		@SuppressWarnings("hiding")
 		private ReportOnce reportOnce;
 
 		private ReportSubject reportSubject;

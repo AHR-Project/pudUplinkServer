@@ -102,8 +102,8 @@ public class NodesImpl implements Nodes {
 		}
 	}
 
-	protected class NodeComparatorOnClusterNodes_ReceptionTime_MainIP implements Comparator<Node> {
-		private int compareInetAddresses(InetAddress ip1, InetAddress ip2) {
+	protected static class NodeComparatorOnClusterNodes_ReceptionTime_MainIP implements Comparator<Node> {
+		private static  int compareInetAddresses(InetAddress ip1, InetAddress ip2) {
 			byte[] ip1a = ip1.getAddress();
 			byte[] ip2a = ip2.getAddress();
 

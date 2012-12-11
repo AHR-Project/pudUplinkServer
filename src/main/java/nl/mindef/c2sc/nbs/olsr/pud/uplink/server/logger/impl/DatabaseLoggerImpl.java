@@ -298,7 +298,7 @@ public class DatabaseLoggerImpl implements DatabaseLogger {
 		gvos.write(sbFull.toString().getBytes(Constants.CHARSET_DEFAULT));
 	}
 
-	protected class NodeNameComparatorOnIp implements Comparator<Node> {
+	protected static class NodeNameComparatorOnIp implements Comparator<Node> {
 		@Override
 		public int compare(Node o1, Node o2) {
 			return o1.getMainIp().getHostAddress().toString().compareTo(o2.getMainIp().getHostAddress().toString());
