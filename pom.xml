@@ -93,20 +93,6 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 		</profile>
 	</profiles>
 
-	<reporting>
-		<plugins>
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>findbugs-maven-plugin</artifactId>
-				<version>2.5.2</version>
-				<configuration>
-					<excludeFilterFile>${project.basedir}/findbugs/findbugs.exclude.xml</excludeFilterFile>
-					<includeFilterFile>${project.basedir}/findbugs/findbugs.include.xml</includeFilterFile>
-				</configuration>
-			</plugin>
-		</plugins>
-	</reporting>
-
 	<build>
 		<pluginManagement>
 			<plugins>
@@ -181,6 +167,70 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 		</pluginManagement>
 
 		<plugins>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>findbugs-maven-plugin</artifactId>
+				<version>2.5.2</version>
+				<configuration>
+					<excludeFilterFile>${project.basedir}/findbugs/findbugs.exclude.xml</excludeFilterFile>
+					<includeFilterFile>${project.basedir}/findbugs/findbugs.include.xml</includeFilterFile>
+					<xmlOutput>true</xmlOutput>
+					<findbugsXmlOutputDirectory>${project.basedir}/target/findbugs</findbugsXmlOutputDirectory>
+					<failOnError>false</failOnError>
+				</configuration>
+				<executions>
+					<execution>
+						<id>verify-findbug</id>
+						<phase>verify</phase>
+						<goals>
+							<goal>check</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>xml-maven-plugin</artifactId>
+				<version>1.0</version>
+				<executions>
+					<execution>
+						<phase>verify</phase>
+						<goals>
+							<goal>transform</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<transformationSets>
+						<transformationSet>
+							<dir>${project.basedir}/target/findbugs</dir>
+							<outputDir>${project.basedir}/target/findbugs/html</outputDir>
+							<stylesheet>default.xsl</stylesheet>
+							<!--
+							<stylesheet>plain.xsl</stylesheet>
+							<stylesheet>fancy.xsl</stylesheet>
+							<stylesheet>fancy-hist.xsl</stylesheet>
+							<stylesheet>summary.xsl</stylesheet>
+							-->
+							<fileMappers>
+								<fileMapper
+									implementation="org.codehaus.plexus.components.io.filemappers.FileExtensionMapper">
+									<targetExtension>.html</targetExtension>
+								</fileMapper>
+							</fileMappers>
+						</transformationSet>
+					</transformationSets>
+				</configuration>
+				<dependencies>
+					<dependency>
+						<groupId>com.google.code.findbugs</groupId>
+						<artifactId>findbugs</artifactId>
+						<version>2.0.0</version>
+					</dependency>
+				</dependencies>
+			</plugin>
+
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
