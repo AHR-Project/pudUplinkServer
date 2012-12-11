@@ -20,6 +20,7 @@ package nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.impl;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.Serializable;
 import java.net.InetAddress;
 import java.util.Collections;
 import java.util.Comparator;
@@ -102,7 +103,9 @@ public class NodesImpl implements Nodes {
 		}
 	}
 
-	protected static class NodeComparatorOnClusterNodes_ReceptionTime_MainIP implements Comparator<Node> {
+	protected static class NodeComparatorOnClusterNodes_ReceptionTime_MainIP implements Comparator<Node>, Serializable {
+		private static final long serialVersionUID = 8059264913324031432L;
+
 		private static  int compareInetAddresses(InetAddress ip1, InetAddress ip2) {
 			byte[] ip1a = ip1.getAddress();
 			byte[] ip2a = ip2.getAddress();

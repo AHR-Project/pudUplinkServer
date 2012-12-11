@@ -22,6 +22,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.nio.channels.FileChannel;
 import java.util.Collections;
@@ -298,7 +299,9 @@ public class DatabaseLoggerImpl implements DatabaseLogger {
 		gvos.write(sbFull.toString().getBytes(Constants.CHARSET_DEFAULT));
 	}
 
-	protected static class NodeNameComparatorOnIp implements Comparator<Node> {
+	protected static class NodeNameComparatorOnIp implements Comparator<Node>, Serializable {
+		private static final long serialVersionUID = -2764537819530543962L;
+
 		@Override
 		public int compare(Node o1, Node o2) {
 			return o1.getMainIp().getHostAddress().toString().compareTo(o2.getMainIp().getHostAddress().toString());
