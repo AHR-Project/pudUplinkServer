@@ -65,8 +65,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 	</properties>
 
 	<issueManagement>
-		<system>Trac</system>
-		<url>http://gitnbs/trac/pudUplinkServer</url>
+		<url>https://github.com/AHR-Project/pudUplinkServer/issues</url>
 	</issueManagement>
 
 	<scm>
