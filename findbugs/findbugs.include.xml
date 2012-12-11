@@ -1,0 +1,68 @@
+<FindBugsFilter>
+     <Match>
+       <Package name="nl.mindef.c2sc.nbs.olsr.pud.uplink.server" />
+     </Match>
+     <Match>
+       <Package name="nl.mindef.c2sc.nbs.olsr.pud.uplink.server.cluster" />
+     </Match>
+     <Match>
+       <Package name="nl.mindef.c2sc.nbs.olsr.pud.uplink.server.cluster.impl" />
+     </Match>
+     <Match>
+       <Package name="nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao" />
+     </Match>
+     <Match>
+       <Package name="nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.domainmodel" />
+     </Match>
+     <Match>
+       <Package name="nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.expiry" />
+     </Match>
+     <Match>
+       <Package name="nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.expiry.impl" />
+     </Match>
+     <Match>
+       <Package name="nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.impl" />
+     </Match>
+     <Match>
+       <Package name="nl.mindef.c2sc.nbs.olsr.pud.uplink.server.dao.util" />
+     </Match>
+     <Match>
+       <Package name="nl.mindef.c2sc.nbs.olsr.pud.uplink.server.distributor" />
+     </Match>
+     <Match>
+       <Package name="nl.mindef.c2sc.nbs.olsr.pud.uplink.server.distributor.impl" />
+     </Match>
+     <Match>
+       <Package name="nl.mindef.c2sc.nbs.olsr.pud.uplink.server.handlers" />
+     </Match>
+     <Match>
+       <Package name="nl.mindef.c2sc.nbs.olsr.pud.uplink.server.handlers.impl" />
+     </Match>
+     <Match>
+       <Package name="nl.mindef.c2sc.nbs.olsr.pud.uplink.server.handlers.impl.debug" />
+     </Match>
+     <Match>
+       <Package name="nl.mindef.c2sc.nbs.olsr.pud.uplink.server.logger" />
+     </Match>
+     <Match>
+       <Package name="nl.mindef.c2sc.nbs.olsr.pud.uplink.server.logger.impl" />
+     </Match>
+     <Match>
+       <Package name="nl.mindef.c2sc.nbs.olsr.pud.uplink.server.reportonce" />
+     </Match>
+     <Match>
+       <Package name="nl.mindef.c2sc.nbs.olsr.pud.uplink.server.reportonce.impl" />
+     </Match>
+     <Match>
+       <Package name="nl.mindef.c2sc.nbs.olsr.pud.uplink.server.signals" />
+     </Match>
+     <Match>
+       <Package name="nl.mindef.c2sc.nbs.olsr.pud.uplink.server.signals.impl" />
+     </Match>
+     <Match>
+       <Package name="nl.mindef.c2sc.nbs.olsr.pud.uplink.server.uplink" />
+     </Match>
+     <Match>
+       <Package name="nl.mindef.c2sc.nbs.olsr.pud.uplink.server.util" />
+     </Match>
+</FindBugsFilter>
