@@ -222,17 +222,17 @@ public class DatabaseLoggerImpl implements DatabaseLogger {
 	 * Main
 	 */
 
-	private static final String dotNodeTemplateSimple = "\n%s%s [shape=%s, style=filled, fillcolor=%s, label=\"%s\"%s]\n";
+	private static final String dotNodeTemplateSimple = "%n%s%s [shape=%s, style=filled, fillcolor=%s, label=\"%s\"%s]%n";
 
-	private static final String dotNodeTemplateFullIp = "\n%s%s [shape=box, margin=0, label=<\n"
-			+ "    <table border=\"0\" cellborder=\"1\" cellspacing=\"2\" cellpadding=\"4\">\n"
-			+ "      <tr><td bgcolor=\"%s\">%s</td></tr>\n" + "      <tr><td bgcolor=\"%s\">%s</td></tr>\n"
-			+ "    </table>>%s];\n";
+	private static final String dotNodeTemplateFullIp = "%n%s%s [shape=box, margin=0, label=<%n"
+			+ "    <table border=\"0\" cellborder=\"1\" cellspacing=\"2\" cellpadding=\"4\">%n"
+			+ "      <tr><td bgcolor=\"%s\">%s</td></tr>%n" + "      <tr><td bgcolor=\"%s\">%s</td></tr>%n"
+			+ "    </table>>%s];%n";
 
-	private static final String dotNodeTemplateFull = "\n%s%s [shape=box, margin=0, label=<\n"
-			+ "    <table border=\"0\" cellborder=\"1\" cellspacing=\"2\" cellpadding=\"4\">\n"
-			+ "      <tr><td bgcolor=\"%s\">%s</td></tr>\n" + "      <tr><td bgcolor=\"%s\">%s</td></tr>\n"
-			+ "      <tr><td bgcolor=\"%s\">%s</td></tr>\n" + "    </table>>%s];\n";
+	private static final String dotNodeTemplateFull = "%n%s%s [shape=box, margin=0, label=<%n"
+			+ "    <table border=\"0\" cellborder=\"1\" cellspacing=\"2\" cellpadding=\"4\">%n"
+			+ "      <tr><td bgcolor=\"%s\">%s</td></tr>%n" + "      <tr><td bgcolor=\"%s\">%s</td></tr>%n"
+			+ "      <tr><td bgcolor=\"%s\">%s</td></tr>%n" + "    </table>>%s];%n";
 
 	private static final String shapeNormal = "ellipse";
 	private static final String shapeClusterLeader = "box";
@@ -290,8 +290,8 @@ public class DatabaseLoggerImpl implements DatabaseLogger {
 		/* now write graph */
 		ClusterLeaderMsg nodeCL = node.getClusterLeaderMsg();
 		if (nodeCL != null) {
-			formatterSimple.format("%s%s -> %s\n", indent, nodeId, nodeCL.getClusterLeaderNode().getId());
-			formatterFull.format("%s%s -> %s\n", indent, nodeId, nodeCL.getClusterLeaderNode().getId());
+			formatterSimple.format("%s%s -> %s%n", indent, nodeId, nodeCL.getClusterLeaderNode().getId());
+			formatterFull.format("%s%s -> %s%n", indent, nodeId, nodeCL.getClusterLeaderNode().getId());
 		}
 
 		gvoss.write(sbSimple.toString().getBytes(Constants.CHARSET_DEFAULT));
