@@ -435,7 +435,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 				<executions>
 					<execution>
 						<id>replace-faker-use</id>
-						<phase>validate</phase>
+						<phase>process-resources</phase>
 						<goals>
 							<goal>replace</goal>
 						</goals>
