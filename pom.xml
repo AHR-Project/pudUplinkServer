@@ -435,7 +435,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 				<executions>
 					<execution>
 						<id>replace-faker-use</id>
-						<phase>process-resources</phase>
+						<phase>generate-resources</phase>
 						<goals>
 							<goal>replace</goal>
 						</goals>
@@ -544,7 +544,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 				<executions>
 					<execution>
 						<id>exec-getGitSha</id>
-						<phase>generate-resources</phase>
+						<phase>generate-sources</phase>
 						<goals>
 							<goal>exec</goal>
 						</goals>
@@ -581,7 +581,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 				<version>1.0-alpha-2</version>
 				<executions>
 					<execution>
-						<phase>process-resources</phase>
+						<phase>process-sources</phase>
 						<goals>
 							<goal>read-project-properties</goal>
 						</goals>
