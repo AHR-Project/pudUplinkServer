@@ -51,6 +51,9 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 		<project.wireformat.c.so>libOlsrdPudWireFormat.so</project.wireformat.c.so>
 		<project.wireformat.dir>${project.basedir}/../nbsolsrd/lib/pud/wireformat-java/lib</project.wireformat.dir>
 		<project.wireformat.so>libOlsrdPudWireFormatJava.so</project.wireformat.so>
+		<project.wireformat.jar.group>org.olsr.plugin.pud</project.wireformat.jar.group>
+		<project.wireformat.jar.name>OlsrdPudWireFormatJava_Internal</project.wireformat.jar.name>
+		<project.wireformat.jar.version>1.1.0</project.wireformat.jar.version>
 		<project.wireformat.jar>OlsrdPudWireFormatJava.jar</project.wireformat.jar>
 		<project.gitsha>${project.build.directory}/gitsha</project.gitsha>
 		<project.startscript>relayserver</project.startscript>
@@ -319,6 +322,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 							<goal>copy-dependencies</goal>
 						</goals>
 						<configuration>
+							<excludeArtifactIds>${project.wireformat.jar.name}</excludeArtifactIds>
 							<overWriteReleases>true</overWriteReleases>
 							<overWriteSnapshots>true</overWriteSnapshots>
 							<outputDirectory>${project.dist.directory}${project.usrlocaldir}${project.libdir}</outputDirectory>
@@ -721,9 +725,9 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 		</dependency>
 
 		<dependency>
-			<groupId>org.olsr</groupId>
-			<artifactId>plugin.pud</artifactId>
-			<version>1.1.0</version>
+			<groupId>${project.wireformat.jar.group}</groupId>
+			<artifactId>${project.wireformat.jar.name}</artifactId>
+			<version>${project.wireformat.jar.version}</version>
 			<scope>system</scope>
 			<systemPath>${project.wireformat.dir}/${project.wireformat.jar}</systemPath>
 		</dependency>
