@@ -39,7 +39,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 		<project.mainclass>nl.mindef.c2sc.nbs.olsr.pud.uplink.server.Main</project.mainclass>
 
 		<project.configdir>config</project.configdir>
-		<project.dist.directory>dist</project.dist.directory>
+		<project.dist.directory>${project.build.directory}/dist</project.dist.directory>
 		<project.etcdir>/etc/init.d/</project.etcdir>
 		<project.usrdir>/usr/lib/</project.usrdir>
 		<project.libdir>libs</project.libdir>
@@ -257,7 +257,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 							<followSymLinks>false</followSymLinks>
 							<filesets>
 								<fileset>
-									<directory>${basedir}/${project.dist.directory}</directory>
+									<directory>${project.dist.directory}</directory>
 								</fileset>
 								<fileset>
 									<directory>${basedir}/${project.javadoc.directory}</directory>
@@ -459,7 +459,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 							<goal>replace</goal>
 						</goals>
 						<configuration>
-							<file>${project.dist.directory}${project.usrlocaldir}${project.configdir}/${project.log.properties}</file>
+							<basedir>${project.dist.directory}</basedir>
+							<file>${project.usrlocaldir}${project.configdir}/${project.log.properties}</file>
 							<regex>true</regex>
 							<regexFlags>
 								<regexFlag>MULTILINE</regexFlag>
@@ -479,7 +480,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 							<goal>replace</goal>
 						</goals>
 						<configuration>
-							<file>${project.dist.directory}${project.usrlocaldir}${project.configdir}/${project.rs.properties}</file>
+							<basedir>${project.dist.directory}</basedir>
+							<file>${project.usrlocaldir}${project.configdir}/${project.rs.properties}</file>
 							<regex>true</regex>
 							<regexFlags>
 								<regexFlag>MULTILINE</regexFlag>
@@ -503,7 +505,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 							<goal>replace</goal>
 						</goals>
 						<configuration>
-							<file>${project.dist.directory}${project.usrlocaldir}${project.startscript}</file>
+							<basedir>${project.dist.directory}</basedir>
+							<file>${project.usrlocaldir}${project.startscript}</file>
 							<regex>false</regex>
 							<replacements>
 								<replacement>
@@ -524,7 +527,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 							<goal>replace</goal>
 						</goals>
 						<configuration>
-							<file>${project.dist.directory}${project.etcdir}${project.sysvscript}</file>
+							<basedir>${project.dist.directory}</basedir>
+							<file>${project.etcdir}${project.sysvscript}</file>
 							<regex>false</regex>
 							<replacements>
 								<replacement>
