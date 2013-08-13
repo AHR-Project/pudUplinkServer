@@ -257,46 +257,61 @@ public class DatabaseLoggerImpl implements DatabaseLogger {
 			throws IllegalFormatException, FormatterClosedException, IOException {
 		StringBuilder sbSimple = new StringBuilder();
 		StringBuilder sbFull = new StringBuilder();
-		Formatter formatterSimple = new Formatter(sbSimple);
-		Formatter formatterFull = new Formatter(sbFull);
+		Formatter formatterSimple = null;
+		Formatter formatterFull = null;
 
-		Sender sender = node.getSender();
-		String senderIP = (sender == null) ? "" : "" + sender.getIp().getHostAddress() + ":" + sender.getPort();
-		String senderColor = (sender == null) ? colorFullNotOk : colorFullOk;
+		try {
+			formatterSimple = new Formatter(sbSimple);
+			formatterFull = new Formatter(sbFull);
 
-		Long nodeId = node.getId();
-		String nodeIP = node.getMainIp().getHostAddress().toString();
+			Sender sender = node.getSender();
+			String senderIP = (sender == null) ? "" : "" + sender.getIp().getHostAddress() + ":" + sender.getPort();
+			String senderColor = (sender == null) ? colorFullNotOk : colorFullOk;
 
-		PositionUpdateMsg nodePU = node.getPositionUpdateMsg();
-		PositionUpdate nodePUMsg = (nodePU == null) ? null : nodePU.getPositionUpdateMsg();
+			Long nodeId = node.getId();
+			String nodeIP = node.getMainIp().getHostAddress().toString();
 
-		String nodeSimpleColor = (nodePUMsg == null) ? colorSimpleNotOk : colorSimpleOk;
-		String nodeColor = (nodePUMsg == null) ? colorFullNotOk : colorFullOk;
-		String nodeShape = node.getClusterNodes().isEmpty() ? shapeNormal : shapeClusterLeader;
+			PositionUpdateMsg nodePU = node.getPositionUpdateMsg();
+			PositionUpdate nodePUMsg = (nodePU == null) ? null : nodePU.getPositionUpdateMsg();
 
-		String nodeName = getNodeNameOrIp(node);
+			String nodeSimpleColor = (nodePUMsg == null) ? colorSimpleNotOk : colorSimpleOk;
+			String nodeColor = (nodePUMsg == null) ? colorFullNotOk : colorFullOk;
+			String nodeShape = node.getClusterNodes().isEmpty() ? shapeNormal : shapeClusterLeader;
 
-		String url = (sender == null) ? "" : ", URL=\"http://" + sender.getIp().getHostAddress() + "\"";
-		formatterSimple.format(dotNodeTemplateSimple, indent, nodeId, nodeShape, nodeSimpleColor, nodeName, url);
-		if ((nodePUMsg == null) || (nodePUMsg.getPositionUpdateNodeIdType() == 4)
-				|| (nodePUMsg.getPositionUpdateNodeIdType() == 6)) {
-			/* use IP variant */
-			formatterFull.format(dotNodeTemplateFullIp, indent, nodeId, nodeColor, nodeName, senderColor, senderIP, url);
-		} else {
-			/* use named variant */
-			formatterFull.format(dotNodeTemplateFull, indent, nodeId, nodeColor, nodeName, colorFullOk, nodeIP, senderColor,
-					senderIP, url);
+			String nodeName = getNodeNameOrIp(node);
+
+			String url = (sender == null) ? "" : ", URL=\"http://" + sender.getIp().getHostAddress() + "\"";
+			formatterSimple.format(dotNodeTemplateSimple, indent, nodeId, nodeShape, nodeSimpleColor, nodeName, url);
+			if ((nodePUMsg == null) || (nodePUMsg.getPositionUpdateNodeIdType() == 4)
+					|| (nodePUMsg.getPositionUpdateNodeIdType() == 6)) {
+				/* use IP variant */
+				formatterFull.format(dotNodeTemplateFullIp, indent, nodeId, nodeColor, nodeName, senderColor, senderIP, url);
+			} else {
+				/* use named variant */
+				formatterFull.format(dotNodeTemplateFull, indent, nodeId, nodeColor, nodeName, colorFullOk, nodeIP,
+						senderColor, senderIP, url);
+			}
+
+			/* now write graph */
+			ClusterLeaderMsg nodeCL = node.getClusterLeaderMsg();
+			if (nodeCL != null) {
+				formatterSimple.format("%s%s -> %s%n", indent, nodeId, nodeCL.getClusterLeaderNode().getId());
+				formatterFull.format("%s%s -> %s%n", indent, nodeId, nodeCL.getClusterLeaderNode().getId());
+			}
+
+			gvoss.write(sbSimple.toString().getBytes(Constants.CHARSET_DEFAULT));
+			gvos.write(sbFull.toString().getBytes(Constants.CHARSET_DEFAULT));
+		} finally {
+			if (formatterSimple != null) {
+				formatterSimple.close();
+				formatterSimple = null;
+			}
+			if (formatterFull != null) {
+				formatterFull.close();
+				formatterFull = null;
+			}
+
 		}
-
-		/* now write graph */
-		ClusterLeaderMsg nodeCL = node.getClusterLeaderMsg();
-		if (nodeCL != null) {
-			formatterSimple.format("%s%s -> %s%n", indent, nodeId, nodeCL.getClusterLeaderNode().getId());
-			formatterFull.format("%s%s -> %s%n", indent, nodeId, nodeCL.getClusterLeaderNode().getId());
-		}
-
-		gvoss.write(sbSimple.toString().getBytes(Constants.CHARSET_DEFAULT));
-		gvos.write(sbFull.toString().getBytes(Constants.CHARSET_DEFAULT));
 	}
 
 	protected static class NodeNameComparatorOnIp implements Comparator<Node>, Serializable {
