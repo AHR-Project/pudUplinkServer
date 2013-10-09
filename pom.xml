@@ -21,7 +21,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 	<groupId>nl.mindef.c2sc.nbs</groupId>
 	<artifactId>olsr.pud.uplink.server</artifactId>
-	<version>1.1.0</version>
+	<version>2.0.0</version>
 	<packaging>jar</packaging>
 
 	<name>olsr.pud.uplink.server</name>

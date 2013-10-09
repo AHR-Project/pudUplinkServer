@@ -79,8 +79,7 @@ public class DumpUtil {
 			s.append(indent + "    *** PudOlsrPositionUpdate ***\n");
 			s.append(String.format(indent + "    version      = %d\n", Integer.valueOf(pu.getPositionUpdateVersion())));
 			s.append(String.format(indent + "    validity     = %d sec\n", Long.valueOf(pu.getPositionUpdateValidityTime())));
-			s.append(String.format(indent + "    smask        = 0x%02x\n", Integer.valueOf(pu.getPositionUpdateSMask())));
-			s.append(String.format(indent + "    flags        = 0x%02x\n", Integer.valueOf(pu.getPositionUpdateFlags())));
+			s.append(String.format(indent + "    present      = 0x%02x\n", Long.valueOf(pu.getPositionUpdatePresent())));
 
 			s.append(indent + "      *** GpsInfo ***\n");
 			s.append(String.format(indent + "      time       = %d\n",
