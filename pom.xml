@@ -697,7 +697,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 		<dependency>
 			<groupId>org.javassist</groupId>
 			<artifactId>javassist</artifactId>
-			<version>3.16.1-GA</version>
+			<version>3.18.2-GA</version>
 		</dependency>
 		<dependency>
 			<groupId>cglib</groupId>
