@@ -30,8 +30,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-		<project.source>1.7</project.source>
-		<project.target>1.7</project.target>
+		<project.source>1.6</project.source>
+		<project.target>1.6</project.target>
 
 		<!-- can be none, or a combination of source,lines,vars -->
 		<project.debug.level>source,lines,vars</project.debug.level>
