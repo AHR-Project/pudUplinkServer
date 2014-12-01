@@ -170,9 +170,9 @@ public class DistributorWorkerImpl implements DistributorWorker {
 			return null;
 		}
 
-		List<DatagramPacket> result = new LinkedList<DatagramPacket>();
+		List<DatagramPacket> result = new LinkedList<>();
 
-		List<PositionUpdateMsg> packetPositionUpdateMsgs = new LinkedList<PositionUpdateMsg>();
+		List<PositionUpdateMsg> packetPositionUpdateMsgs = new LinkedList<>();
 		int packetPositionUpdateMsgsByteCount = 0;
 		for (PositionUpdateMsg positionUpdateMsgToDistribute : positionUpdateMsgsToDistribute) {
 			int positionUpdateMsgLength = positionUpdateMsgToDistribute.getPositionUpdateMsg().getData().length;

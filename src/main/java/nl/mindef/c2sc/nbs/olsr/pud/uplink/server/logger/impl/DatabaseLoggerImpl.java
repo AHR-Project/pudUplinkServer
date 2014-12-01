@@ -330,7 +330,7 @@ public class DatabaseLoggerImpl implements DatabaseLogger {
 		String nodeName = getNodeNameOrIp(node);
 		List<Node> mapping = nodeName2Nodes.get(nodeName);
 		if (mapping == null) {
-			mapping = new LinkedList<Node>();
+			mapping = new LinkedList<>();
 			mapping.add(node);
 			nodeName2Nodes.put(nodeName, mapping);
 		} else {
@@ -386,7 +386,7 @@ public class DatabaseLoggerImpl implements DatabaseLogger {
 		this.logger.debug("Checking for duplicate node names");
 
 		try {
-			Map<String, List<Node>> nodeName2Nodes = new TreeMap<String, List<Node>>();
+			Map<String, List<Node>> nodeName2Nodes = new TreeMap<>();
 
 			for (List<Node> cluster : clusters) {
 				for (Node clusterNode : cluster) {
@@ -414,7 +414,7 @@ public class DatabaseLoggerImpl implements DatabaseLogger {
 		try {
 			if (clusters != null) {
 				if (this.detectDuplicateNames) {
-					nodeName2Nodes = new TreeMap<String, List<Node>>();
+					nodeName2Nodes = new TreeMap<>();
 					this.logger.debug("  and also checking for duplicate node names");
 				}
 

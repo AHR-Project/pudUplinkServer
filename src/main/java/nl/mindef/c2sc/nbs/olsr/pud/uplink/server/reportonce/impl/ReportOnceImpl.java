@@ -29,7 +29,7 @@ import nl.mindef.c2sc.nbs.olsr.pud.uplink.server.reportonce.ReportSubject;
 
 public class ReportOnceImpl implements ReportOnce {
 	private ReentrantLock lock = new ReentrantLock();
-	private Map<ReportSubject, Map<String, Set<String>>> subject2Reports = new TreeMap<ReportSubject, Map<String, Set<String>>>();
+	private Map<ReportSubject, Map<String, Set<String>>> subject2Reports = new TreeMap<>();
 
 	@Override
 	public boolean add(ReportSubject reportSubject, String key, String report) {
@@ -40,13 +40,13 @@ public class ReportOnceImpl implements ReportOnce {
 		try {
 			Map<String, Set<String>> subjectReports = this.subject2Reports.get(reportSubject);
 			if (subjectReports == null) {
-				subjectReports = new TreeMap<String, Set<String>>();
+				subjectReports = new TreeMap<>();
 				this.subject2Reports.put(reportSubject, subjectReports);
 			}
 
 			Set<String> keyReports = subjectReports.get(key);
 			if (keyReports == null) {
-				keyReports = new TreeSet<String>();
+				keyReports = new TreeSet<>();
 				subjectReports.put(key, keyReports);
 			}
 

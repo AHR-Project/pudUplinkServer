@@ -41,7 +41,7 @@ public class StopHandlerImpl implements SignalHandler {
 		this.signal = new Signal(signal);
 	}
 
-	private Set<StopHandlerConsumer> handlers = new TreeSet<StopHandlerConsumer>();
+	private Set<StopHandlerConsumer> handlers = new TreeSet<>();
 
 	/**
 	 * @param handlers

@@ -123,7 +123,7 @@ public class Sender implements Serializable {
 
 	/** the associated nodes */
 	@OneToMany(cascade = CascadeType.ALL, mappedBy = "sender")
-	private Set<Node> nodes = new HashSet<Node>();
+	private Set<Node> nodes = new HashSet<>();
 
 	/**
 	 * @return the nodes
@@ -171,7 +171,7 @@ public class Sender implements Serializable {
 		builder.append((this.relayServer != null) ? this.relayServer.getId() : "");
 		builder.append(", nodes=[");
 		boolean comma = false;
-		Set<Long> ids = new TreeSet<Long>();
+		Set<Long> ids = new TreeSet<>();
 		for (Node node : this.nodes) {
 			ids.add(node.getId());
 		}

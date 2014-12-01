@@ -191,11 +191,11 @@ public class NodesImpl implements Nodes {
 			return null;
 		}
 
-		List<List<Node>> clusters = new LinkedList<List<Node>>();
+		List<List<Node>> clusters = new LinkedList<>();
 
 		while (!allNodes.isEmpty()) {
-			LinkedList<Node> cluster = new LinkedList<Node>();
-			Set<Node> clusterLeaders = new HashSet<Node>();
+			LinkedList<Node> cluster = new LinkedList<>();
+			Set<Node> clusterLeaders = new HashSet<>();
 			addToCluster(allNodes, clusterLeaders, cluster, allNodes.get(0), true);
 			if (cluster.size() > 0) {
 				Collections.sort(cluster, new NodeComparatorOnClusterNodes_ReceptionTime_MainIP());
