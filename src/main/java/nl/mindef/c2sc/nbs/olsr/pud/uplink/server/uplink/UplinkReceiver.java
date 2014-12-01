@@ -136,7 +136,7 @@ public class UplinkReceiver extends Thread implements StopHandlerConsumer {
 		this.relayServers = relayServers;
 	}
 
-	private Set<RelayServer> configuredRelayServers = new HashSet<>();
+	private Set<RelayServer> configuredRelayServers = new HashSet<RelayServer>();
 
 	private static final String ipMatcher = "(\\d{1,3}\\.){0,3}\\d{1,3}";
 	private static final String portMatcher = "\\d{1,5}";

@@ -66,7 +66,7 @@ public class RelayClusterSenderImpl extends Thread implements RelayClusterSender
 	 * Queue
 	 */
 
-	private LinkedBlockingQueue<RelayClusterMessage> packetsToSend = new LinkedBlockingQueue<>();
+	private LinkedBlockingQueue<RelayClusterMessage> packetsToSend = new LinkedBlockingQueue<RelayClusterMessage>();
 
 	@Override
 	public boolean addPacket(RelayServer relayServer, DatagramPacket packet) {
@@ -175,7 +175,7 @@ public class RelayClusterSenderImpl extends Thread implements RelayClusterSender
 				/* swallow */
 			}
 			if (relayClusterMessage != null) {
-				List<RelayClusterMessage> relayClusterMessages = new LinkedList<>();
+				List<RelayClusterMessage> relayClusterMessages = new LinkedList<RelayClusterMessage>();
 				relayClusterMessages.add(relayClusterMessage);
 				this.packetsToSend.drainTo(relayClusterMessages);
 				distribute(relayClusterMessages);

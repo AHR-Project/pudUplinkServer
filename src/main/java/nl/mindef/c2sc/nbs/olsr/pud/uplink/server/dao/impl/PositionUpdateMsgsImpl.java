@@ -83,7 +83,7 @@ public class PositionUpdateMsgsImpl implements PositionUpdateMsgs {
 			+ " pu.receptionTime > :startTime and pu.receptionTime <= :endTime").setLong("startTime", startTime)
 					.setLong("endTime", endTime).list();
 		} else {
-			List<Long> clusterLeaderIds = new LinkedList<>();
+			List<Long> clusterLeaderIds = new LinkedList<Long>();
 			boolean first = true;
 			for (Node clusterNode : cluster) {
 				if (!first && (clusterNode.getClusterNodes().size() == 0)) {

@@ -118,7 +118,7 @@ public class RelayServer implements Serializable {
 
 	/** the senders associated with the relay server */
 	@OneToMany(cascade = CascadeType.ALL, mappedBy = "relayServer")
-	private Set<Sender> senders = new HashSet<>();
+	private Set<Sender> senders = new HashSet<Sender>();
 
 	/**
 	 * @return the senders
@@ -144,7 +144,7 @@ public class RelayServer implements Serializable {
 		builder.append(this.ip.getHostAddress() + ":" + this.port);
 		builder.append(", senders=[");
 		boolean comma = false;
-		Set<Long> ids = new TreeSet<>();
+		Set<Long> ids = new TreeSet<Long>();
 		for (Sender sender : this.senders) {
 			ids.add(sender.getId());
 		}

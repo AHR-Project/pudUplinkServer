@@ -29,7 +29,7 @@ import java.util.Set;
  * Stores the IP addresses of all network interfaces of the machine upon classload
  */
 public class MyIPAddresses {
-	private static final Set<InetAddress> myIpAddresses = new HashSet<>();
+	private static final Set<InetAddress> myIpAddresses = new HashSet<InetAddress>();
 
 	static {
 		try {
