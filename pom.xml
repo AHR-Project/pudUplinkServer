@@ -191,7 +191,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>findbugs-maven-plugin</artifactId>
-				<version>2.5.2</version>
+				<version>3.0.0</version>
 				<configuration>
 					<excludeFilterFile>${project.basedir}/findbugs/findbugs.exclude.xml</excludeFilterFile>
 					<includeFilterFile>${project.basedir}/findbugs/findbugs.include.xml</includeFilterFile>
@@ -247,7 +247,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 					<dependency>
 						<groupId>com.google.code.findbugs</groupId>
 						<artifactId>findbugs</artifactId>
-						<version>2.0.0</version>
+						<version>3.0.0</version>
 					</dependency>
 				</dependencies>
 			</plugin>
