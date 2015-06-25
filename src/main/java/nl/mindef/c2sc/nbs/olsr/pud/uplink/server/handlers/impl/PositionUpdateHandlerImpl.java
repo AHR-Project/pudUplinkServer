@@ -119,7 +119,7 @@ public class PositionUpdateHandlerImpl implements PositionUpdateHandler {
 		InetAddress originator = puMsg.getOlsrMessageOriginator();
 
 		/* retrieve the node that sent the position update */
-		Node originatorNode = this.nodes.getNode(originator);
+		Node originatorNode = ((originator == null) || (this.nodes == null)) ? null : this.nodes.getNode(originator);
 		if (originatorNode == null) {
 			/* new node */
 			originatorNode = new Node(originator, sender);

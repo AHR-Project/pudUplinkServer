@@ -135,16 +135,20 @@ public class ExpireNodesImpl implements ExpireNodes {
 			this.logger.error("Removal of expired position update messages failed", e);
 		}
 
-		try {
-			this.nodes.removeExpiredNodes();
-		} catch (Throwable e) {
-			this.logger.error("Removal of empty nodes failed", e);
+		if (this.nodes != null) {
+			try {
+				this.nodes.removeExpiredNodes();
+			} catch (Throwable e) {
+				this.logger.error("Removal of empty nodes failed", e);
+			}
 		}
 
-		try {
-			this.senders.removeExpiredSenders();
-		} catch (Throwable e) {
-			this.logger.error("Removal of empty senders failed", e);
+		if (this.senders != null) {
+			try {
+				this.senders.removeExpiredSenders();
+			} catch (Throwable e) {
+				this.logger.error("Removal of empty senders failed", e);
+			}
 		}
 	}
 }
