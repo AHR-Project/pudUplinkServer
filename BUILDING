@@ -1,0 +1,46 @@
+
+* Summary
+
+This project is a server that distributes position updates that are received
+from OLSR pud plugin instances over all OLSR meshes.
+
+* Dependencies
+
+This project depends on the olsrd project.
+
+* Setup
+
+Make to have a parallel checkout of the dcmolrc project.
+Ensure the checkout looks like below:
+   <checkout-root>
+             +------- nbsolsrd
+             +------- pudUplinkServer
+
+* Building OLSRd
+
+  * 32 bits
+
+    make prefix=/usr DESTDIR="$(pwd)/dist/debug"   OS="linux" M32=1 DEBUG="1" MAKEBIN=1 cfgparser_install cfgparser_clean
+    make uberclean
+    make prefix=/usr DESTDIR="$(pwd)/dist/release" OS="linux" M32=1 DEBUG="0" MAKEBIN=1 cfgparser_install cfgparser_clean
+    make uberclean
+    make prefix=/usr DESTDIR="$(pwd)/dist/debug"   OS="linux" M32=1 DEBUG="1" build_all gui install_all pud_java pud_java_install
+    make uberclean
+    make prefix=/usr DESTDIR="$(pwd)/dist/release" OS="linux" M32=1 DEBUG="0" build_all gui install_all pud_java pud_java_install
+
+  * 64 bits
+
+    make prefix=/usr DESTDIR="$(pwd)/dist/debug"   OS="linux" M64=1 DEBUG="1" MAKEBIN=1 cfgparser_install cfgparser_clean
+    make uberclean
+    make prefix=/usr DESTDIR="$(pwd)/dist/release" OS="linux" M64=1 DEBUG="0" MAKEBIN=1 cfgparser_install cfgparser_clean
+    make uberclean
+    make prefix=/usr DESTDIR="$(pwd)/dist/debug"   OS="linux" M64=1 DEBUG="1" build_all gui install_all pud_java pud_java_install
+    make uberclean
+    make prefix=/usr DESTDIR="$(pwd)/dist/release" OS="linux" M64=1 DEBUG="0" build_all gui install_all pud_java pud_java_install
+
+* Building pudUplinkServer
+
+  * Everything
+
+    mvn -P ahr verify assembly:single
+
