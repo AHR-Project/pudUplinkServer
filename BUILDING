@@ -10,7 +10,7 @@ This project depends on the olsrd project.
 
 * Setup
 
-Make to have a parallel checkout of the dcmolrc project.
+Make to have a parallel checkout of the nbsolsrd project.
 Ensure the checkout looks like below:
    <checkout-root>
              +------- nbsolsrd
